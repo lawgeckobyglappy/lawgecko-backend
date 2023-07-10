@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
-import morgan from "./shared/middlewares/morgan";
+import morgan from "./shared/middlewares/morgan.middleware";
 import config from "./config/env";
 
 import exampleRoutes from "./api/v1/example";

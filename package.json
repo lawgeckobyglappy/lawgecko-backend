@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "start": "ts-node ./src/server.ts",
-    "start:dev": "nodemon --exec npm run start",
+    "start:dev": "npm run start -- --watch",
     "build": "tsc -p tsconfig.json",
     "format": "prettier \"**/*\" --ignore-unknown",
     "test": "echo \"Error: no test specified\" && exit 1"
