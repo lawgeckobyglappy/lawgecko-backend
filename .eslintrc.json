@@ -1,0 +1,22 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "warnOnUnsupportedTypeScriptVersion": false,
+    "sourceType": "module"
+  },
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "no-null",
+    "import",
+    "eslint-plugin-local",
+    "simple-import-sort"
+  ],
+  "ignorePatterns": ["**/node_modules/**", "/built/**", "/tests/**"],
+  "rules": {},
+  "overrides": []
+}
