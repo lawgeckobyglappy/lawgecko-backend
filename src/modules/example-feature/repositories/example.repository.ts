@@ -1,5 +1,5 @@
 export class ExampleRepository {
-  public getExample() {
-    return { name: "gecko" };
-  }
+	public getExample() {
+		return { name: 'gecko' };
+	}
 }

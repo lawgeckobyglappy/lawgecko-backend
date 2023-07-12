@@ -1,22 +1,37 @@
 {
-  "root": true,
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "warnOnUnsupportedTypeScriptVersion": false,
-    "sourceType": "module"
-  },
-  "env": {
-    "node": true,
-    "es6": true
-  },
-  "plugins": [
-    "@typescript-eslint",
-    "no-null",
-    "import",
-    "eslint-plugin-local",
-    "simple-import-sort"
-  ],
-  "ignorePatterns": ["**/node_modules/**", "/built/**", "/tests/**"],
-  "rules": {},
-  "overrides": []
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"warnOnUnsupportedTypeScriptVersion": false,
+		"sourceType": "module"
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"prettier"
+	],
+	"env": {
+		"node": true,
+		"es6": true
+	},
+	"plugins": [
+		"@typescript-eslint",
+		"no-null",
+		"import",
+		"eslint-plugin-local",
+		"simple-import-sort"
+	],
+	"ignorePatterns": ["**/node_modules/**", "/built/**", "/tests/**"],
+	"rules": {
+		//	"indent": ["error", 2],
+		"prettier/prettier": [
+			//or whatever plugin that is causing the clash
+			"error",
+			{
+				"tabWidth": 2
+			}
+		]
+	},
+
+	"overrides": []
 }
