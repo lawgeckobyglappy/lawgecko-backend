@@ -1,3 +1,3 @@
 export class Example {
-  public name!: string;
+	public name!: string;
 }
