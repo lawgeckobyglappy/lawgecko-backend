@@ -1,5 +1,5 @@
-import { Schema } from 'clean-schema';
 import dayjs from 'dayjs';
+import { Schema } from 'clean-schema';
 
 import { generateId, getRandom } from 'shared/utils';
 import { LoginOTP, LoginOTPInput } from 'shared/types';

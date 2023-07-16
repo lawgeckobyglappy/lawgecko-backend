@@ -1,6 +1,8 @@
 import Schema from 'clean-schema';
-import { User, UserInput } from 'shared/types';
+
 import { generateId } from 'shared/utils';
+import { User, UserInput } from 'shared/types';
+
 import {
 	validateString,
 	validateUserAccountStatus,

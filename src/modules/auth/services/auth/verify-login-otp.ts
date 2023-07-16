@@ -1,3 +1,5 @@
+import { UserAccountStatus } from 'shared/types';
+
 import { LoginSessionModel } from 'modules/auth/models';
 import {
 	loginOTPRepository,
@@ -5,7 +7,7 @@ import {
 	userRepository,
 } from 'modules/auth/repositories';
 import { createToken, handleAuthError, handleError } from 'modules/auth/utils';
-import { UserAccountStatus } from 'shared/types';
+
 import { activateUser } from './activate-user';
 
 export { verifyLoginOTP };
@@ -25,12 +27,8 @@ const verifyLoginOTP = async (code: string) => {
 	if (!user || !acceptedAccountStatus.includes(user.accountStatus))
 		return handleAuthError('Authentication failed');
 
-	if (user.accountStatus == 'pending:activation') await activateUser(user);
-
 	const [sessionInfo] = await Promise.all([
-		await LoginSessionModel.create({
-			userId: user._id,
-		}),
+		await LoginSessionModel.create({ userId: user._id }),
 		user.accountStatus == 'pending:activation'
 			? await activateUser(user)
 			: null,
