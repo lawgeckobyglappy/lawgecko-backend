@@ -1,5 +1,5 @@
-import { userRepository } from 'modules/auth/repositories';
 import { handleError } from 'modules/auth/utils';
+import { userRepository } from 'modules/auth/repositories';
 import { validateEmail } from 'modules/auth/validators';
 
 import { createLoginOTP } from './create-login-otp';

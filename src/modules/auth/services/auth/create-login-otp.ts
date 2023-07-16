@@ -1,7 +1,8 @@
-import { LoginOTPModel } from 'modules/auth/models';
-import { loginOTPRepository } from 'modules/auth/repositories';
 import { User } from 'shared/types';
 import { sendOTPEmail } from 'shared/utils';
+
+import { LoginOTPModel } from 'modules/auth/models';
+import { loginOTPRepository } from 'modules/auth/repositories';
 
 export { createLoginOTP };
 

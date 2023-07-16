@@ -1,6 +1,8 @@
-import { UserModel } from 'modules/auth/models';
-import { userRepository } from 'modules/auth/repositories';
 import { UserInput } from 'shared/types';
+
+import { UserModel } from 'modules/auth/models';
+import { handleError } from 'modules/auth/utils';
+import { userRepository } from 'modules/auth/repositories';
 
 import { createLoginOTP } from './create-login-otp';
 
@@ -12,7 +14,7 @@ const register = async (values: Partial<UserInput>) => {
 		accountStatus: 'pending:activation',
 	});
 
-	if (error) return { error };
+	if (error) return handleError(error);
 
 	const user = await userRepository.insertOne(data);
 

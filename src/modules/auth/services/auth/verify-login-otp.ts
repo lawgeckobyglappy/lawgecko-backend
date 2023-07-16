@@ -5,8 +5,15 @@ import {
 	userRepository,
 } from 'modules/auth/repositories';
 import { createToken, handleAuthError, handleError } from 'modules/auth/utils';
+import { UserAccountStatus } from 'shared/types';
+import { activateUser } from './activate-user';
 
 export { verifyLoginOTP };
+
+const acceptedAccountStatus: UserAccountStatus[] = [
+	'active',
+	'pending:activation',
+];
 
 const verifyLoginOTP = async (code: string) => {
 	const otp = await loginOTPRepository.findByCode(code);
@@ -15,11 +22,21 @@ const verifyLoginOTP = async (code: string) => {
 
 	const user = await userRepository.findById(otp.userId);
 
-	if (!user) return handleAuthError('Authentication failed');
+	if (!user || !acceptedAccountStatus.includes(user.accountStatus))
+		return handleAuthError('Authentication failed');
 
-	const { data: session, error } = await LoginSessionModel.create({
-		userId: user._id,
-	});
+	if (user.accountStatus == 'pending:activation') await activateUser(user);
+
+	const [sessionInfo] = await Promise.all([
+		await LoginSessionModel.create({
+			userId: user._id,
+		}),
+		user.accountStatus == 'pending:activation'
+			? await activateUser(user)
+			: null,
+	]);
+
+	const { data: session, error } = sessionInfo;
 
 	if (error) return handleError(error);
 
