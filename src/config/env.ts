@@ -17,7 +17,9 @@ const config = {
 	jwt: {
 		algorithm: process.env.JWT_ALGO,
 		secret: process.env.JWT_SECRET,
-		accessExpirationMinutes: process.env.JWT_ACCESS_EXPIRATION_MINUTES,
+		accessExpirationMinutes: parseInt(
+			process.env.JWT_ACCESS_EXPIRATION_MINUTES ?? '15',
+		),
 		refreshExpirationDays: process.env.JWT_REFRESH_EXPIRATION_DAYS,
 		resetPasswordExpirationMinutes:
 			process.env.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
