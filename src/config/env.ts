@@ -2,6 +2,13 @@ import dotenv from 'dotenv';
 dotenv.config({ path: __dirname + '/.env' });
 
 const config = {
+	emails: {
+		default: {
+			user: process.env.DEFAULT_EMAIL_USER,
+			password: process.env.DEFAULT_EMAIL_PASSWORD,
+			service: process.env.DEFAULT_EMAIL_SERVICE,
+		},
+	},
 	environment: process.env.NODE_ENV || 'development',
 	port: process.env.PORT || 5000,
 	db: {
