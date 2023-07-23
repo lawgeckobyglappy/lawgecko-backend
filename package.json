@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "src/app.js",
 	"scripts": {
+		"dev": "nodemon",
 		"start": "ts-node ./src/server.ts",
 		"start:dev": "npm run start -- --watch",
 		"build": "tsc -p tsconfig.json",
@@ -24,6 +25,7 @@
 		"@typescript-eslint/eslint-plugin": "^5.61.0",
 		"@typescript-eslint/parser": "^5.61.0",
 		"eslint-config-prettier": "^8.8.0",
+		"nodemon": "^3.0.1",
 		"pino-pretty": "^10.0.1",
 		"prettier": "^3.0.0",
 		"ts-node": "^10.9.1",
@@ -41,6 +43,7 @@
 		"jsonwebtoken": "^9.0.1",
 		"mongoose": "^7.3.2",
 		"morgan": "^1.10.0",
+		"node-cache": "^5.1.2",
 		"nodemailer": "^6.9.3",
 		"pino": "^8.14.1",
 		"randomatic": "^3.1.1",
