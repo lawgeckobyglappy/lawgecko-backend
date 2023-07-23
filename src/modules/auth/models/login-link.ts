@@ -1,16 +1,15 @@
 import dayjs from 'dayjs';
 import { Schema } from 'clean-schema';
 
-import { generateId, getRandom } from 'shared/utils';
-import { LoginOTP, LoginOTPInput } from 'shared/types';
+import { generateId } from '../../../shared/utils';
+import { LoginLink, LoginLinkInput } from '../../../shared/types';
 
 import { validateString } from '../validators';
 
-export { LoginOTPModel };
+export { LoginLinkModel };
 
-const LoginOTPModel = new Schema<LoginOTPInput, LoginOTP>({
+const LoginLinkModel = new Schema<LoginLinkInput, LoginLink>({
 	_id: { constant: true, value: () => generateId() },
-	code: { constant: true, value: () => getRandom('0', 5) },
 	expiresAt: {
 		constant: true,
 		value: () => dayjs(new Date()).add(15, 'minutes').toDate(),

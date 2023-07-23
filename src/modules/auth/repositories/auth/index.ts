@@ -1,2 +1,2 @@
-export * from './login-otp';
+export * from './login-link';
 export * from './login-session';

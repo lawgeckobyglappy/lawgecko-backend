@@ -5,8 +5,8 @@ export type {
 	UserInput,
 	UserAccountStatus,
 	UserRole,
-	LoginOTP,
-	LoginOTPInput,
+	LoginLink,
+	LoginLinkInput,
 	LoginSession,
 	LoginSessionInput,
 };
@@ -52,13 +52,12 @@ type User = {
 	updatedAt: Date | string;
 };
 
-type LoginOTPInput = {
+type LoginLinkInput = {
 	userId: string;
 };
 
-type LoginOTP = {
+type LoginLink = {
 	_id: string;
-	code: string;
 	createdAt: string;
 	expiresAt: Date | string;
 	userId: string;

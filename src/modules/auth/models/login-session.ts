@@ -1,9 +1,10 @@
 import dayjs from 'dayjs';
 import { Schema, validate } from 'clean-schema';
 
-import config from 'config/env';
-import { generateId } from 'shared/utils';
-import { LoginSession, LoginSessionInput } from 'shared/types';
+import config from '../../../config/env';
+
+import { generateId } from '../../../shared/utils';
+import { LoginSession, LoginSessionInput } from '../../../shared/types';
 
 import { validateString } from '../validators';
 

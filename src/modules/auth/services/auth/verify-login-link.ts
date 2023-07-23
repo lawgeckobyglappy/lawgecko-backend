@@ -1,28 +1,28 @@
-import { UserAccountStatus } from 'shared/types';
+import { UserAccountStatus } from '../../../../shared/types';
 
-import { LoginSessionModel } from 'modules/auth/models';
 import {
-	loginOTPRepository,
+	loginLinkRepository,
 	loginSessionRepository,
 	userRepository,
-} from 'modules/auth/repositories';
-import { createToken, handleAuthError, handleError } from 'modules/auth/utils';
+} from '../../repositories';
+import { LoginSessionModel } from '../../models';
+import { createToken, handleAuthError, handleError } from '../../utils';
 
 import { activateUser } from './activate-user';
 
-export { verifyLoginOTP };
+export { verifyLoginLink };
 
 const acceptedAccountStatus: UserAccountStatus[] = [
 	'active',
 	'pending:activation',
 ];
 
-const verifyLoginOTP = async (code: string) => {
-	const otp = await loginOTPRepository.findByCode(code);
+const verifyLoginLink = async (id: string) => {
+	const link = await loginLinkRepository.findById(id);
 
-	if (!otp) return handleError({ message: 'Invalid code' });
+	if (!link) return handleError({ message: 'Invalid code' });
 
-	const user = await userRepository.findById(otp.userId);
+	const user = await userRepository.findById(link.userId);
 
 	if (!user || !acceptedAccountStatus.includes(user.accountStatus))
 		return handleAuthError('Authentication failed');
@@ -46,7 +46,7 @@ const verifyLoginOTP = async (code: string) => {
 		sessionId: session._id,
 	});
 
-	loginOTPRepository.deleteByCode(code);
+	loginLinkRepository.deleteById(id);
 
 	return { data: accessToken };
 };

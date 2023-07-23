@@ -1,24 +1,23 @@
 import { Schema, model } from 'mongoose';
 
-import { LoginSession } from '../../../../shared/types';
+import { LoginLink } from '../../../../shared/types';
 
-export { loginSessionRepository };
+export { loginLinkRepository };
 
-const schema = new Schema<LoginSession>(
+const schema = new Schema<LoginLink>(
 	{
 		_id: { type: String, required: true },
 		expiresAt: { type: Date, expires: 0 },
-		isBlocked: { type: Boolean, default: false },
 		userId: { type: String, required: true, index: true },
 	},
 	{ timestamps: { updatedAt: false } },
 );
 
-const dbModel = model('login-sessions', schema);
+const dbModel = model('login-links', schema);
 
-const loginSessionRepository = {
+const loginLinkRepository = {
 	findById: (id: string) => dbModel.findById(id),
-	insertOne: (data: LoginSession) => dbModel.create(data),
+	insertOne: (link: LoginLink) => dbModel.create(link),
 	deleteById: (_id: string) => dbModel.deleteOne({ _id }),
 	deleteByUserId: (userId: string) => dbModel.deleteMany({ userId }),
 };

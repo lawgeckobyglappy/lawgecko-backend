@@ -1,31 +1,32 @@
-import { User } from 'shared/types';
+import config from '../../../../config/env';
+import { User } from '../../../types';
+
 import { sendMail } from '../sendMail';
 
-export { sendOTPEmail };
+export { sendLoginLinkEmail };
 
-type Props = {
-	code: string;
+type Options = {
+	linkId: string;
 	user: User;
 };
 
-function sendOTPEmail({ user, code }: Props) {
+function sendLoginLinkEmail({ user, linkId }: Options) {
 	const { email, firstName } = user;
 
+	const link = `${config.frontendUrl}/${linkId}`;
+
 	const text = `
-    <html>
-        <body>
             Hi ${firstName},
             
-            Use the code below to log into your account.
+            Use the link below to log into your account.
 
-            <span style='font-size: 20px; font-weight: 400'>${code}</span>
+            <a href="${link}">${link}</a>
         
-            Please hurry, the code will expired shortly.
+            Please hurry, the link will expired shortly.
         
             Regards,
             Lawgecko Team
-        </body>
-    </html>`;
+       `;
 
-	return sendMail({ from: 'support', to: email, subject: 'Login Code', text });
+	return sendMail({ from: 'support', to: email, subject: 'Login link', text });
 }

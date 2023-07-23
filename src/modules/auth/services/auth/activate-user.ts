@@ -1,8 +1,8 @@
 import { User } from 'shared/types';
 
-import { UserModel } from 'modules/auth/models';
-import { handleError } from 'modules/auth/utils';
-import { userRepository } from 'modules/auth/repositories';
+import { UserModel } from '../../models';
+import { handleError } from '../../utils';
+import { userRepository } from '../../repositories';
 
 export { activateUser };
 

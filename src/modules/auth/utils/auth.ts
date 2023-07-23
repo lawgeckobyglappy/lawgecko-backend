@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import type { IncomingMessage } from 'http';
 
-import config from 'config/env';
-import { AuthPayload, AuthPayloadInput } from 'shared/types';
+import config from '../../../config/env';
+import { AuthPayload, AuthPayloadInput } from '../../../shared/types';
 
 const { secret, accessExpirationMinutes } = config.jwt;
 

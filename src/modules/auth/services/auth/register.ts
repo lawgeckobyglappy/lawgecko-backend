@@ -1,10 +1,10 @@
-import { UserInput } from 'shared/types';
+import { UserInput } from '../../../../shared/types';
 
-import { UserModel } from 'modules/auth/models';
-import { handleError } from 'modules/auth/utils';
-import { userRepository } from 'modules/auth/repositories';
+import { UserModel } from '../../models';
+import { handleError } from '../../utils';
+import { userRepository } from '../../repositories';
 
-import { createLoginOTP } from './create-login-otp';
+import { createLoginLink } from './create-login-link';
 
 export { register };
 
@@ -18,7 +18,7 @@ const register = async (values: Partial<UserInput>) => {
 
 	const user = await userRepository.insertOne(data);
 
-	await createLoginOTP(user as any);
+	await createLoginLink(user as any);
 
 	return { data: user };
 };

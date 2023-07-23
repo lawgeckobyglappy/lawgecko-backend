@@ -26,7 +26,7 @@ const config = {
 		verifyEmailExpirationMinutes:
 			process.env.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
 	},
-
+	frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5000',
 	logs: {
 		level: process.env.PINO_LOG_LEVEL || 'info',
 	},

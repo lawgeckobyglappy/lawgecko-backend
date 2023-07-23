@@ -1,8 +1,9 @@
 import { Schema, model } from 'mongoose';
+import { User } from '../../../../shared/types';
 
 export { dbModel };
 
-const userSchema = new Schema(
+const userSchema = new Schema<User>(
 	{
 		_id: { type: String, required: true },
 		email: { type: String, index: true, required: true },

@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
 
-import { logger } from 'shared/logger';
-import config from 'config/env';
+import config from '../../../config/env';
+
+import { logger } from '../../logger';
 
 const { emails, environment } = config;
 
@@ -20,7 +21,8 @@ const sendMail = async ({
 	subject = '',
 	text = '',
 }: MailProps) => {
-	if (environment !== 'production') return logger.info(from, to, subject, text);
+	if (environment !== 'production')
+		return logger.info({ from, to, subject, text });
 
 	if (!Array.isArray(to)) to = [to];
 
