@@ -87,8 +87,6 @@ describe('users', () => {
 
 			const { data, error } = body;
 
-			console.log(data);
-
 			expect(status).toBe(400);
 
 			expect(data).toBeUndefined();
@@ -97,6 +95,42 @@ describe('users', () => {
 				email: expect.arrayContaining(['Email already taken']),
 				username: expect.arrayContaining(['Username already taken']),
 			});
+		});
+	});
+
+	describe('POST /auth/request-login-link', () => {
+		const url = `${BASE_URL}/request-login-link`;
+
+		it('should reject if invalid email is provided', async () => {
+			const { body, status } = await api.post(url).send({
+				email: ' ',
+			});
+
+			const { data, error } = body;
+
+			expect(status).toBe(400);
+
+			expect(data).toBeUndefined();
+
+			expect(error.message).toBe('Invalid email');
+		});
+
+		it('should respond with positive message when email is valid', async () => {
+			const emails = [users[0].email, '1@1.com'];
+
+			for (const email of emails) {
+				const { body, status } = await api.post(url).send({
+					email,
+				});
+
+				const { data, error } = body;
+
+				expect(status).toBe(200);
+
+				expect(error).toBeUndefined();
+
+				expect(data).toBe('Success');
+			}
 		});
 	});
 });
