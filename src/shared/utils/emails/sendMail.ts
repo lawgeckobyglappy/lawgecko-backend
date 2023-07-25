@@ -21,8 +21,11 @@ const sendMail = async ({
 	subject = '',
 	text = '',
 }: MailProps) => {
-	if (environment !== 'production')
-		return logger.info({ from, to, subject, text });
+	if (environment !== 'production') {
+		if (environment == 'development') logger.info({ from, to, subject, text });
+
+		return;
+	}
 
 	if (!Array.isArray(to)) to = [to];
 

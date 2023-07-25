@@ -10,7 +10,7 @@ const config = {
 		},
 	},
 	environment: process.env.NODE_ENV || 'development',
-	port: process.env.PORT || 5000,
+	port: process.env.NODE_ENV == 'test' ? 5001 : process.env.PORT || 5000,
 	db: {
 		dbURI: process.env.MONGODB_URI,
 	},

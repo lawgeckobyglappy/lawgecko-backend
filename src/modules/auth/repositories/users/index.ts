@@ -12,6 +12,7 @@ const userRepository = {
 
 		return (res as any)._doc as User;
 	},
+	insertMany: (users: User[]) => dbModel.insertMany(users),
 	find: (query: FilterQuery<User> = {}, options?: QueryOptions<User>) => {
 		return dbModel.find(query, undefined, options).lean();
 	},
