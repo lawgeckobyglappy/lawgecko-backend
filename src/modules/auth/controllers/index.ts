@@ -1,15 +1,42 @@
-import { Request, Response } from 'express';
-import { register } from '../services';
+import { ApiError } from 'apitoolz';
+import { NextFunction, Request, Response } from 'express';
+
+import {
+	getCurrentuser,
+	register,
+	requestLoginLink,
+	verifyLoginLink,
+} from '../services';
 
 export { controllers };
 
 const controllers = {
-	async register(req: Request, res: Response) {
-		const results = await register(req.body);
-
-		return adaptResponse({ res, results, successCode: 201 });
-	},
+	getCurrentUser: makeController((req) => getCurrentuser(req.authInfo!)),
+	register: makeController((req) => register(req.body), 201),
+	requestLoginLink: makeController((req) => requestLoginLink(req.body.email)),
+	verifyLoginLink: makeController((req) => verifyLoginLink(req.body.id)),
 };
+
+type Handler = (req: Request, res: Response, next?: NextFunction) => any;
+function makeController(
+	handler: Handler,
+	successCode?: number,
+	errorCode?: number,
+) {
+	return async (req: Request, res: Response, next?: NextFunction) => {
+		try {
+			const results = await handler(req, res, next);
+
+			return adaptResponse({ res, results, successCode });
+		} catch (err: any) {
+			return adaptResponse({
+				res,
+				results: { error: new ApiError(err).summary },
+				errorCode,
+			});
+		}
+	};
+}
 
 type Options = {
 	res: Response;

@@ -13,5 +13,10 @@ function handleError({ message, payload = {} }: ErrorType) {
 }
 
 function handleAuthError(message: 'Access denied' | 'Authentication failed') {
-	return { error: new ApiError({ message }).summary };
+	return {
+		error: new ApiError({
+			message,
+			statusCode: message == 'Access denied' ? 403 : 401,
+		}).summary,
+	};
 }

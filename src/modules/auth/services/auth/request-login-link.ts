@@ -13,7 +13,7 @@ const requestLoginLink = async (email: string) => {
 
 	const user = await userRepository.findOne({ email: isValid.validated });
 
-	if (!user || user.accountStatus !== 'active') return { data: 'Success' };
+	if (!user || user.accountStatus != 'active') return { data: 'Success' };
 
 	return createLoginLink(user);
 };

@@ -1,6 +1,6 @@
 export type {
-	AuthPayload,
-	AuthPayloadInput,
+	AuthInfo,
+	AuthInfoInput,
 	User,
 	UserInput,
 	UserAccountStatus,
@@ -11,22 +11,18 @@ export type {
 	LoginSessionInput,
 };
 
-type AuthPayloadInput = {
+type AuthInfoInput = {
 	userId: string;
 	userRole: UserRole;
 	sessionId: string;
 };
 
-type AuthPayload = {
+type AuthInfo = {
 	user: { _id: string; role: UserRole };
 	sessionId: string;
 };
 
-type UserAccountStatus =
-	| 'active'
-	| 'blocked'
-	| 'deleted'
-	| 'pending:activation';
+type UserAccountStatus = 'active' | 'blocked' | 'deleted';
 
 type UserRole = 'admin' | 'moderator' | 'user';
 

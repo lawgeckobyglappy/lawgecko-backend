@@ -38,7 +38,6 @@ const validAccountStatus: UserAccountStatus[] = [
 	'active',
 	'blocked',
 	'deleted',
-	'pending:activation',
 ];
 function validateUserAccountStatus(status: any) {
 	return validateString('Invalid account status', {

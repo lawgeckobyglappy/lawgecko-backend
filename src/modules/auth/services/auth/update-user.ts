@@ -1,6 +1,6 @@
 import { sanitize } from 'apitoolz';
 
-import { AuthPayload, User } from '../../../../shared/types';
+import { AuthInfo, User } from '../../../../shared/types';
 
 import { UserModel } from '../../models';
 import { userRepository } from '../../repositories';
@@ -11,7 +11,7 @@ export { updateUser };
 type Options = {
 	id: string;
 	updates: Partial<User>;
-	authInfo: AuthPayload;
+	authInfo: AuthInfo;
 };
 const updateUser = async ({ id, updates, authInfo }: Options) => {
 	const user = await userRepository.findById(id);

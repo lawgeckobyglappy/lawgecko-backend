@@ -8,31 +8,19 @@ import {
 import { LoginSessionModel } from '../../models';
 import { createToken, handleAuthError, handleError } from '../../utils';
 
-import { activateUser } from './activate-user';
-
 export { verifyLoginLink };
 
-const acceptedAccountStatus: UserAccountStatus[] = [
-	'active',
-	'pending:activation',
-];
-
-const verifyLoginLink = async (id: string) => {
-	const link = await loginLinkRepository.findById(id);
+const verifyLoginLink = async (linkId: string) => {
+	const link = await loginLinkRepository.findById(linkId);
 
 	if (!link) return handleError({ message: 'Invalid code' });
 
 	const user = await userRepository.findById(link.userId);
 
-	if (!user || !acceptedAccountStatus.includes(user.accountStatus))
+	if (!user || user.accountStatus != 'active')
 		return handleAuthError('Authentication failed');
 
-	const [sessionInfo] = await Promise.all([
-		await LoginSessionModel.create({ userId: user._id }),
-		user.accountStatus == 'pending:activation'
-			? await activateUser(user)
-			: null,
-	]);
+	const sessionInfo = await LoginSessionModel.create({ userId: user._id });
 
 	const { data: session, error } = sessionInfo;
 
@@ -46,7 +34,7 @@ const verifyLoginLink = async (id: string) => {
 		sessionId: session._id,
 	});
 
-	loginLinkRepository.deleteById(id);
+	loginLinkRepository.deleteById(linkId);
 
 	return { data: accessToken };
 };

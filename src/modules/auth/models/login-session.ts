@@ -8,7 +8,7 @@ import { LoginSession, LoginSessionInput } from '../../../shared/types';
 
 import { validateString } from '../validators';
 
-const { accessExpirationMinutes } = config.jwt;
+const { accessExpirationDays } = config.jwt;
 
 export { LoginSessionModel };
 
@@ -22,8 +22,7 @@ const LoginSessionModel = new Schema<LoginSessionInput, LoginSession>({
 	},
 	expiresAt: {
 		constant: true,
-		value: () =>
-			dayjs(new Date()).add(accessExpirationMinutes, 'minutes').toDate(),
+		value: () => dayjs(new Date()).add(accessExpirationDays, 'days').toDate(),
 	},
 	userId: { readonly: true, validator: validateString('Invalid user id') },
 }).getModel();

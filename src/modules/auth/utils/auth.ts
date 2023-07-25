@@ -1,35 +1,31 @@
 import jwt from 'jsonwebtoken';
-import type { IncomingMessage } from 'http';
 
 import config from '../../../config/env';
-import { AuthPayload, AuthPayloadInput } from '../../../shared/types';
+import { AuthInfo, AuthInfoInput } from '../../../shared/types';
+import { Request } from 'express';
 
-const { secret, accessExpirationMinutes } = config.jwt;
+const { secret, accessExpirationDays } = config.jwt;
 
-export { createToken, requireAuth };
+export { createToken, parseAuth };
 
-function createToken({ userId, userRole, sessionId }: AuthPayloadInput) {
+function createToken({ userId, userRole, sessionId }: AuthInfoInput) {
 	return jwt.sign(
-		{ user: { _id: userId, role: userRole }, sessionId } as AuthPayload,
+		{ user: { _id: userId, role: userRole }, sessionId } as AuthInfo,
 		secret!,
-		{ expiresIn: accessExpirationMinutes },
+		{ expiresIn: `${accessExpirationDays}d` },
 	);
 }
 
-function getPayload(token: string) {
+function getAuthInfo(token: string) {
 	try {
-		return jwt.verify(token, secret!) as AuthPayload;
+		return jwt.verify(token, secret!) as AuthInfo;
 	} catch (err: any) {
 		return null;
 	}
 }
 
-function requireAuth(req: IncomingMessage) {
-	let payload: AuthPayload | null = null;
-
+function parseAuth(req: Request) {
 	const bearerToken = req.headers['authorization']?.split(' ');
 
-	if (bearerToken?.[0] === 'Bearer') payload = getPayload(bearerToken[1]);
-
-	return { isAuth: !!payload, payload };
+	return bearerToken?.[0] === 'Bearer' ? getAuthInfo(bearerToken[1]) : null;
 }

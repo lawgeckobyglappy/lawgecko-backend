@@ -15,7 +15,8 @@ export { UserModel };
 const UserModel = new Schema<UserInput, User>({
 	_id: { constant: true, value: () => generateId() },
 	accountStatus: {
-		default: 'pending:activation',
+		default: 'active',
+		shouldInit: false,
 		validator: validateUserAccountStatus,
 	},
 	email: { required: true, validator: validateUserEmail },

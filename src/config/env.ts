@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: __dirname + '/.env' });
+dotenv.config();
 
 const config = {
 	emails: {
@@ -17,8 +17,8 @@ const config = {
 	jwt: {
 		algorithm: process.env.JWT_ALGO,
 		secret: process.env.JWT_SECRET,
-		accessExpirationMinutes: parseInt(
-			process.env.JWT_ACCESS_EXPIRATION_MINUTES ?? '15',
+		accessExpirationDays: parseInt(
+			process.env.JWT_ACCESS_EXPIRATION_DAYS ?? '25',
 		),
 		refreshExpirationDays: process.env.JWT_REFRESH_EXPIRATION_DAYS,
 		resetPasswordExpirationMinutes:

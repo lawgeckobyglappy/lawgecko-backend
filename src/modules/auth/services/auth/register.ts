@@ -9,10 +9,7 @@ import { createLoginLink } from './create-login-link';
 export { register };
 
 const register = async (values: Partial<UserInput>) => {
-	const { data, error } = await UserModel.create({
-		...values,
-		accountStatus: 'pending:activation',
-	});
+	const { data, error } = await UserModel.create(values);
 
 	if (error) return handleError(error);
 
