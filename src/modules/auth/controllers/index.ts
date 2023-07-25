@@ -5,6 +5,7 @@ import {
 	getCurrentuser,
 	register,
 	requestLoginLink,
+	updateUser,
 	verifyLoginLink,
 } from '../services';
 
@@ -14,6 +15,9 @@ const controllers = {
 	getCurrentUser: makeController((req) => getCurrentuser(req.authInfo!)),
 	register: makeController((req) => register(req.body), 201),
 	requestLoginLink: makeController((req) => requestLoginLink(req.body.email)),
+	updateUser: makeController(({ params: { id }, body, authInfo }) => {
+		return updateUser({ id, updates: body, authInfo });
+	}),
 	verifyLoginLink: makeController((req) => verifyLoginLink(req.body.id)),
 };
 
