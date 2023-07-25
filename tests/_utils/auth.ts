@@ -1,10 +1,10 @@
 import request from 'supertest';
-import { User, UserRole } from '../../../src/shared/types';
-import { createToken } from '../../../src/modules/auth/utils';
+import { User, UserRole } from '../../src/shared/types';
+import { createToken } from '../../src/modules/auth/utils';
 
 let api: request.SuperTest<request.Test>, server: any;
 
-export { expectAuthError, generateToken, users };
+export { expectAuthError, generateToken };
 
 type AuthConfig = {
 	description: string;
@@ -14,17 +14,6 @@ type AuthConfig = {
 	role?: '' | UserRole;
 	url: string;
 };
-
-const users = [
-	{
-		_id: '1',
-		email: 'john@mail.com',
-		firstName: 'John',
-		accountStatus: 'active',
-		lastName: 'Doe',
-		role: 'user',
-	},
-] as User[];
 
 function generateToken({
 	customId,
@@ -53,7 +42,7 @@ function expectAuthError({
 }: AuthConfig) {
 	describe('auth failure', () => {
 		beforeEach(async () => {
-			server = (await import('../../../src/server')).server;
+			server = (await import('../../src/server')).server;
 			api = request(server);
 		});
 

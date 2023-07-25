@@ -1,5 +1,3 @@
-import { UserAccountStatus } from '../../../../shared/types';
-
 import {
 	loginLinkRepository,
 	loginSessionRepository,
@@ -13,7 +11,7 @@ export { verifyLoginLink };
 const verifyLoginLink = async (linkId: string) => {
 	const link = await loginLinkRepository.findById(linkId);
 
-	if (!link) return handleError({ message: 'Invalid code' });
+	if (!link) return handleError({ message: 'Invalid link' });
 
 	const user = await userRepository.findById(link.userId);
 
