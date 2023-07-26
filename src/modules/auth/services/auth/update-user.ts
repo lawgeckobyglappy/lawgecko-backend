@@ -20,6 +20,9 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
 
 	const isCurrentUser = user._id == authInfo.user._id;
 
+	if (isCurrentUser && user.accountStatus != 'active')
+		return handleAuthError('Authentication failed');
+
 	if (!isCurrentUser && authInfo.user.role != 'admin')
 		return handleAuthError('Access denied');
 

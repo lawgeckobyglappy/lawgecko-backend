@@ -31,6 +31,24 @@ const users = [
 		username: 'deleted-user',
 		role: 'user',
 	},
+	{
+		_id: '4',
+		email: 'other-user@mail.com',
+		firstName: 'Other',
+		accountStatus: 'active',
+		lastName: 'User',
+		username: 'other-user',
+		role: 'user',
+	},
+	{
+		_id: '5',
+		email: 'admin@mail.com',
+		firstName: 'Admin',
+		accountStatus: 'active',
+		lastName: 'User',
+		username: 'admin-user',
+		role: 'admin',
+	},
 ] as User[];
 
 function addUsers() {

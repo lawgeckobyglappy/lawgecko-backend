@@ -200,24 +200,12 @@ describe('Auth', () => {
 
 		expectAuthError({
 			description:
-				"should reject with 'Authentication failed' if no token is provided",
+				'should reject with "Authentication failed" if no token is provided',
 			errorCode: 401,
 			errorMessage: 'Authentication failed',
 			method: 'get',
 			role: '',
 			url,
-		});
-
-		it('should reject with "Authentication failed" error if access token is not provided', async () => {
-			const { body, status } = await api.get(url);
-
-			const { data, error } = body;
-
-			expect(status).toBe(401);
-
-			expect(data).toBeUndefined();
-
-			expect(error.message).toBe('Authentication failed');
 		});
 
 		it('should reject with "Authentication failed" error if user is not active', async () => {
@@ -262,6 +250,227 @@ describe('Auth', () => {
 			expect(error).toBeUndefined();
 
 			expect(data).toMatchObject(user);
+		});
+	});
+
+	describe('PATCH /auth/update-user', () => {
+		let token = '';
+
+		const linkId = 'valid-link-id',
+			user = users[0],
+			url = `${BASE_URL}/update-user/${user._id}`;
+
+		beforeEach(async () => {
+			await loginLinkRepository.insertOne({
+				_id: linkId,
+				userId: user._id,
+			} as any);
+
+			const {
+				body: { data },
+			} = await verifyLoginLink({ id: linkId });
+
+			token = data;
+		});
+
+		expectAuthError({
+			description:
+				'should reject with "Authentication failed" if no token is provided',
+			errorCode: 401,
+			errorMessage: 'Authentication failed',
+			method: 'patch',
+			role: '',
+			url,
+		});
+
+		it('should reject with "User not found" error if user does not exist', async () => {
+			const { body, status } = await api
+				.patch(url + 'id-that-is-not-in-db')
+				.set('Authorization', `Bearer ${token}`)
+				.send({ firstName: 'Update' });
+
+			const { data, error } = body;
+
+			expect(status).toBe(404);
+
+			expect(data).toBeUndefined();
+
+			expect(error.message).toBe('User not found');
+		});
+
+		it('should reject with "Access denied" error if user is not ower of accout and is not admin', async () => {
+			const linkId = 'new-link';
+
+			await loginLinkRepository.insertOne({
+				_id: linkId,
+				userId: users[3]._id,
+			} as any);
+
+			const {
+				body: { data: token },
+			} = await verifyLoginLink({ id: linkId });
+
+			const { body, status } = await api
+				.patch(url)
+				.set('Authorization', `Bearer ${token}`)
+				.send({ firstName: 'Update' });
+
+			const { data, error } = body;
+
+			expect(status).toBe(403);
+
+			expect(data).toBeUndefined();
+
+			expect(error.message).toBe('Access denied');
+		});
+
+		it('should reject with "Authentication failed" error if user is not active', async () => {
+			const statusToReject = ['blocked', 'deleted'];
+
+			for (const accountStatus of statusToReject) {
+				await userRepository.updateOne({ _id: user._id }, {
+					accountStatus,
+				} as any);
+
+				const { body, status } = await api
+					.patch(url)
+					.set('Authorization', `Bearer ${token}`)
+					.send({ firstName: 'Update' });
+
+				const { data, error } = body;
+
+				expect(status).toBe(401);
+
+				expect(data).toBeUndefined();
+
+				expect(error.message).toBe('Authentication failed');
+			}
+		});
+
+		it('should update other users if valid data is provided', async () => {
+			const update = { firstName: 'Update', username: 'updated-username' };
+
+			const { body, status } = await api
+				.patch(url)
+				.set('Authorization', `Bearer ${token}`)
+				.send(update);
+
+			const { data, error } = body;
+
+			expect(status).toBe(200);
+
+			expect(error).toBeUndefined();
+
+			expect(data).toMatchObject(update);
+		});
+
+		it('should ignore if users try to update their "accountStatus" or "role"', async () => {
+			const update = { accountStatus: 'blocked', role: 'admin' };
+
+			const { body, status } = await api
+				.patch(url)
+				.set('Authorization', `Bearer ${token}`)
+				.send(update);
+
+			const { data, error } = body;
+
+			expect(status).toBe(200);
+
+			expect(error).toBeUndefined();
+
+			expect(data).toMatchObject(user);
+		});
+
+		it('should allow admins to update other users if is admin', async () => {
+			const linkId = 'new-link';
+
+			await loginLinkRepository.insertOne({
+				_id: linkId,
+				userId: users[4]._id,
+			} as any);
+
+			const {
+				body: { data: token },
+			} = await verifyLoginLink({ id: linkId });
+
+			const update = { firstName: 'Update', accountStatus: 'blocked' };
+
+			const { body, status } = await api
+				.patch(url)
+				.set('Authorization', `Bearer ${token}`)
+				.send(update);
+
+			const { data, error } = body;
+
+			expect(status).toBe(200);
+
+			expect(error).toBeUndefined();
+
+			expect(data).toMatchObject(update);
+		});
+
+		it("should allow admins to update other users' account statuses", async () => {
+			const linkId = 'new-link';
+
+			await loginLinkRepository.insertOne({
+				_id: linkId,
+				userId: users[4]._id,
+			} as any);
+
+			const {
+				body: { data: token },
+			} = await verifyLoginLink({ id: linkId });
+
+			const validStatuses = ['active', 'blocked', 'deleted'];
+
+			for (const accountStatus of validStatuses) {
+				const update = { accountStatus };
+
+				const { body, status } = await api
+					.patch(url)
+					.set('Authorization', `Bearer ${token}`)
+					.send(update);
+
+				const { data, error } = body;
+
+				expect(status).toBe(200);
+
+				expect(error).toBeUndefined();
+
+				expect(data).toMatchObject(update);
+			}
+		});
+
+		it("should allow admins to update other users' roles", async () => {
+			const linkId = 'new-link';
+
+			await loginLinkRepository.insertOne({
+				_id: linkId,
+				userId: users[4]._id,
+			} as any);
+
+			const {
+				body: { data: token },
+			} = await verifyLoginLink({ id: linkId });
+
+			const validRoles = ['admin', 'moderator', 'user'];
+
+			for (const role of validRoles) {
+				const update = { role };
+
+				const { body, status } = await api
+					.patch(url)
+					.set('Authorization', `Bearer ${token}`)
+					.send(update);
+
+				const { data, error } = body;
+
+				expect(status).toBe(200);
+
+				expect(error).toBeUndefined();
+
+				expect(data).toMatchObject(update);
+			}
 		});
 	});
 

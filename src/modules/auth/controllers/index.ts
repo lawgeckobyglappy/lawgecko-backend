@@ -31,7 +31,7 @@ function makeController(
 		try {
 			const results = await handler(req, res, next);
 
-			return adaptResponse({ res, results, successCode });
+			return adaptResponse({ res, results, successCode, errorCode });
 		} catch (err: any) {
 			return adaptResponse({
 				res,
@@ -54,9 +54,11 @@ function adaptResponse({
 	successCode = 200,
 	errorCode = 400,
 }: Options) {
-	const { error } = results;
+	if (results?.error) {
+		const error = new ApiError(results?.error).summary;
 
-	if (error) return res.status(error?.statusCode ?? errorCode).json(results);
+		return res.status(error?.statusCode ?? errorCode).json({ error });
+	}
 
-	return res.status(successCode).json(results);
+	return res.status(successCode).json({ data: results?.data ?? null });
 }

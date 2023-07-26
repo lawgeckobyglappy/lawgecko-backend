@@ -7,6 +7,7 @@ import {
 	validateString,
 	validateUserAccountStatus,
 	validateUserEmail,
+	validateUserRole,
 	validateUsername,
 } from '../validators';
 
@@ -28,6 +29,6 @@ const UserModel = new Schema<UserInput, User>({
 		required: true,
 		validator: validateString('Invalid last name'),
 	},
-	role: { constant: true, value: 'user' },
+	role: { default: 'user', shouldInit: false, validator: validateUserRole },
 	username: { required: true, validator: validateUsername },
 }).getModel();

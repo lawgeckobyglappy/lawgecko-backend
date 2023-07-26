@@ -8,8 +8,8 @@ type ErrorType = {
 	statusCode?: number;
 };
 
-function handleError({ message, payload = {} }: ErrorType) {
-	return { error: new ApiError({ message, payload }).summary };
+function handleError({ message, payload = {}, statusCode = 400 }: ErrorType) {
+	return { error: new ApiError({ message, payload, statusCode }).summary };
 }
 
 function handleAuthError(message: 'Access denied' | 'Authentication failed') {
