@@ -9,9 +9,9 @@
 		"start:dev": "npm run start -- --watch",
 		"build": "tsc -p tsconfig.json",
 		"format": "prettier \"**/*\" --ignore-unknown",
-		"test": "tsc & jest --verbose --forceExit",
+		"test": "jest --verbose --forceExit",
 		"test:coverage": "jest --coverage --forceExit",
-		"test:watch": "tsc & jest --verbose --watchAll --forceExit --maxWorkers=1"
+		"test:watch": "jest --verbose --watchAll --forceExit --maxWorkers=1"
 	},
 	"author": "lawgecko-developers",
 	"license": "ISC",

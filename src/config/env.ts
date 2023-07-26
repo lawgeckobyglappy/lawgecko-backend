@@ -14,6 +14,9 @@ const config = {
 	db: {
 		dbURI: process.env.MONGODB_URI,
 	},
+	loginLinkExpirationMinutes: parseInt(
+		process.env.LOGIN_LINK_EXPIRATION_MINUTES ?? '15',
+	),
 	jwt: {
 		algorithm: process.env.JWT_ALGO,
 		secret: process.env.JWT_SECRET,
