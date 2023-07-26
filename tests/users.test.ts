@@ -1,7 +1,11 @@
 import request from 'supertest';
 import { cleanupDp } from './_utils';
 import { addUsers, users } from './_utils/users';
-import { loginLinkRepository } from '../src/modules/auth/repositories';
+import {
+	loginLinkRepository,
+	userRepository,
+} from '../src/modules/auth/repositories';
+import { expectAuthError } from './_utils/auth';
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -135,10 +139,8 @@ describe('Auth', () => {
 	});
 
 	describe('POST /auth/verify-login-link', () => {
-		const url = `${BASE_URL}/verify-login-link`;
-
 		it('should reject if invalid link id is provided', async () => {
-			const { body, status } = await api.post(url).send({ id: ' ' });
+			const { body, status } = await verifyLoginLink({ id: ' ' });
 
 			const { data, error } = body;
 
@@ -155,7 +157,7 @@ describe('Auth', () => {
 			for (const _id of ids) {
 				await loginLinkRepository.insertOne({ _id, userId: _id } as any);
 
-				const { body, status } = await api.post(url).send({ id: _id });
+				const { body, status } = await verifyLoginLink({ id: _id });
 
 				const { data, error } = body;
 
@@ -172,7 +174,7 @@ describe('Auth', () => {
 
 			await loginLinkRepository.insertOne({ _id, userId: users[0]._id } as any);
 
-			const { body, status } = await api.post(url).send({ id: _id });
+			const { body, status } = await verifyLoginLink({ id: _id });
 
 			const { data, error } = body;
 
@@ -183,4 +185,87 @@ describe('Auth', () => {
 			expect(typeof data).toBe('string');
 		});
 	});
+
+	describe('GET /auth/current-user', () => {
+		const linkId = 'valid-link-id',
+			user = users[0],
+			url = `${BASE_URL}/current-user`;
+
+		beforeEach(async () => {
+			return loginLinkRepository.insertOne({
+				_id: linkId,
+				userId: user._id,
+			} as any);
+		});
+
+		expectAuthError({
+			description:
+				"should reject with 'Authentication failed' if no token is provided",
+			errorCode: 401,
+			errorMessage: 'Authentication failed',
+			method: 'get',
+			role: '',
+			url,
+		});
+
+		it('should reject with "Authentication failed" error if access token is not provided', async () => {
+			const { body, status } = await api.get(url);
+
+			const { data, error } = body;
+
+			expect(status).toBe(401);
+
+			expect(data).toBeUndefined();
+
+			expect(error.message).toBe('Authentication failed');
+		});
+
+		it('should reject with "Authentication failed" error if user is not active', async () => {
+			const statusToReject = ['blocked', 'deleted'];
+
+			const {
+				body: { data: token },
+			} = await verifyLoginLink({ id: linkId });
+
+			for (const accountStatus of statusToReject) {
+				await userRepository.updateOne({ _id: user._id }, {
+					accountStatus,
+				} as any);
+
+				const { body, status } = await api
+					.get(url)
+					.set('Authorization', `Bearer ${token}`);
+
+				const { data, error } = body;
+
+				expect(status).toBe(401);
+
+				expect(data).toBeUndefined();
+
+				expect(error.message).toBe('Authentication failed');
+			}
+		});
+
+		it('should return user info if valid token is provided', async () => {
+			const {
+				body: { data: token },
+			} = await verifyLoginLink({ id: linkId });
+
+			const { body, status } = await api
+				.get(url)
+				.set('Authorization', `Bearer ${token}`);
+
+			const { data, error } = body;
+
+			expect(status).toBe(200);
+
+			expect(error).toBeUndefined();
+
+			expect(data).toMatchObject(user);
+		});
+	});
+
+	function verifyLoginLink(requestBody: any) {
+		return api.post(`${BASE_URL}/verify-login-link`).send(requestBody);
+	}
 });

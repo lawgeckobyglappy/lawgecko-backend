@@ -46,9 +46,7 @@ function expectAuthError({
 			api = request(server);
 		});
 
-		afterEach(async () => {
-			server?.close();
-		});
+		afterEach(() => server?.close());
 
 		it(description, async () => {
 			const res = await api[method](url)
