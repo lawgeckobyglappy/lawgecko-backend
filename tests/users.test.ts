@@ -364,6 +364,28 @@ describe('Auth', () => {
 			expect(data).toMatchObject(update);
 		});
 
+		it('should with corresponding error if invalid data is provided', async () => {
+			const update = { firstName: '', email: users[4].email, username: '' };
+
+			const { body, status } = await api
+				.patch(url)
+				.set('Authorization', `Bearer ${token}`)
+				.send(update);
+
+			const { data, error } = body;
+
+			expect(status).toBe(400);
+
+			expect(data).toBeUndefined();
+
+			expect(error.message).toBe('Validation Error');
+			expect(error.payload).toMatchObject({
+				firstName: expect.arrayContaining(['Invalid first name']),
+				email: expect.arrayContaining(['Email already taken']),
+				username: expect.arrayContaining(['Invalid username']),
+			});
+		});
+
 		it('should ignore if users try to update their "accountStatus" or "role"', async () => {
 			const update = { accountStatus: 'blocked', role: 'admin' };
 
