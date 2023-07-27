@@ -19,7 +19,7 @@ const config = {
 	),
 	jwt: {
 		algorithm: process.env.JWT_ALGO,
-		secret: process.env.JWT_SECRET,
+		secret: process.env.JWT_SECRET ?? 'test-secret',
 		accessExpirationDays: parseInt(
 			process.env.JWT_ACCESS_EXPIRATION_DAYS ?? '25',
 		),
