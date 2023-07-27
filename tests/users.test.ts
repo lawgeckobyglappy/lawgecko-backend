@@ -364,7 +364,7 @@ describe('Auth', () => {
 			expect(data).toMatchObject(update);
 		});
 
-		it('should with corresponding error if invalid data is provided', async () => {
+		it('should return corresponding errors if invalid data is provided', async () => {
 			const update = { firstName: '', email: users[4].email, username: '' };
 
 			const { body, status } = await api
