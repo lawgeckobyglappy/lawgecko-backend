@@ -13,7 +13,7 @@ type Options = {
 function sendLoginLinkEmail({ user, linkId }: Options) {
 	const { email, firstName } = user;
 
-	const link = `${config.frontendUrl}/?id=${linkId}`;
+	const link = `${config.frontendUrl}/verifylink/?id=${linkId}`;
 
 	const html = `
           <html>
