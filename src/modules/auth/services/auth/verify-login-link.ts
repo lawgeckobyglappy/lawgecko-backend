@@ -32,7 +32,7 @@ const verifyLoginLink = async (linkId: string) => {
 		sessionId: session._id,
 	});
 
-	loginLinkRepository.deleteById(linkId);
+	await loginLinkRepository.deleteById(linkId);
 
 	return { data: accessToken };
 };
