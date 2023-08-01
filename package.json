@@ -56,21 +56,5 @@
 		"pino": "^8.14.1",
 		"tsconfig-paths": "^4.2.0",
 		"uniqid": "^5.4.0"
-	},
-	"jest": {
-		"moduleNameMapper": {
-			"@/(.*)$": "<rootDir>/src/$1"
-		},
-		"preset": "ts-jest",
-		"testEnvironment": "node",
-		"testMatch": [
-			"**/tests/**/(*.)+(test).(ts|js)"
-		],
-		"transform": {
-			"node_modules/variables/.+\\.(js|ts)$": "ts-jest"
-		},
-		"transformIgnorePatterns": [
-			"node_modules/(?!variables/.*)"
-		]
 	}
 }
