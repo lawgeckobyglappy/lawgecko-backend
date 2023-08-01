@@ -40,7 +40,7 @@
 	},
 	"dependencies": {
 		"apitoolz": "^0.3.14",
-		"clean-schema": "^3.2.1",
+		"clean-schema": "^3.3.0",
 		"cors": "^2.8.5",
 		"dayjs": "^1.11.9",
 		"dotenv": "^16.3.1",
@@ -54,7 +54,6 @@
 		"node-cache": "^5.1.2",
 		"nodemailer": "^6.9.3",
 		"pino": "^8.14.1",
-		"randomatic": "^3.1.1",
 		"uniqid": "^5.4.0"
 	},
 	"jest": {
