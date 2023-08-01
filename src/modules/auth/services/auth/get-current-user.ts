@@ -1,4 +1,4 @@
-import { AuthInfo } from '../../../../shared/types';
+import { AuthInfo } from '@types';
 
 import { handleAuthError } from '../../utils';
 import { userRepository } from '../../repositories';

@@ -1,6 +1,6 @@
 import { sanitize } from 'apitoolz';
 
-import { AuthInfo, User } from '../../../../shared/types';
+import { AuthInfo, User } from '@types';
 
 import { UserModel } from '../../models';
 import { userRepository } from '../../repositories';

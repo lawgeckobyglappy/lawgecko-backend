@@ -5,11 +5,11 @@
 	"main": "src/app.js",
 	"scripts": {
 		"dev": "nodemon",
-		"start": "ts-node ./src/server.ts",
+		"start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/server.js",
 		"start:dev": "npm run start -- --watch",
 		"build": "tsc -p tsconfig.json",
 		"format": "prettier \"**/*\" --ignore-unknown",
-		"test": "jest --verbose --forceExit --detectOpenHandles  --maxWorkers=1",
+		"test": "jest --verbose --forceExit --detectOpenHandles --maxWorkers=1",
 		"test:coverage": "jest --coverage --forceExit --detectOpenHandles  --maxWorkers=1",
 		"test:watch": "jest --verbose --watchAll --forceExit --detectOpenHandles --maxWorkers=1"
 	},
@@ -54,6 +54,7 @@
 		"node-cache": "^5.1.2",
 		"nodemailer": "^6.9.3",
 		"pino": "^8.14.1",
+		"tsconfig-paths": "^4.2.0",
 		"uniqid": "^5.4.0"
 	},
 	"jest": {
