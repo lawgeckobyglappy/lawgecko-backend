@@ -27,7 +27,6 @@ type UserAccountStatus = 'active' | 'blocked' | 'deleted';
 type UserRole = 'admin' | 'moderator' | 'user';
 
 type UserInput = {
-	_id: string;
 	accountStatus: UserAccountStatus;
 	email: string;
 	firstName: string;
