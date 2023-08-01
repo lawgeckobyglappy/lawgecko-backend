@@ -13,7 +13,7 @@ type Options = {
 function sendLoginLinkEmail({ user, linkId }: Options) {
 	const { email, firstName } = user;
 
-	const link = `${config.frontendUrl}/verifylink/?id=${linkId}`;
+	const link = `${config.frontendUrl}/verify-link/?id=${linkId}`;
 
 	const html = `
           <html>
@@ -34,7 +34,7 @@ function sendLoginLinkEmail({ user, linkId }: Options) {
        `;
 
 	return sendMail({
-		from: 'ourlawgecko@gmail.com',
+		from: 'accounts',
 		to: email,
 		subject: 'Login link',
 		html,
