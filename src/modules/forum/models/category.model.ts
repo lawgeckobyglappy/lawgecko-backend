@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
 import { ISubCategory } from './sub-category.model';
-import { ICategory } from 'shared/types/forum';
+import { ICategory } from 'shared/types/forum.types';
 
 const categorySchema = new Schema<ICategory>({
 	name: { type: String, required: true },

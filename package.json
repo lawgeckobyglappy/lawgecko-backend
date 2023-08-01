@@ -4,9 +4,9 @@
 	"description": "",
 	"main": "src/app.js",
 	"scripts": {
+		"start": "node ./dist/server.js",
 		"dev": "nodemon",
-		"start": "ts-node ./src/server.ts",
-		"start:dev": "npm run start -- --watch",
+		"start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts",
 		"build": "tsc -p tsconfig.json",
 		"format": "prettier \"**/*\" --ignore-unknown",
 		"test": "jest --verbose --forceExit --detectOpenHandles  --maxWorkers=1",

@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { ICategory } from './category.model';
+import { ICategory } from 'shared/types/forum.types';
 
 export interface ISubCategory extends Document {
 	name: string;
