@@ -5,11 +5,17 @@
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"moduleResolution": "node",
-		"baseUrl": "./src",
+		"baseUrl": ".",
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"paths": {
+			"@config/*": ["src/config/*"],
+			"@types": ["src/shared/types/index.ts", "src/shared/types/*"],
+			"@utils": ["src/shared/utils/index.ts", "src/shared/utils/*"],
+			"@/*": ["src/*"]
+		}
 	},
 	"files": ["src/global.d.ts"],
 	"include": ["src/**/*"],

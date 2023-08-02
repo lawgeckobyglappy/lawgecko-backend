@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-import { LoginLink } from '../../../../shared/types';
+import { LoginLink } from '@types';
 
 export { loginLinkRepository };
 

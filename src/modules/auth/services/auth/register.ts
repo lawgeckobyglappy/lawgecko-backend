@@ -1,4 +1,4 @@
-import { UserInput } from '../../../../shared/types';
+import { UserInput } from '@types';
 
 import { UserModel } from '../../models';
 import { handleError } from '../../utils';

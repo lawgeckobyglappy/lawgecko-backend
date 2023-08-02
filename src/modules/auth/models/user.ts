@@ -1,7 +1,7 @@
 import Schema from 'clean-schema';
 
-import { generateId } from '../../../shared/utils';
-import { User, UserInput } from '../../../shared/types';
+import { generateId } from '@utils';
+import { User, UserInput } from '@types';
 
 import {
 	validateString,

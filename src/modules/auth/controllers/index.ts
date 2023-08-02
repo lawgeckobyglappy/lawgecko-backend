@@ -33,10 +33,15 @@ function makeController(
 
 			return adaptResponse({ res, results, successCode, errorCode });
 		} catch (err: any) {
+			const error = new ApiError({
+				message: err.message,
+				statusCode: 500,
+			}).summary;
+
 			return adaptResponse({
 				res,
-				results: { error: new ApiError(err).summary },
-				errorCode,
+				results: { error },
+				errorCode: error.statusCode,
 			});
 		}
 	};

@@ -1,6 +1,6 @@
 import { ValidatorResponse } from 'clean-schema';
 import { validateEmail, validateString } from './shared';
-import { UserAccountStatus, UserRole } from 'shared/types';
+import { UserAccountStatus, UserRole } from '@/shared/types';
 import { userRepository } from '../repositories';
 
 export {

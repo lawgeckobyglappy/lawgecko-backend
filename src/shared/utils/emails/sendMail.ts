@@ -1,12 +1,15 @@
 import nodemailer from 'nodemailer';
 
-import config from '../../../config/env';
+import config from '@config/env';
 
 import { logger } from '../../logger';
 
 const { emails, environment } = config;
 
 export { sendMail };
+
+// emails could be sent from: accounts, posts, support, etc
+type EmailAccount = 'accounts';
 
 type MailProps = {
 	from: EmailAccount;
@@ -15,9 +18,7 @@ type MailProps = {
 	html?: string;
 };
 
-type EmailAccount = 'ourlawgecko@gmail.com';
 function getSender(name: EmailAccount) {
-	// logger.info(emails);
 	const { user, password, service } = (emails as any)?.[name] ?? emails.default;
 	return { user, password, service };
 }
@@ -28,13 +29,11 @@ const sendMail = async ({
 	subject = '',
 	html = '',
 }: MailProps) => {
-	// if (environment !== 'production') {
-	// 	if (environment == 'development') {
-	// 		logger.info({ from, to, subject, text });
-	// 		const { user, password, service } = getSender(from);
-	// 	}
-	// 	return;
-	// }
+	if (environment !== 'production') {
+		if (environment == 'development') logger.info({ from, to, subject, html });
+
+		return;
+	}
 
 	if (!Array.isArray(to)) to = [to];
 	const { user, password, service } = getSender(from);

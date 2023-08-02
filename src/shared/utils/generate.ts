@@ -1,9 +1,6 @@
-import uniqid from 'uniqid'
-import randomize from 'randomatic'
+import uniqid from 'uniqid';
 
-export { generateId, getRandom }
+export { generateId };
 
 const generateId = (prefix?: string, suffix?: string) =>
-  uniqid.process(prefix, suffix).toUpperCase()
-
-const getRandom = (charType = '*', length = 10) => randomize(charType, length)
+	uniqid.process(prefix, suffix).toUpperCase();

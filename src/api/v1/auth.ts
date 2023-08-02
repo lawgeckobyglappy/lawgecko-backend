@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { controllers } from '../../modules/auth/controllers';
-import { requireAuth } from '../../shared/middlewares/auth.middleware';
+import { controllers } from '@/modules/auth/controllers';
+import { requireAuth } from '@/shared/middlewares/auth.middleware';
 
 export { router as authRouter };
 
