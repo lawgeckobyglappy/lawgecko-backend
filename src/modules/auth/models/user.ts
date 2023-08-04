@@ -4,17 +4,20 @@ import { generateId } from '@utils';
 import { User, UserInput } from '@types';
 
 import {
+	validateAuthProviders,
 	validateString,
 	validateUserAccountStatus,
 	validateUserEmail,
 	validateUserRole,
 	validateUsername,
 } from '../validators';
+import { generateUsername } from '../utils';
 
 export { UserModel };
 
 const UserModel = new Schema<User, UserInput>({
 	_id: { constant: true, value: () => generateId() },
+	authProviders: { default: [], validator: validateAuthProviders },
 	accountStatus: {
 		default: 'active',
 		shouldInit: false,
@@ -30,5 +33,12 @@ const UserModel = new Schema<User, UserInput>({
 		validator: validateString('Invalid last name'),
 	},
 	role: { default: 'user', shouldInit: false, validator: validateUserRole },
-	username: { required: true, validator: validateUsername },
+	username: {
+		default({ firstName, lastName }) {
+			return generateUsername(
+				`${firstName?.trim() || ''}-${lastName?.trim() || ''}`,
+			);
+		},
+		validator: validateUsername,
+	},
 }).getModel();

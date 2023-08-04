@@ -1,6 +1,9 @@
+export { supportedAuthProviders, validAccountStatus };
+
 export type {
 	AuthInfo,
 	AuthInfoInput,
+	AuthProvider,
 	User,
 	UserInput,
 	UserAccountStatus,
@@ -22,12 +25,17 @@ type AuthInfo = {
 	sessionId: string;
 };
 
-type UserAccountStatus = 'active' | 'blocked' | 'deleted';
+const validAccountStatus = ['active', 'blocked', 'deleted'] as const;
+type UserAccountStatus = (typeof validAccountStatus)[number];
 
 type UserRole = 'admin' | 'moderator' | 'user';
 
+const supportedAuthProviders = ['google'] as const;
+type AuthProvider = (typeof supportedAuthProviders)[number];
+
 type UserInput = {
 	accountStatus: UserAccountStatus;
+	authProviders: AuthProvider[];
 	email: string;
 	firstName: string;
 	lastName: string;
@@ -38,6 +46,7 @@ type UserInput = {
 type User = {
 	_id: string;
 	accountStatus: UserAccountStatus;
+	authProviders?: AuthProvider[];
 	createdAt: Date | string;
 	email: string;
 	firstName: string;

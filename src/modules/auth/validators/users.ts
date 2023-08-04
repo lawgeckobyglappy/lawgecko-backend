@@ -1,9 +1,16 @@
 import { ValidatorResponse } from 'clean-schema';
 import { validateEmail, validateString } from './shared';
-import { UserAccountStatus, UserRole } from '@/shared/types';
+import {
+	AuthProvider,
+	supportedAuthProviders,
+	UserAccountStatus,
+	UserRole,
+	validAccountStatus,
+} from '@/shared/types';
 import { userRepository } from '../repositories';
 
 export {
+	validateAuthProviders,
 	validateUserAccountStatus,
 	validateUserEmail,
 	validateUsername,
@@ -34,14 +41,25 @@ async function validateUsername(val: any) {
 	return isValid;
 }
 
-const validAccountStatus: UserAccountStatus[] = [
-	'active',
-	'blocked',
-	'deleted',
-];
+function validateAuthProviders(providers: any) {
+	if (!Array.isArray(providers)) return { valid: false, reason: '' };
+
+	const reasons: string[] = [];
+
+	for (const provider of providers)
+		if (!supportedAuthProviders.includes(provider))
+			reasons.push(`${provider} is not a supported auth provider`);
+
+	if (reasons.length) return { valid: false, reasons };
+
+	return { valid: true, validated: providers } as ValidatorResponse<
+		AuthProvider[]
+	>;
+}
+
 function validateUserAccountStatus(status: any) {
 	return validateString('Invalid account status', {
-		enums: validAccountStatus,
+		enums: validAccountStatus as any,
 	})(status) as ValidatorResponse<UserAccountStatus>;
 }
 
