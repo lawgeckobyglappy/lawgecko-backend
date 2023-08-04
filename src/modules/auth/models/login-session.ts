@@ -12,7 +12,7 @@ const { accessExpirationDays } = config.jwt;
 
 export { LoginSessionModel };
 
-const LoginSessionModel = new Schema<LoginSessionInput, LoginSession>({
+const LoginSessionModel = new Schema<LoginSession, LoginSessionInput>({
 	_id: { constant: true, value: () => generateId() },
 	isBlocked: {
 		default: false,

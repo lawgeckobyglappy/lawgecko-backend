@@ -13,7 +13,7 @@ import {
 
 export { UserModel };
 
-const UserModel = new Schema<UserInput, User>({
+const UserModel = new Schema<User, UserInput>({
 	_id: { constant: true, value: () => generateId() },
 	accountStatus: {
 		default: 'active',
