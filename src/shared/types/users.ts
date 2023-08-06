@@ -4,6 +4,7 @@ export type {
 	AuthInfo,
 	AuthInfoInput,
 	AuthProvider,
+	IApiError,
 	User,
 	UserInput,
 	UserAccountStatus,
@@ -25,6 +26,12 @@ type AuthInfo = {
 	sessionId: string;
 };
 
+type IApiError = {
+	message: string;
+	payload: Record<string, string[]>;
+	statusCode: number;
+};
+
 const validAccountStatus = ['active', 'blocked', 'deleted'] as const;
 type UserAccountStatus = (typeof validAccountStatus)[number];
 
@@ -35,12 +42,13 @@ type AuthProvider = (typeof supportedAuthProviders)[number];
 
 type UserInput = {
 	accountStatus: UserAccountStatus;
-	authProviders: AuthProvider[];
 	email: string;
 	firstName: string;
 	lastName: string;
 	role: UserRole;
 	username: string;
+
+	_addAuthProvider: AuthProvider;
 };
 
 type User = {

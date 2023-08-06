@@ -1,14 +1,11 @@
-import { handleAuthError, handleError } from '../../utils';
-import { validateEmail } from '../../validators';
-import { userRepository } from '../../repositories';
-
-import { createLoginLink } from './create-login-link';
-
-export { requestLoginLink };
-
 import { OAuth2Client } from 'google-auth-library';
-import { UserModel } from '../../models';
-import { AuthProvider } from '@types';
+
+import { handleError } from '../../utils';
+
+import { handleAuthProvider } from './helpers';
+
+export { handleGoogleAuth };
+
 const client = new OAuth2Client({
 	clientId: 'YOUR_GOOGLE_CLIENT_ID',
 	clientSecret: 'YOUR_GOOGLE_CLIENT_SECRET',
@@ -43,57 +40,12 @@ async function handleGoogleAuth(code: string) {
 	if (!userInfo.email_verified)
 		return handleError({ message: 'Email not verified' });
 
-	let user = await userRepository.findOne({ email: userInfo.email });
-
-	if (user?.accountStatus == 'deleted')
-		return handleAuthError('Authentication failed');
-
-	if (user?.accountStatus != 'active') return handleAuthError('Access denied');
-
-	if (user && !user?.authProviders?.includes('google')) {
-		const { data, error } = await UserModel.create({
+	return handleAuthProvider({
+		userInfo: {
 			email: userInfo.email,
 			firstName: userInfo.given_name,
 			lastName: userInfo.family_name,
-			authProviders: ['google'],
-		});
-
-		if (error) return handleError(error);
-
-		const authProviders: AuthProvider[] = [
-			...(user?.authProviders ?? []),
-			'google',
-		];
-
-		user.authProviders = authProviders;
-
-		await userRepository.updateOne({ _id: user._id }, { authProviders });
-	}
-
-	if (!user) {
-		const { data, error } = await UserModel.create({
-			email: userInfo.email,
-			firstName: userInfo.given_name,
-			lastName: userInfo.family_name,
-			authProviders: ['google'],
-		});
-
-		if (error) return handleError(error);
-
-		user = await userRepository.insertOne(data);
-	}
-
-	return userInfo;
+		},
+		provider: 'google',
+	});
 }
-
-const requestLoginLink = async (email: string) => {
-	const isValid = validateEmail(email);
-
-	if (!isValid.valid) return handleError({ message: 'Invalid email' });
-
-	const user = await userRepository.findOne({ email: isValid.validated });
-
-	if (!user || user.accountStatus != 'active') return { data: 'Success' };
-
-	return createLoginLink(user);
-};

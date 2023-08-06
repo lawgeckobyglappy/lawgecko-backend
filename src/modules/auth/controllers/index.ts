@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import {
 	getCurrentuser,
+	handleGoogleAuth,
 	register,
 	requestLoginLink,
 	updateUser,
@@ -13,6 +14,7 @@ export { controllers };
 
 const controllers = {
 	getCurrentUser: makeController((req) => getCurrentuser(req.authInfo!)),
+	handleGoogleAuth: makeController((req) => handleGoogleAuth(req.body.code)),
 	register: makeController((req) => register(req.body), 201),
 	requestLoginLink: makeController((req) => requestLoginLink(req.body.email)),
 	updateUser: makeController(({ params: { id }, body, authInfo }) => {

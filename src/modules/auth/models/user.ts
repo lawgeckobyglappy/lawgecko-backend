@@ -4,7 +4,7 @@ import { generateId } from '@utils';
 import { User, UserInput } from '@types';
 
 import {
-	validateAuthProviders,
+	validateAuthProvider,
 	validateString,
 	validateUserAccountStatus,
 	validateUserEmail,
@@ -18,7 +18,18 @@ export { UserModel };
 const UserModel = new Schema<User, UserInput>(
 	{
 		_id: { constant: true, value: () => generateId() },
-		authProviders: { default: [], validator: validateAuthProviders },
+		authProviders: {
+			default: [],
+			dependent: true,
+			dependsOn: '_addAuthProvider',
+			resolver({ context: { _addAuthProvider, authProviders } }) {
+				if (!authProviders) authProviders = [];
+
+				authProviders.push(_addAuthProvider);
+
+				return authProviders;
+			},
+		},
 		accountStatus: {
 			default: 'active',
 			shouldInit: false,
@@ -42,6 +53,8 @@ const UserModel = new Schema<User, UserInput>(
 			},
 			validator: validateUsername,
 		},
+
+		_addAuthProvider: { virtual: true, validator: validateAuthProvider },
 	},
 	{ setMissingDefaultsOnUpdate: true },
 ).getModel();

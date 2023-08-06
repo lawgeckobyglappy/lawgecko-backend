@@ -1,21 +1,25 @@
-import { ValidatorResponse } from 'clean-schema';
+import { Summary, ValidatorResponse } from 'clean-schema';
 import { validateEmail, validateString } from './shared';
 import {
 	AuthProvider,
 	supportedAuthProviders,
+	User,
 	UserAccountStatus,
+	UserInput,
 	UserRole,
 	validAccountStatus,
 } from '@/shared/types';
 import { userRepository } from '../repositories';
 
 export {
-	validateAuthProviders,
+	validateAuthProvider,
 	validateUserAccountStatus,
 	validateUserEmail,
 	validateUsername,
 	validateUserRole,
 };
+
+type UserValidationSummary = Summary<User, UserInput>;
 
 async function validateUserEmail(val: any) {
 	const isValid = validateEmail(val);
@@ -41,20 +45,20 @@ async function validateUsername(val: any) {
 	return isValid;
 }
 
-function validateAuthProviders(providers: any) {
-	if (!Array.isArray(providers)) return { valid: false, reason: '' };
+function validateAuthProvider(provider: any, summary: UserValidationSummary) {
+	const isValid = validateString('Unsupported auth provider', {
+		enums: supportedAuthProviders as any,
+	})(provider) as ValidatorResponse<AuthProvider>;
 
-	const reasons: string[] = [];
+	if (!isValid) return isValid;
 
-	for (const provider of providers)
-		if (!supportedAuthProviders.includes(provider))
-			reasons.push(`${provider} is not a supported auth provider`);
+	const {
+		context: { authProviders },
+	} = summary;
 
-	if (reasons.length) return { valid: false, reasons };
-
-	return { valid: true, validated: providers } as ValidatorResponse<
-		AuthProvider[]
-	>;
+	return authProviders?.includes(provider)
+		? { valid: false, reason: 'Provider already registered' }
+		: true;
 }
 
 function validateUserAccountStatus(status: any) {
