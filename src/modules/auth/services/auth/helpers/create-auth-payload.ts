@@ -1,4 +1,4 @@
-import { User } from '@types';
+import { UserRole } from '@types';
 
 import { loginSessionRepository } from '../../../repositories';
 import { LoginSessionModel } from '../../../models';
@@ -6,8 +6,10 @@ import { createToken, handleError } from '../../../utils';
 
 export { createAuthPayload };
 
-const createAuthPayload = async (user: User) => {
-	const sessionInfo = await LoginSessionModel.create({ userId: user._id });
+type UserInfo = { _id: string; role: UserRole };
+
+const createAuthPayload = async ({ _id: userId, role }: UserInfo) => {
+	const sessionInfo = await LoginSessionModel.create({ userId });
 
 	const { data: session, error } = sessionInfo;
 
@@ -16,8 +18,8 @@ const createAuthPayload = async (user: User) => {
 	await loginSessionRepository.insertOne(session);
 
 	const accessToken = createToken({
-		userId: user._id,
-		userRole: user.role,
+		userId,
+		userRole: role,
 		sessionId: session._id,
 	});
 
