@@ -41,7 +41,7 @@
 	},
 	"dependencies": {
 		"apitoolz": "^0.3.14",
-		"clean-schema": "^3.4.0",
+		"clean-schema": "^3.5.0",
 		"cors": "^2.8.5",
 		"dayjs": "^1.11.9",
 		"dotenv": "^16.3.1",

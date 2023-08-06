@@ -15,30 +15,33 @@ import { generateUsername } from '../utils';
 
 export { UserModel };
 
-const UserModel = new Schema<User, UserInput>({
-	_id: { constant: true, value: () => generateId() },
-	authProviders: { default: [], validator: validateAuthProviders },
-	accountStatus: {
-		default: 'active',
-		shouldInit: false,
-		validator: validateUserAccountStatus,
-	},
-	email: { required: true, validator: validateUserEmail },
-	firstName: {
-		required: true,
-		validator: validateString('Invalid first name'),
-	},
-	lastName: {
-		required: true,
-		validator: validateString('Invalid last name'),
-	},
-	role: { default: 'user', shouldInit: false, validator: validateUserRole },
-	username: {
-		default({ firstName, lastName }) {
-			return generateUsername(
-				`${firstName?.trim() || ''}-${lastName?.trim() || ''}`,
-			);
+const UserModel = new Schema<User, UserInput>(
+	{
+		_id: { constant: true, value: () => generateId() },
+		authProviders: { default: [], validator: validateAuthProviders },
+		accountStatus: {
+			default: 'active',
+			shouldInit: false,
+			validator: validateUserAccountStatus,
 		},
-		validator: validateUsername,
+		email: { required: true, validator: validateUserEmail },
+		firstName: {
+			required: true,
+			validator: validateString('Invalid first name'),
+		},
+		lastName: {
+			required: true,
+			validator: validateString('Invalid last name'),
+		},
+		role: { default: 'user', shouldInit: false, validator: validateUserRole },
+		username: {
+			default({ firstName, lastName }) {
+				return generateUsername(
+					`${firstName?.trim() || ''}-${lastName?.trim() || ''}`,
+				);
+			},
+			validator: validateUsername,
+		},
 	},
-}).getModel();
+	{ setMissingDefaultsOnUpdate: true },
+).getModel();
