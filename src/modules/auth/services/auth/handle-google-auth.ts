@@ -1,15 +1,20 @@
 import { OAuth2Client } from 'google-auth-library';
 
+import config from '@config/env';
 import { handleError } from '../../utils';
 
 import { handleAuthProvider } from './helpers';
 
 export { handleGoogleAuth };
 
+const {
+	authProviders: { google },
+} = config;
+
 const client = new OAuth2Client({
-	clientId: 'YOUR_GOOGLE_CLIENT_ID',
-	clientSecret: 'YOUR_GOOGLE_CLIENT_SECRET',
-	redirectUri: 'YOUR_GOOGLE_REDIRECT_URI',
+	clientId: google.clientId,
+	clientSecret: google.clientSecret,
+	redirectUri: google.redirectUri,
 });
 
 type GoogleUserInfo = {
