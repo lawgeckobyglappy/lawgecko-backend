@@ -11,6 +11,6 @@ const exampleController: ExampleController = new ExampleController(
 	exampleService,
 );
 
-router.get('/example', exampleController.getExample.bind(exampleController));
+router.get('/', exampleController.getExample.bind(exampleController));
 
 export default router;

@@ -1,13 +1,13 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import { ISubCategory } from './sub-category.model';
-import { ICategory } from 'shared/types/forum.types';
+import { ICategory } from '../../../shared/types/forum.types';
+import { tagSchema } from './tag.model';
 
-const categorySchema = new Schema<ICategory>({
+export const categorySchema = new Schema<ICategory>({
 	name: { type: String, required: true },
 	description: { type: String, required: true },
-	sub_categories: [{ type: Schema.Types.ObjectId, ref: 'SubCategory' }],
+	tags: [tagSchema],
 });
 
-const CategoryModel = mongoose.model<ICategory>('Category', categorySchema);
+const CategoryModel = mongoose.model<ICategory>('category', categorySchema);
 
 export { CategoryModel };

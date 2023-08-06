@@ -1,21 +1,24 @@
 import express from 'express';
-import { ExampleController } from '../../modules/example-feature/controllers/example.controller';
-import SubCategoryRepo from 'modules/forum/repositories/sub-category.repo';
-import ForumService from 'modules/forum/services/forum.service';
-import CategoryRepo from 'modules/forum/repositories/category.repo';
-import ForumController from 'modules/forum/controllers/forum.controller';
+import ForumService from '../../modules/forum/services/category.service';
+import CategoryRepo from '../../modules/forum/repositories/category.repo';
+import ForumController from '../../modules/forum/controllers/category.controller';
 
 const router = express.Router();
 
-const subCategoryRepo: SubCategoryRepo = new SubCategoryRepo();
 const categoryRepo: CategoryRepo = new CategoryRepo();
-const forumService: ForumService = new ForumService(
-	categoryRepo,
-	subCategoryRepo,
+const categoryService: ForumService = new ForumService(categoryRepo);
+const categoryController: ForumController = new ForumController(
+	categoryService,
 );
-const forumController: ForumController = new ForumController(forumService);
 
-// router.get('/forum', forumController.createCategory);
-// router.post('/forum', forumController.getCategoryById);
+router
+	.route('/category')
+	.get(categoryController.getAllCategories.bind(categoryController))
+	.post(categoryController.createCategory.bind(categoryController));
 
-export { router as forumRouter };
+router
+	.route('/category/:id')
+	.get(categoryController.getCategoryById.bind(categoryController))
+	.delete(categoryController.removeCategory.bind(categoryController));
+
+export default router;

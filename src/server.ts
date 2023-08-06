@@ -1,4 +1,5 @@
 // import errorHandler from "errorhandler";
+import 'reflect-metadata';
 import app from './app';
 import config from './config/env';
 import { connectdb } from './config/db';
