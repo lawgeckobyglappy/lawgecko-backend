@@ -1,14 +1,25 @@
-import { ValidatorResponse } from 'clean-schema';
+import { Summary, ValidatorResponse } from 'clean-schema';
 import { validateEmail, validateString } from './shared';
-import { UserAccountStatus, UserRole } from '@/shared/types';
+import {
+	AuthProvider,
+	supportedAuthProviders,
+	User,
+	UserAccountStatus,
+	UserInput,
+	UserRole,
+	validAccountStatus,
+} from '@/shared/types';
 import { userRepository } from '../repositories';
 
 export {
+	validateAuthProvider,
 	validateUserAccountStatus,
 	validateUserEmail,
 	validateUsername,
 	validateUserRole,
 };
+
+type UserValidationSummary = Summary<User, UserInput>;
 
 async function validateUserEmail(val: any) {
 	const isValid = validateEmail(val);
@@ -34,14 +45,25 @@ async function validateUsername(val: any) {
 	return isValid;
 }
 
-const validAccountStatus: UserAccountStatus[] = [
-	'active',
-	'blocked',
-	'deleted',
-];
+function validateAuthProvider(provider: any, summary: UserValidationSummary) {
+	const isValid = validateString('Unsupported auth provider', {
+		enums: supportedAuthProviders as any,
+	})(provider) as ValidatorResponse<AuthProvider>;
+
+	if (!isValid) return isValid;
+
+	const {
+		context: { authProviders },
+	} = summary;
+
+	return authProviders?.includes(provider)
+		? { valid: false, reason: 'Provider already registered' }
+		: true;
+}
+
 function validateUserAccountStatus(status: any) {
 	return validateString('Invalid account status', {
-		enums: validAccountStatus,
+		enums: validAccountStatus as any,
 	})(status) as ValidatorResponse<UserAccountStatus>;
 }
 

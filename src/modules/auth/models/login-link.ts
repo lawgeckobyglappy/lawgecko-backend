@@ -11,7 +11,7 @@ const { loginLinkExpirationMinutes } = config;
 
 export { LoginLinkModel };
 
-const LoginLinkModel = new Schema<LoginLinkInput, LoginLink>({
+const LoginLinkModel = new Schema<LoginLink, LoginLinkInput>({
 	_id: { constant: true, value: () => generateId().toLowerCase() },
 	expiresAt: {
 		constant: true,

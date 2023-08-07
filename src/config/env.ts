@@ -2,6 +2,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config = {
+	authProviders: {
+		google: {
+			clientId: process.env.GOOGLE_AUTH_CLIENT_ID,
+			clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET,
+			redirectUri: process.env.GOOGLE_AUTH_REDIRECT_URI,
+		},
+	},
 	emails: {
 		default: {
 			user: process.env.DEFAULT_EMAIL_USER,

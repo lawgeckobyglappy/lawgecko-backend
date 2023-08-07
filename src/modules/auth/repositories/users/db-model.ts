@@ -6,9 +6,10 @@ export { dbModel };
 const userSchema = new Schema<User>(
 	{
 		_id: { type: String, required: true },
+		accountStatus: { type: String },
+		authProviders: { default: [], type: Array },
 		email: { type: String, index: true, required: true },
 		firstName: { type: String, required: true },
-		accountStatus: { type: String },
 		lastName: { type: String, required: false },
 		role: {
 			type: String,

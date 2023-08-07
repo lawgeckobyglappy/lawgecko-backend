@@ -1,3 +1,4 @@
+import { IApiError } from '@types';
 import { ApiError } from 'apitoolz';
 
 export { handleError, handleAuthError };
@@ -17,6 +18,6 @@ function handleAuthError(message: 'Access denied' | 'Authentication failed') {
 		error: new ApiError({
 			message,
 			statusCode: message == 'Access denied' ? 403 : 401,
-		}).summary,
+		}).summary as IApiError,
 	};
 }

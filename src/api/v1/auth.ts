@@ -7,6 +7,7 @@ export { router as authRouter };
 const router = Router();
 
 router.post('/register', controllers.register);
+router.post('/handle-google-auth', controllers.handleGoogleAuth);
 router.get('/current-user', requireAuth(), controllers.getCurrentUser);
 router.patch('/update-user/:id', requireAuth(), controllers.updateUser);
 router.post('/request-login-link', controllers.requestLoginLink);
