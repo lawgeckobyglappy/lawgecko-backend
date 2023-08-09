@@ -25,7 +25,13 @@ type GoogleUserInfo = {
 	given_name: string;
 	family_name: string;
 };
-async function handleGoogleAuth(code: string) {
+async function handleGoogleAuth({
+	code,
+	isLogin,
+}: {
+	code: string;
+	isLogin: boolean;
+}) {
 	const { tokens } = await client.getToken(code);
 
 	client.setCredentials({
@@ -46,6 +52,7 @@ async function handleGoogleAuth(code: string) {
 		return handleError({ message: 'Email not verified' });
 
 	return handleAuthProvider({
+		isLogin,
 		userInfo: {
 			email: userInfo.email,
 			firstName: userInfo.given_name,

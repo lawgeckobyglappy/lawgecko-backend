@@ -14,7 +14,7 @@ export { controllers };
 
 const controllers = {
 	getCurrentUser: makeController((req) => getCurrentuser(req.authInfo!)),
-	handleGoogleAuth: makeController((req) => handleGoogleAuth(req.body.code)),
+	handleGoogleAuth: makeController((req) => handleGoogleAuth(req.body)),
 	register: makeController((req) => register(req.body), 201),
 	requestLoginLink: makeController((req) => requestLoginLink(req.body.email)),
 	updateUser: makeController(({ params: { id }, body, authInfo }) => {
