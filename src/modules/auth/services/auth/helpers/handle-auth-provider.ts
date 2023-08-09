@@ -23,7 +23,8 @@ async function handleAuthProvider({ userInfo, provider }: Options) {
 	if (user?.accountStatus == 'deleted')
 		return handleAuthError('Authentication failed');
 
-	if (user?.accountStatus != 'active') return handleAuthError('Access denied');
+	if (user && user?.accountStatus != 'active')
+		return handleAuthError('Access denied');
 
 	if (!user) {
 		const { data, error } = await UserModel.create({
