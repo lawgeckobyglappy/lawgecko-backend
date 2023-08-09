@@ -34,7 +34,7 @@ async function validateUserEmail(val: any) {
 }
 
 async function validateUsername(val: any) {
-	const isValid = validateString('Invalid username')(val);
+	const isValid = validateString('Invalid username', { minLength: 3 })(val);
 
 	if (!isValid.valid) return isValid;
 
