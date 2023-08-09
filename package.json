@@ -51,7 +51,7 @@
 		"http-status": "^1.6.2",
 		"jsonwebtoken": "^9.0.1",
 		"mongodb-memory-server": "^8.13.0",
-		"mongoose": "^7.3.2",
+		"mongoose": "^7.3.3",
 		"morgan": "^1.10.0",
 		"node-cache": "^5.1.2",
 		"nodemailer": "^6.9.3",
