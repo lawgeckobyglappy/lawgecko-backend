@@ -7,7 +7,7 @@ export * from './errors';
 export { generateUsername };
 
 async function generateUsername(name: string) {
-	let username = getSlug(name);
+	const username = getSlug(name);
 
 	const isTaken = await userRepository.findOne({ username });
 
