@@ -9,12 +9,13 @@ export { handleGoogleAuth };
 
 const {
 	authProviders: { google },
+	frontendUrl,
 } = config;
 
 const client = new OAuth2Client({
 	clientId: google.clientId,
 	clientSecret: google.clientSecret,
-	redirectUri: google.redirectUri,
+	redirectUri: frontendUrl,
 });
 
 type GoogleUserInfo = {
