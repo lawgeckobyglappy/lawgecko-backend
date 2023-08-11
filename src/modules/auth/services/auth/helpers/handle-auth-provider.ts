@@ -27,10 +27,24 @@ async function handleAuthProvider({ userInfo, isLogin, provider }: Options) {
 	if (user && user?.accountStatus != 'active')
 		return handleAuthError('Access denied');
 
-	if (isLogin && (!user || !user?.authProviders?.includes(provider)))
+	const isProviderRegistered = user?.authProviders?.includes(provider);
+
+	if (isLogin && (!user || !isProviderRegistered))
 		return handleError({
 			message: 'Auth provider not registered for this account',
 		});
+
+	if (!isLogin && user && !isProviderRegistered) {
+		const { data, error } = await UserModel.update(user, {
+			_addAuthProvider: provider,
+		});
+
+		if (error) return handleError(error);
+
+		await userRepository.updateOne({ _id: user._id }, data);
+
+		user = { ...user, ...data };
+	}
 
 	if (!user) {
 		const { data, error } = await UserModel.create({
