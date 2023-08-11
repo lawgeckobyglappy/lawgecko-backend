@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import {
 	getCurrentuser,
+	handleGoogleAuth,
 	register,
 	requestLoginLink,
 	updateUser,
@@ -13,6 +14,7 @@ export { controllers };
 
 const controllers = {
 	getCurrentUser: makeController((req) => getCurrentuser(req.authInfo!)),
+	handleGoogleAuth: makeController((req) => handleGoogleAuth(req.body)),
 	register: makeController((req) => register(req.body), 201),
 	requestLoginLink: makeController((req) => requestLoginLink(req.body.email)),
 	updateUser: makeController(({ params: { id }, body, authInfo }) => {
@@ -33,10 +35,15 @@ function makeController(
 
 			return adaptResponse({ res, results, successCode, errorCode });
 		} catch (err: any) {
+			const error = new ApiError({
+				message: err.message,
+				statusCode: 500,
+			}).summary;
+
 			return adaptResponse({
 				res,
-				results: { error: new ApiError(err).summary },
-				errorCode,
+				results: { error },
+				errorCode: error.statusCode,
 			});
 		}
 	};

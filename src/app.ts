@@ -8,9 +8,7 @@ import exampleRoutes from './api/v1/example';
 
 const app: Application = express();
 
-if (config.environment !== 'test') {
-	app.use(morgan);
-}
+if (config.environment !== 'test') app.use(morgan);
 
 app.use(cors({ origin: '*' }));
 

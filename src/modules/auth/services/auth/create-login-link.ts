@@ -1,5 +1,5 @@
-import { User } from '../../../../shared/types';
-import { sendLoginLinkEmail } from '../../../../shared/utils';
+import { User } from '@types';
+import { sendLoginLinkEmail } from '@utils';
 
 import { LoginLinkModel } from '../../models';
 import { handleError } from '../../utils/errors';

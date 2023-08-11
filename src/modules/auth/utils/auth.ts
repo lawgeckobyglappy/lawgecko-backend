@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
-import config from '../../../config/env';
-import { AuthInfo, AuthInfoInput } from '../../../shared/types';
+import config from '@/config/env';
+import { AuthInfo, AuthInfoInput } from '@/shared/types';
 import { Request } from 'express';
 
 const { secret, accessExpirationDays } = config.jwt;

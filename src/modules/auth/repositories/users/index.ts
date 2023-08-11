@@ -1,6 +1,6 @@
 import { FilterQuery, QueryOptions } from 'mongoose';
 
-import { User } from '../../../../shared/types';
+import { User } from '@types';
 
 import { dbModel } from './db-model';
 

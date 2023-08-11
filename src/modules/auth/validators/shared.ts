@@ -1,4 +1,4 @@
-import { validate, IStringOptions } from 'clean-schema';
+import { validate, StringOptions } from 'clean-schema';
 
 export { validateEmail, validateString };
 
@@ -10,9 +10,15 @@ function validateEmail(val: any) {
 	return validation;
 }
 
-function validateString(msg?: string, options?: IStringOptions) {
+function validateString<T extends string = string>(
+	msg?: string,
+	options?: StringOptions<T>,
+) {
 	return (val: any) => {
-		const validation = validate.isStringOk(val, { trim: true, ...options });
+		const validation = validate.isStringOk(val, {
+			trim: true,
+			...options,
+		} as any);
 
 		if (!validation.valid && msg) validation.reasons.unshift(msg);
 

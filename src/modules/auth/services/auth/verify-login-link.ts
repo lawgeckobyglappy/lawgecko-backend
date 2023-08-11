@@ -1,10 +1,7 @@
-import {
-	loginLinkRepository,
-	loginSessionRepository,
-	userRepository,
-} from '../../repositories';
-import { LoginSessionModel } from '../../models';
-import { createToken, handleAuthError, handleError } from '../../utils';
+import { loginLinkRepository, userRepository } from '../../repositories';
+import { handleAuthError, handleError } from '../../utils';
+
+import { createAuthPayload } from './helpers';
 
 export { verifyLoginLink };
 
@@ -18,21 +15,7 @@ const verifyLoginLink = async (linkId: string) => {
 	if (!user || user.accountStatus != 'active')
 		return handleAuthError('Authentication failed');
 
-	const sessionInfo = await LoginSessionModel.create({ userId: user._id });
-
-	const { data: session, error } = sessionInfo;
-
-	if (error) return handleError(error);
-
-	await loginSessionRepository.insertOne(session);
-
-	const accessToken = createToken({
-		userId: user._id,
-		userRole: user.role,
-		sessionId: session._id,
-	});
-
 	await loginLinkRepository.deleteById(linkId);
 
-	return { data: accessToken };
+	return createAuthPayload(user);
 };

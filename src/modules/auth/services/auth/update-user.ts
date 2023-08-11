@@ -1,6 +1,6 @@
 import { sanitize } from 'apitoolz';
 
-import { AuthInfo, User } from '../../../../shared/types';
+import { AuthInfo, User } from '@types';
 
 import { UserModel } from '../../models';
 import { userRepository } from '../../repositories';
@@ -32,8 +32,7 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
 	const { data, error } = await UserModel.update(user, updates);
 
 	if (error) {
-		if (error.message.toLowerCase() == 'nothing to update')
-			return { data: user };
+		if (error.message == 'Nothing to update') return { data: user };
 
 		return handleError(error);
 	}

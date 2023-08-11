@@ -1,6 +1,10 @@
+export { supportedAuthProviders, validAccountStatus };
+
 export type {
 	AuthInfo,
 	AuthInfoInput,
+	AuthProvider,
+	IApiError,
 	User,
 	UserInput,
 	UserAccountStatus,
@@ -22,23 +26,35 @@ type AuthInfo = {
 	sessionId: string;
 };
 
-type UserAccountStatus = 'active' | 'blocked' | 'deleted';
+type IApiError = {
+	message: string;
+	payload: Record<string, string[]>;
+	statusCode: number;
+};
+
+const validAccountStatus = ['active', 'blocked', 'deleted'] as const;
+type UserAccountStatus = (typeof validAccountStatus)[number];
 
 type UserRole = 'admin' | 'moderator' | 'user';
 
+const supportedAuthProviders = ['google'] as const;
+type AuthProvider = (typeof supportedAuthProviders)[number];
+
 type UserInput = {
-	_id: string;
 	accountStatus: UserAccountStatus;
 	email: string;
 	firstName: string;
 	lastName: string;
 	role: UserRole;
 	username: string;
+
+	_addAuthProvider: AuthProvider;
 };
 
 type User = {
 	_id: string;
 	accountStatus: UserAccountStatus;
+	authProviders?: AuthProvider[];
 	createdAt: Date | string;
 	email: string;
 	firstName: string;
