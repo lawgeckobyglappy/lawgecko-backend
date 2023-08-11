@@ -6,4 +6,4 @@ export const tagSchema = new Schema<ITag>({
 	name: { type: String, required: true, unique: true },
 });
 
-export const Tag = model<ITag>('tag', tagSchema);
+export const TagModel = model<ITag>('tag', tagSchema);

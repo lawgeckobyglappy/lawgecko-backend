@@ -1,15 +1,24 @@
-import { CreateCategoryDto, ICategory } from 'shared/types/forum.types';
+import {
+	CreateCategoryDto,
+	ICategory,
+	ICreateCategory,
+} from 'shared/types/forum.types';
 import CategoryRepo from '../repositories/category.repo';
+import TagRepo from '../repositories/tag.repo';
 
 export default class CategoryService {
-	constructor(private categoryRepo: CategoryRepo) {}
+	constructor(
+		private categoryRepo: CategoryRepo,
+		private tagsRepo: TagRepo,
+	) {}
 
-	// Category CRUD operations
 	async createCategory(categoryData: CreateCategoryDto): Promise<ICategory> {
-		const createdCategory = await this.categoryRepo.createCategory(
-			categoryData,
-		);
-		return createdCategory;
+		const newCategory: ICreateCategory = {
+			name: categoryData.name,
+			description: categoryData.description,
+		};
+		newCategory.tags = await this.tagsRepo.bulkInsert(categoryData.tags);
+		return await this.categoryRepo.createCategory(newCategory);
 	}
 
 	async getCategoryById(categoryId: string): Promise<ICategory | null> {

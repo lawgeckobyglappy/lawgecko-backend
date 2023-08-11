@@ -1,6 +1,10 @@
 import { Collection, Model } from 'mongoose';
 import { CategoryModel } from '../models/category.model';
-import { CreateCategoryDto, ICategory } from 'shared/types/forum.types';
+import {
+	CreateCategoryDto,
+	ICategory,
+	ICreateCategory,
+} from 'shared/types/forum.types';
 
 export default class CategoryRepo {
 	private categoryModel: Model<ICategory>;
@@ -9,7 +13,7 @@ export default class CategoryRepo {
 		this.categoryModel = CategoryModel;
 	}
 
-	createCategory(categoryData: CreateCategoryDto): Promise<ICategory> {
+	createCategory(categoryData: ICreateCategory): Promise<ICategory> {
 		const category = new this.categoryModel(categoryData);
 		return category.save();
 	}
