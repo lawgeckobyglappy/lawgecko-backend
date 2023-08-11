@@ -19,3 +19,14 @@ function validateString(msg?: string, options?: IStringOptions) {
 		return validation;
 	};
 }
+
+
+function validateObjectId(msg?: string, options?: IStringOptions) {
+	return (val: any) => {
+		const validation = validate.isStringOk(val, { trim: true, ...options });
+
+		if (!validation.valid && msg) validation.reasons.unshift(msg);
+
+		return validation;
+	};
+}
