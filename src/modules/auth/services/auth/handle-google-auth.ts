@@ -9,12 +9,13 @@ export { handleGoogleAuth };
 
 const {
 	authProviders: { google },
+	frontendUrl,
 } = config;
 
 const client = new OAuth2Client({
 	clientId: google.clientId,
 	clientSecret: google.clientSecret,
-	redirectUri: google.redirectUri,
+	redirectUri: frontendUrl,
 });
 
 type GoogleUserInfo = {
@@ -25,7 +26,13 @@ type GoogleUserInfo = {
 	given_name: string;
 	family_name: string;
 };
-async function handleGoogleAuth(code: string) {
+async function handleGoogleAuth({
+	code,
+	isLogin,
+}: {
+	code: string;
+	isLogin: boolean;
+}) {
 	const { tokens } = await client.getToken(code);
 
 	client.setCredentials({
@@ -46,6 +53,7 @@ async function handleGoogleAuth(code: string) {
 		return handleError({ message: 'Email not verified' });
 
 	return handleAuthProvider({
+		isLogin,
 		userInfo: {
 			email: userInfo.email,
 			firstName: userInfo.given_name,
