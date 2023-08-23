@@ -26,10 +26,12 @@ function validateString<T extends string = string>(
 	};
 }
 
-
-function validateObjectId(msg?: string, options?: IStringOptions) {
+function validateObjectId(msg?: string, options?: StringOptions) {
 	return (val: any) => {
-		const validation = validate.isStringOk(val, { trim: true, ...options });
+		const validation = validate.isStringOk(val, {
+			trim: true,
+			...(options as any),
+		});
 
 		if (!validation.valid && msg) validation.reasons.unshift(msg);
 

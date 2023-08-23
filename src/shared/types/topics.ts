@@ -10,10 +10,10 @@ type PostInput = {
 };
 
 type Post = {
-	_id: Schema.Types.ObjectId;
-	userId: Schema.Types.ObjectId;
-	categoryId: Schema.Types.ObjectId;
-	parentId: Schema.Types.ObjectId;
+	_id: string;
+	userId: string;
+	categoryId: string;
+	parentId: string;
 	title: string;
 	content: string;
 	createdDate: Date;
@@ -26,15 +26,15 @@ enum ReactionType {
 }
 
 type ReactionInput = {
-	userId: Schema.Types.ObjectId;
-	postId: Schema.Types.ObjectId;
+	userId: string;
+	postId: string;
 	type: ReactionType;
 };
 
 type Reaction = {
-	id: Schema.Types.ObjectId;
-	userId: Schema.Types.ObjectId;
-	postId: Schema.Types.ObjectId;
+	id: string;
+	userId: string;
+	postId: string;
 	type: ReactionType;
 	createdDate: Date;
 	updatedDate: Date;

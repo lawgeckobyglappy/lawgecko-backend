@@ -1,8 +1,8 @@
 import Schema from 'clean-schema';
 
-import { generateObjectId } from '../../../shared/utils';
-import { PostInput, Post } from '../../../shared/types';
-import { validateString } from 'modules/auth/validators';
+import { generateId } from '@utils';
+import { PostInput, Post } from '@types';
+import { validateString } from '@/modules/auth/validators';
 
 /*import {
 	validateString,
@@ -14,15 +14,16 @@ import { validateString } from 'modules/auth/validators';
 
 export { postModel };
 
-const postModel = new Schema<PostInput, Post>({
-	_id:{
-		constant:true, value: () => generateObjectId(),
+const postModel = new Schema<Post, PostInput>({
+	_id: {
+		constant: true,
+		value: () => generateId(),
 	},
-	categoryId:{
-		required:true,
-		validator:validateString(),
+	categoryId: {
+		required: true,
+		validator: validateString(),
 	},
-	content:{},
-
+	content: {
+		default: '',
+	},
 }).getModel();
-
