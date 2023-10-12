@@ -2,42 +2,42 @@ import { sanitize } from 'apitoolz';
 
 import { AuthInfo, User } from '@types';
 
-import { UserModel } from '../../models';
+import { UserModel } from '../../entities';
 import { userRepository } from '../../repositories';
 import { handleAuthError, handleError } from '../../utils';
 
 export { updateUser };
 
 type Options = {
-	id: string;
-	updates: Partial<User>;
-	authInfo: AuthInfo;
+  id: string;
+  updates: Partial<User>;
+  authInfo: AuthInfo;
 };
 const updateUser = async ({ id, updates, authInfo }: Options) => {
-	const user = await userRepository.findById(id);
+  const user = await userRepository.findById(id);
 
-	if (!user) return handleError({ message: 'User not found', statusCode: 404 });
+  if (!user) return handleError({ message: 'User not found', statusCode: 404 });
 
-	const isCurrentUser = user._id == authInfo.user._id;
+  const isCurrentUser = user._id == authInfo.user._id;
 
-	if (isCurrentUser && user.accountStatus != 'active')
-		return handleAuthError('Authentication failed');
+  if (isCurrentUser && user.accountStatus != 'active')
+    return handleAuthError('Authentication failed');
 
-	if (!isCurrentUser && authInfo.user.role != 'admin')
-		return handleAuthError('Access denied');
+  if (!isCurrentUser && authInfo.user.role != 'admin')
+    return handleAuthError('Access denied');
 
-	if (isCurrentUser)
-		updates = sanitize(updates, { remove: ['accountStatus', 'role'] });
+  if (isCurrentUser)
+    updates = sanitize(updates, { remove: ['accountStatus', 'role'] });
 
-	const { data, error } = await UserModel.update(user, updates);
+  const { data, error } = await UserModel.update(user, updates);
 
-	if (error) {
-		if (error.message == 'Nothing to update') return { data: user };
+  if (error) {
+    if (error.message == 'Nothing to update') return { data: user };
 
-		return handleError(error);
-	}
+    return handleError(error);
+  }
 
-	await userRepository.updateOne({ _id: id }, data);
+  await userRepository.updateOne({ _id: id }, data);
 
-	return { data: { ...user, ...data } };
+  return { data: { ...user, ...data } };
 };

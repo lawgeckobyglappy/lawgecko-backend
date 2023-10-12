@@ -6,16 +6,16 @@ import { sendMail } from '../sendMail';
 export { sendLoginLinkEmail };
 
 type Options = {
-	linkId: string;
-	user: User;
+  linkId: string;
+  user: User;
 };
 
 function sendLoginLinkEmail({ user, linkId }: Options) {
-	const { email, firstName } = user;
+  const { email, firstName } = user;
 
-	const link = `${config.frontendUrl}/verify-link/?id=${linkId}`;
+  const link = `${config.frontendUrl}/verify-link/?id=${linkId}`;
 
-	const html = `
+  const html = `
           <html>
                <head>
                     <title>Login Link Email</title>
@@ -33,10 +33,10 @@ function sendLoginLinkEmail({ user, linkId }: Options) {
           </html>
        `;
 
-	return sendMail({
-		from: 'accounts',
-		to: email,
-		subject: 'Login link',
-		html,
-	});
+  return sendMail({
+    from: 'accounts',
+    to: email,
+    subject: 'Login link',
+    html,
+  });
 }

@@ -6,16 +6,16 @@ import { createAuthPayload } from './helpers';
 export { verifyLoginLink };
 
 const verifyLoginLink = async (linkId: string) => {
-	const link = await loginLinkRepository.findById(linkId);
+  const link = await loginLinkRepository.findById(linkId);
 
-	if (!link) return handleError({ message: 'Invalid link' });
+  if (!link) return handleError({ message: 'Invalid link' });
 
-	const user = await userRepository.findById(link.userId);
+  const user = await userRepository.findById(link.userId);
 
-	if (!user || user.accountStatus != 'active')
-		return handleAuthError('Authentication failed');
+  if (!user || user.accountStatus != 'active')
+    return handleAuthError('Authentication failed');
 
-	await loginLinkRepository.deleteById(linkId);
+  await loginLinkRepository.deleteById(linkId);
 
-	return createAuthPayload(user);
+  return createAuthPayload(user);
 };

@@ -8,57 +8,57 @@ import { handleAuthProvider } from './helpers';
 export { handleGoogleAuth };
 
 const {
-	authProviders: { google },
-	frontendUrl,
+  authProviders: { google },
+  frontendUrl,
 } = config;
 
 const client = new OAuth2Client({
-	clientId: google.clientId,
-	clientSecret: google.clientSecret,
-	redirectUri: frontendUrl,
+  clientId: google.clientId,
+  clientSecret: google.clientSecret,
+  redirectUri: frontendUrl,
 });
 
 type GoogleUserInfo = {
-	email: string;
-	email_verified: boolean;
-	name: string;
-	picture: string;
-	given_name: string;
-	family_name: string;
+  email: string;
+  email_verified: boolean;
+  name: string;
+  picture: string;
+  given_name: string;
+  family_name: string;
 };
 async function handleGoogleAuth({
-	code,
-	isLogin,
+  code,
+  isLogin,
 }: {
-	code: string;
-	isLogin: boolean;
+  code: string;
+  isLogin: boolean;
 }) {
-	const { tokens } = await client.getToken(code);
+  const { tokens } = await client.getToken(code);
 
-	client.setCredentials({
-		access_token: tokens.access_token,
-		refresh_token: tokens.refresh_token,
-	});
+  client.setCredentials({
+    access_token: tokens.access_token,
+    refresh_token: tokens.refresh_token,
+  });
 
-	const response = await client.request<GoogleUserInfo>({
-		url: 'https://www.googleapis.com/oauth2/v3/userinfo',
-	});
+  const response = await client.request<GoogleUserInfo>({
+    url: 'https://www.googleapis.com/oauth2/v3/userinfo',
+  });
 
-	if (response.status != 200)
-		return handleError({ message: response.statusText, statusCode: 500 });
+  if (response.status != 200)
+    return handleError({ message: response.statusText, statusCode: 500 });
 
-	const userInfo = response.data;
+  const userInfo = response.data;
 
-	if (!userInfo.email_verified)
-		return handleError({ message: 'Email not verified' });
+  if (!userInfo.email_verified)
+    return handleError({ message: 'Email not verified' });
 
-	return handleAuthProvider({
-		isLogin,
-		userInfo: {
-			email: userInfo.email,
-			firstName: userInfo.given_name,
-			lastName: userInfo.family_name,
-		},
-		provider: 'google',
-	});
+  return handleAuthProvider({
+    isLogin,
+    userInfo: {
+      email: userInfo.email,
+      firstName: userInfo.given_name,
+      lastName: userInfo.family_name,
+    },
+    provider: 'google',
+  });
 }

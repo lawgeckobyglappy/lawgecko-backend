@@ -1,6 +1,6 @@
 import { UserInput } from '@types';
 
-import { UserModel } from '../../models';
+import { UserModel } from '../../entities';
 import { handleError } from '../../utils';
 import { userRepository } from '../../repositories';
 
@@ -9,13 +9,13 @@ import { createLoginLink } from './create-login-link';
 export { register };
 
 const register = async (values: Partial<UserInput>) => {
-	const { data, error } = await UserModel.create(values);
+  const { data, error } = await UserModel.create(values);
 
-	if (error) return handleError(error);
+  if (error) return handleError(error);
 
-	const user = await userRepository.insertOne(data);
+  const user = await userRepository.insertOne(data);
 
-	await createLoginLink(user as any);
+  await createLoginLink(user as any);
 
-	return { data: user };
+  return { data: user };
 };

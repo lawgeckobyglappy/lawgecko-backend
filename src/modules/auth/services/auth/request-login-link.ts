@@ -7,13 +7,13 @@ import { createLoginLink } from './create-login-link';
 export { requestLoginLink };
 
 const requestLoginLink = async (email: string) => {
-	const isValid = validateEmail(email);
+  const isValid = validateEmail(email);
 
-	if (!isValid.valid) return handleError({ message: 'Invalid email' });
+  if (!isValid.valid) return handleError({ message: 'Invalid email' });
 
-	const user = await userRepository.findOne({ email: isValid.validated });
+  const user = await userRepository.findOne({ email: isValid.validated });
 
-	if (!user || user.accountStatus != 'active') return { data: 'Success' };
+  if (!user || user.accountStatus != 'active') return { data: 'Success' };
 
-	return createLoginLink(user);
+  return createLoginLink(user);
 };

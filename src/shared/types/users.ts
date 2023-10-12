@@ -1,90 +1,95 @@
-export { supportedAuthProviders, validAccountStatus };
+export { UserRoles, supportedAuthProviders, validAccountStatus };
 
 export type {
-	AuthInfo,
-	AuthInfoInput,
-	AuthProvider,
-	IApiError,
-	User,
-	UserInput,
-	UserAccountStatus,
-	UserRole,
-	LoginLink,
-	LoginLinkInput,
-	LoginSession,
-	LoginSessionInput,
+  AuthInfo,
+  AuthInfoInput,
+  AuthProvider,
+  IApiError,
+  User,
+  UserInput,
+  UserAccountStatus,
+  UserRole,
+  LoginLink,
+  LoginLinkInput,
+  LoginSession,
+  LoginSessionInput,
 };
 
 type AuthInfoInput = {
-	userId: string;
-	userRole: UserRole;
-	sessionId: string;
+  userId: string;
+  userRole: UserRole;
+  sessionId: string;
 };
 
 type AuthInfo = {
-	user: { _id: string; role: UserRole };
-	sessionId: string;
+  user: { _id: string; role: UserRole };
+  sessionId: string;
 };
 
 type IApiError = {
-	message: string;
-	payload: Record<string, string[]>;
-	statusCode: number;
+  message: string;
+  payload: Record<string, string[]>;
+  statusCode: number;
 };
 
 const validAccountStatus = ['active', 'blocked', 'deleted'] as const;
 type UserAccountStatus = (typeof validAccountStatus)[number];
 
-type UserRole = 'admin' | 'moderator' | 'user';
+const UserRoles = {
+  ADMIN: 'admin',
+  MODERATOR: 'moderator',
+  USER: 'user',
+} as const;
+type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
 
 const supportedAuthProviders = ['google'] as const;
 type AuthProvider = (typeof supportedAuthProviders)[number];
 
 type UserInput = {
-	accountStatus: UserAccountStatus;
-	email: string;
-	firstName: string;
-	lastName: string;
-	role: UserRole;
-	username: string;
+  accountStatus: UserAccountStatus;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  username: string;
 
-	_addAuthProvider: AuthProvider;
+  _addAuthProvider: AuthProvider;
 };
 
 type User = {
-	_id: string;
-	accountStatus: UserAccountStatus;
-	authProviders?: AuthProvider[];
-	createdAt: Date | string;
-	email: string;
-	firstName: string;
-	lastName: string;
-	role: UserRole;
-	username: string;
-	updatedAt: Date | string;
+  _id: string;
+  accountStatus: UserAccountStatus;
+  authProviders?: AuthProvider[];
+  createdAt: Date | string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  username: string;
+  updatedAt: Date | string;
 };
 
 type LoginLinkInput = {
-	userId: string;
+  userId: string;
 };
 
 type LoginLink = {
-	_id: string;
-	createdAt: string;
-	expiresAt: Date | string;
-	userId: string;
+  _id: string;
+  createdAt: string;
+  expiresAt: Date | string;
+  userId: string;
 };
 
 type LoginSessionInput = {
-	isBlocked: boolean;
-	userId: string;
+  isBlocked: boolean;
+  userId: string;
 };
 
 type LoginSession = {
-	_id: string;
-	isBlocked: boolean;
-	createdAt: string;
-	expiresAt: Date | string;
-	updatedAt: Date | string;
-	userId: string;
+  _id: string;
+  isBlocked: boolean;
+  createdAt: string;
+  expiresAt: Date | string;
+  updatedAt: Date | string;
+  userId: string;
 };

@@ -10,19 +10,19 @@ const { environment } = config;
  * Connect To Database
  */
 export const connectdb = async (url: string) => {
-	if (environment == 'test') {
-		const server = await MongoMemoryServer.create();
-		url = server.getUri();
-	}
+  if (environment == 'test') {
+    const server = await MongoMemoryServer.create();
+    url = server.getUri();
+  }
 
-	const database = await mongoose.connect(url, {
-		// useNewUrlParser: true,
-		// useCreateIndex: true,
-		// useFindAndModify: false,
-		// useUnifiedTopology: true,
-	});
+  const database = await mongoose.connect(url, {
+    // useNewUrlParser: true,
+    // useCreateIndex: true,
+    // useFindAndModify: false,
+    // useUnifiedTopology: true,
+  });
 
-	if (config.environment !== 'test') logger.info('Connected to MongoDB');
+  if (environment != 'test') logger.info('Connected to MongoDB');
 
-	return database;
+  return database;
 };
