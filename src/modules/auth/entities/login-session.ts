@@ -8,7 +8,7 @@ import { LoginSession, LoginSessionInput } from '@types';
 
 import { validateString } from '../validators';
 
-const { accessExpirationDays } = config.jwt;
+const { JWT_ACCESS_EXPIRATION_DAYS } = config.jwt;
 
 export { LoginSessionModel };
 
@@ -22,7 +22,8 @@ const LoginSessionModel = new Schema<LoginSession, LoginSessionInput>({
   },
   expiresAt: {
     constant: true,
-    value: () => dayjs(new Date()).add(accessExpirationDays, 'days').toDate(),
+    value: () =>
+      dayjs(new Date()).add(JWT_ACCESS_EXPIRATION_DAYS, 'days').toDate(),
   },
   userId: { readonly: true, validator: validateString('Invalid user id') },
 }).getModel();

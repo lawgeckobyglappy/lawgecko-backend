@@ -1,23 +1,23 @@
 {
-	"compilerOptions": {
-		"target": "es2016",
-		"module": "commonjs",
-		"outDir": "./dist",
-		"rootDir": "./src",
-		"moduleResolution": "node",
-		"baseUrl": ".",
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"strict": true,
-		"skipLibCheck": true,
-		"paths": {
-			"@config/*": ["src/config/*"],
-			"@types": ["src/shared/types/index.ts", "src/shared/types/*"],
-			"@utils": ["src/shared/utils/index.ts", "src/shared/utils/*"],
-			"@/*": ["src/*"]
-		}
-	},
-	"files": ["src/global.d.ts"],
-	"include": ["src/**/*"],
-	"exclude": ["node_modules"]
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@config/*": ["src/config/*"],
+      "@types": ["src/shared/types/index.ts"],
+      "@utils": ["src/shared/utils/index.ts"],
+      "@/*": ["src/*"]
+    }
+  },
+  "files": ["src/global.d.ts"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

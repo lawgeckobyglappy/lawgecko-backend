@@ -9,7 +9,7 @@ export { handleGoogleAuth };
 
 const {
   authProviders: { google },
-  frontendUrl,
+  FRONTEND_URL: frontendUrl,
 } = config;
 
 const client = new OAuth2Client({

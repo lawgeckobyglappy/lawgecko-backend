@@ -4,21 +4,21 @@ import { Request } from 'express';
 import config from '@/config/env';
 import { AuthInfo, AuthInfoInput } from '@/shared/types';
 
-const { secret, accessExpirationDays } = config.jwt;
+const { JWT_SECRET, JWT_ACCESS_EXPIRATION_DAYS } = config.jwt;
 
 export { createToken, parseAuth };
 
 function createToken({ userId, userRole, sessionId }: AuthInfoInput) {
   return jwt.sign(
     { user: { _id: userId, role: userRole }, sessionId } as AuthInfo,
-    secret!,
-    { expiresIn: `${accessExpirationDays}d` },
+    JWT_SECRET!,
+    { expiresIn: `${JWT_ACCESS_EXPIRATION_DAYS}d` },
   );
 }
 
 function getAuthInfo(token: string) {
   try {
-    return jwt.verify(token, secret!) as AuthInfo;
+    return jwt.verify(token, JWT_SECRET!) as AuthInfo;
   } catch (err: any) {
     return null;
   }
