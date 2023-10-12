@@ -57,5 +57,9 @@
     "slug": "^8.2.3",
     "tsconfig-paths": "^4.2.0",
     "uniqid": "^5.4.0"
+  },
+  "engines": {
+    "node": "20.8.0",
+    "npm": "10.1.0"
   }
 }
