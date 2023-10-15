@@ -20,7 +20,7 @@ export {
   validateUserRole,
 };
 
-type UserValidationSummary = Summary<User, UserInput>;
+type UserValidationSummary = Summary<UserInput, User>;
 
 async function validateUserEmail(val: any) {
   const isValid = validateEmail(val);

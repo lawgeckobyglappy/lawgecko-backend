@@ -1,4 +1,3 @@
-import { ApiError } from 'apitoolz';
 import { NextFunction, Request, Response } from 'express';
 
 import {
@@ -35,15 +34,10 @@ function makeController(
 
       return adaptResponse({ res, results, successCode, errorCode });
     } catch (err: any) {
-      const error = new ApiError({
-        message: err.message,
-        statusCode: 500,
-      }).summary;
-
       return adaptResponse({
         res,
-        results: { error },
-        errorCode: error.statusCode,
+        results: { message: err.message, statusCode: 500 },
+        errorCode: 500,
       });
     }
   };
@@ -61,11 +55,10 @@ function adaptResponse({
   successCode = 200,
   errorCode = 400,
 }: Options) {
-  if (results?.error) {
-    const error = new ApiError(results?.error).summary;
-
-    return res.status(error?.statusCode ?? errorCode).json({ error });
-  }
+  if (results?.error)
+    return res
+      .status(results.error?.statusCode ?? errorCode)
+      .json({ error: results.error });
 
   return res.status(successCode).json({ data: results?.data ?? null });
 }

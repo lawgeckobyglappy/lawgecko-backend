@@ -1,6 +1,6 @@
-import { handleError } from '../../utils';
-import { validateEmail } from '../../validators';
-import { userRepository } from '../../repositories';
+import { handleError } from '../utils';
+import { validateEmail } from '../validators';
+import { userRepository } from '../repositories';
 
 import { createLoginLink } from './create-login-link';
 

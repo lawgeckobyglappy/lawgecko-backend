@@ -2,9 +2,10 @@ import { sanitize } from 'apitoolz';
 
 import { AuthInfo, User } from '@types';
 
-import { UserModel } from '../../entities';
-import { userRepository } from '../../repositories';
-import { handleAuthError, handleError } from '../../utils';
+import { UserModel } from '../entities';
+import { userRepository } from '../repositories';
+import { handleAuthError, handleError } from '../utils';
+import { VALIDATION_ERRORS } from 'clean-schema';
 
 export { updateUser };
 
@@ -32,7 +33,8 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
   const { data, error } = await UserModel.update(user, updates);
 
   if (error) {
-    if (error.message == 'Nothing to update') return { data: user };
+    if (error.message == VALIDATION_ERRORS.NOTHING_TO_UPDATE)
+      return { data: user };
 
     return handleError(error);
   }

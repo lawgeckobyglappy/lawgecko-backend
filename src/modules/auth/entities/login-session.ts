@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Schema, validate } from 'clean-schema';
+import { Schema, isBooleanOk } from 'clean-schema';
 
 import config from '@config/env';
 
@@ -12,13 +12,13 @@ const { JWT_ACCESS_EXPIRATION_DAYS } = config.jwt;
 
 export { LoginSessionModel };
 
-const LoginSessionModel = new Schema<LoginSession, LoginSessionInput>({
+const LoginSessionModel = new Schema<LoginSessionInput, LoginSession>({
   _id: { constant: true, value: () => generateId() },
   isBlocked: {
     default: false,
     readonly: true,
     shouldInit: false,
-    validator: validate.isBooleanOk,
+    validator: isBooleanOk,
   },
   expiresAt: {
     constant: true,

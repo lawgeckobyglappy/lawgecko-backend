@@ -15,7 +15,7 @@ import { generateUsername } from '../utils';
 
 export { UserModel };
 
-const UserModel = new Schema<User, UserInput>(
+const UserModel = new Schema<UserInput, User>(
   {
     _id: { constant: true, value: () => generateId() },
     authProviders: {

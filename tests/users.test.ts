@@ -18,16 +18,12 @@ makeServer;
 
 describe('Auth', () => {
   beforeAll(() => {
-    jest.isolateModules(() => {
-      server = makeServer();
-      api = request(server);
-    });
+    server = makeServer();
+    api = request(server);
   });
 
   afterAll(async () => {
     await server?.close();
-
-    jest.resetModules();
   });
 
   beforeEach(async () => await addUsers());
@@ -78,10 +74,18 @@ describe('Auth', () => {
       expect(data).toBeUndefined();
 
       expect(error.payload).toMatchObject({
-        email: expect.arrayContaining(['Invalid email']),
-        firstName: expect.arrayContaining(['Invalid first name']),
-        lastName: expect.arrayContaining(['Invalid last name']),
-        username: expect.arrayContaining(['Invalid username']),
+        email: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid email']),
+        }),
+        firstName: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid first name']),
+        }),
+        lastName: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid last name']),
+        }),
+        username: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid username']),
+        }),
       });
     });
 
@@ -102,8 +106,12 @@ describe('Auth', () => {
       expect(data).toBeUndefined();
 
       expect(error.payload).toMatchObject({
-        email: expect.arrayContaining(['Email already taken']),
-        username: expect.arrayContaining(['Username already taken']),
+        email: expect.objectContaining({
+          reasons: expect.arrayContaining(['Email already taken']),
+        }),
+        username: expect.objectContaining({
+          reasons: expect.arrayContaining(['Username already taken']),
+        }),
       });
     });
   });
@@ -382,11 +390,17 @@ describe('Auth', () => {
 
       expect(data).toBeUndefined();
 
-      expect(error.message).toBe('Validation Error');
+      expect(error.message).toBe('VALIDATION_ERROR');
       expect(error.payload).toMatchObject({
-        firstName: expect.arrayContaining(['Invalid first name']),
-        email: expect.arrayContaining(['Email already taken']),
-        username: expect.arrayContaining(['Invalid username']),
+        firstName: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid first name']),
+        }),
+        email: expect.objectContaining({
+          reasons: expect.arrayContaining(['Email already taken']),
+        }),
+        username: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid username']),
+        }),
       });
     });
 

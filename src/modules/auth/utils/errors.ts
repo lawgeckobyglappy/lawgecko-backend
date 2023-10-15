@@ -1,5 +1,3 @@
-import { ApiError } from 'apitoolz';
-
 import { IApiError } from '@types';
 
 export { handleError, handleAuthError };
@@ -11,14 +9,15 @@ type ErrorType = {
 };
 
 function handleError({ message, payload = {}, statusCode = 400 }: ErrorType) {
-  return { error: new ApiError({ message, payload, statusCode }).summary };
+  return { error: { message, payload, statusCode } };
 }
 
 function handleAuthError(message: 'Access denied' | 'Authentication failed') {
   return {
-    error: new ApiError({
+    error: {
       message,
+      payload: {},
       statusCode: message == 'Access denied' ? 403 : 401,
-    }).summary as IApiError,
+    } as IApiError,
   };
 }

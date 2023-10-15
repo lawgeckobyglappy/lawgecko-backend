@@ -1,8 +1,8 @@
 import { UserInput } from '@types';
 
-import { UserModel } from '../../entities';
-import { handleError } from '../../utils';
-import { userRepository } from '../../repositories';
+import { UserModel } from '../entities';
+import { handleError } from '../utils';
+import { userRepository } from '../repositories';
 
 import { createLoginLink } from './create-login-link';
 
