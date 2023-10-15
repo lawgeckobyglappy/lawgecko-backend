@@ -1,4 +1,4 @@
-export { UserRoles, supportedAuthProviders, validAccountStatus };
+export { AccountStatusList, AuthProvidersList, UserRoles, UserRolesList };
 
 export type {
   AuthInfo,
@@ -32,8 +32,8 @@ type IApiError = {
   statusCode: number;
 };
 
-const validAccountStatus = ['active', 'blocked', 'deleted'] as const;
-type UserAccountStatus = (typeof validAccountStatus)[number];
+const AccountStatusList = ['active', 'blocked', 'deleted'] as const;
+type UserAccountStatus = (typeof AccountStatusList)[number];
 
 const UserRoles = {
   ADMIN: 'admin',
@@ -42,8 +42,10 @@ const UserRoles = {
 } as const;
 type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
 
-const supportedAuthProviders = ['google'] as const;
-type AuthProvider = (typeof supportedAuthProviders)[number];
+const UserRolesList = Object.values(UserRoles) as UserRole[];
+
+const AuthProvidersList = ['google'] as const;
+type AuthProvider = (typeof AuthProvidersList)[number];
 
 type UserInput = {
   accountStatus: UserAccountStatus;

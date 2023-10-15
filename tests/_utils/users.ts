@@ -1,5 +1,5 @@
-import { userRepository } from '../../src/modules/auth/repositories';
 import { User } from '../../src/shared/types';
+import { userRepository } from '../../src/modules/auth/repositories';
 
 export { users, addUsers };
 

@@ -1,8 +1,8 @@
 import request from 'supertest';
-import { User, UserRole } from '../../src/shared/types';
-import { createToken } from '../../src/modules/auth/utils';
 
 import { makeServer } from '../../src/app';
+import { User, UserRole } from '../../src/shared/types';
+import { createToken } from '../../src/modules/auth/utils';
 
 let api: request.SuperTest<request.Test>, server: any;
 

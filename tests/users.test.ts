@@ -1,13 +1,14 @@
 import request from 'supertest';
-import { cleanupDp } from './_utils';
-import { addUsers, users } from './_utils/users';
+
+import { makeServer } from '../src/app';
 import {
   loginLinkRepository,
   userRepository,
 } from '../src/modules/auth/repositories';
-import { expectAuthError } from './_utils/auth';
 
-import { makeServer } from '../src/app';
+import { cleanupDp } from './_utils';
+import { expectAuthError } from './_utils/auth';
+import { addUsers, users } from './_utils/users';
 
 let api: request.SuperTest<request.Test>, server: any;
 

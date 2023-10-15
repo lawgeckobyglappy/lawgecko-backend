@@ -1,9 +1,9 @@
-import { validate, StringOptions } from 'clean-schema';
+import { StringOptions, isEmailOk, isStringOk } from 'clean-schema';
 
 export { validateEmail, validateString };
 
 function validateEmail(val: any) {
-  const validation = validate.isEmailOk(val);
+  const validation = isEmailOk(val);
 
   if (!validation.valid) validation.reasons = ['Invalid email'];
 
@@ -15,7 +15,7 @@ function validateString<T extends string = string>(
   options?: StringOptions<T>,
 ) {
   return (val: any) => {
-    const validation = validate.isStringOk(val, {
+    const validation = isStringOk<T>(val, {
       trim: true,
       ...options,
     } as any);

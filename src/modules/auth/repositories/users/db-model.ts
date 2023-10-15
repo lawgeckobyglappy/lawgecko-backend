@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { User } from '@types';
+
+import { User, UserRolesList } from '@types';
 
 export { dbModel };
 
@@ -11,11 +12,7 @@ const userSchema = new Schema<User>(
     email: { type: String, index: true, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: false },
-    role: {
-      type: String,
-      enum: ['admin', 'moderator', 'user'],
-      default: 'user',
-    },
+    role: { type: String, enum: UserRolesList, default: 'user' },
     username: { type: String, default: '', index: true },
   },
   { timestamps: true },

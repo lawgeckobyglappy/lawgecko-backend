@@ -1,6 +1,5 @@
 import cors from 'cors';
-import dotenv from 'dotenv';
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 
 import config from './config/env';
 import { connectdb } from './config/db';
@@ -9,8 +8,6 @@ import morgan from './shared/middlewares/morgan.middleware';
 
 import { router } from './api/v1';
 import exampleRoutes from './api/v1/example';
-
-dotenv.config();
 
 const { environment, port, db } = config;
 
@@ -22,7 +19,7 @@ app.use(cors({ origin: '*' }));
 
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_, res: Response) => {
   res.json({ message: 'live' });
 });
 

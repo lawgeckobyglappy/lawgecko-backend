@@ -1,16 +1,15 @@
-import { Summary, ValidatorResponse } from 'clean-schema';
-import { validateEmail, validateString } from './shared';
+import { Summary } from 'clean-schema';
+
 import {
-  AuthProvider,
-  supportedAuthProviders,
+  AccountStatusList,
+  AuthProvidersList,
   User,
-  UserAccountStatus,
   UserInput,
-  UserRole,
-  UserRoles,
-  validAccountStatus,
+  UserRolesList,
 } from '@/shared/types';
 import { userRepository } from '../repositories';
+
+import { validateEmail, validateString } from './shared';
 
 export {
   validateAuthProvider,
@@ -39,7 +38,9 @@ async function validateUsername(val: any) {
 
   if (!isValid.valid) return isValid;
 
-  const isTaken = await userRepository.findOne({ username: isValid.validated });
+  const isTaken = await userRepository.findOne({
+    username: isValid.validated,
+  });
 
   if (isTaken) return { valid: false, reason: 'Username already taken' };
 
@@ -48,8 +49,8 @@ async function validateUsername(val: any) {
 
 function validateAuthProvider(provider: any, summary: UserValidationSummary) {
   const isValid = validateString('Unsupported auth provider', {
-    enums: supportedAuthProviders as any,
-  })(provider) as ValidatorResponse<AuthProvider>;
+    enums: AuthProvidersList,
+  })(provider);
 
   if (!isValid) return isValid;
 
@@ -64,17 +65,12 @@ function validateAuthProvider(provider: any, summary: UserValidationSummary) {
 
 function validateUserAccountStatus(status: any) {
   return validateString('Invalid account status', {
-    enums: validAccountStatus as any,
-  })(status) as ValidatorResponse<UserAccountStatus>;
+    enums: AccountStatusList,
+  })(status);
 }
 
-const validRoles: UserRole[] = [
-  UserRoles.ADMIN,
-  UserRoles.MODERATOR,
-  UserRoles.USER,
-];
 function validateUserRole(status: any) {
   return validateString('Invalid role', {
-    enums: validRoles,
-  })(status) as ValidatorResponse<UserRole>;
+    enums: UserRolesList,
+  })(status);
 }
