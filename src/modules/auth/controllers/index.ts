@@ -22,7 +22,9 @@ const controllers = {
   verifyLoginLink: makeController((req) => verifyLoginLink(req.body.id)),
 };
 
+/* eslint-disable-next-line no-unused-vars */
 type Handler = (req: Request, res: Response, next?: NextFunction) => any;
+
 function makeController(
   handler: Handler,
   successCode?: number,
