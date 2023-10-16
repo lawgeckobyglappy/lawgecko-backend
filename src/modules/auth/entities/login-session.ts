@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Schema, isBooleanOk } from 'clean-schema';
 
-import config from '@config/env';
+import { config } from '@config';
 import { generateId } from '@utils';
 import { LoginSession, LoginSessionInput } from '@types';
 

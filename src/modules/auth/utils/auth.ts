@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { Request } from 'express';
 
-import config from '@/config/env';
-import { AuthInfo, AuthInfoInput } from '@/shared/types';
+import { config } from '@config';
+import { AuthInfo, AuthInfoInput } from '@types';
 
 const { JWT_SECRET, JWT_ACCESS_EXPIRATION_DAYS } = config.jwt;
 

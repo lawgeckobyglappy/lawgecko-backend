@@ -1,5 +1,5 @@
 import { User } from '@types';
-import config from '@config/env';
+import { config } from '@config';
 
 import { sendMail } from '../sendMail';
 

@@ -8,7 +8,7 @@ import morgan from './shared/middlewares/morgan.middleware';
 
 import { router } from './api/v1';
 import exampleRoutes from './api/v1/example';
-import { scheduler } from '@config/scheduler';
+import { scheduler } from '@config';
 
 const { environment, port, db } = config;
 

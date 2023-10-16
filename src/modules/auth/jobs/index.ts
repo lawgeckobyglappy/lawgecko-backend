@@ -1,4 +1,4 @@
-import { scheduler } from '@config/scheduler';
+import { scheduler } from '@config';
 import { LoginLinkProps, sendLoginLinkEmail } from '@utils';
 
 export { triggerSendLoginLinkEmail };

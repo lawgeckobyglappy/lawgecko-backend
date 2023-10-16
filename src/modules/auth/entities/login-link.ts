@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import Schema from 'clean-schema';
 
-import config from '@config/env';
+import { config } from '@config';
 import { generateId } from '@utils';
 import { LoginLink, LoginLinkInput } from '@types';
 

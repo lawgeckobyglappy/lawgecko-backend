@@ -11,10 +11,11 @@
     "strict": true,
     "skipLibCheck": true,
     "paths": {
-      "@config/*": ["src/config/*"],
-      "@types": ["src/shared/types/index.ts"],
-      "@utils": ["src/shared/utils/index.ts"],
-      "@/*": ["src/*"]
+      "@config": ["src/config"],
+      "@middlewares": ["src/shared/middlewares"],
+      "@shared": ["src/shared"],
+      "@types": ["src/shared/types"],
+      "@utils": ["src/shared/utils"]
     }
   },
   "files": ["src/global.d.ts"],

@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-import config from '@config/env';
+import { config } from '@config';
 import { logger } from '../../logger';
 
 const { emails, environment } = config;

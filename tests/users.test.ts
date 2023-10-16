@@ -1,4 +1,13 @@
 import request from 'supertest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from 'vitest';
 
 import { makeServer } from '../src/app';
 import {
@@ -27,7 +36,9 @@ describe('Auth', () => {
     await server?.close();
   });
 
-  beforeEach(async () => await addUsers());
+  beforeEach(async () => {
+    await addUsers();
+  });
 
   afterEach(async () => await cleanupDp());
 
@@ -205,7 +216,7 @@ describe('Auth', () => {
       url = `${BASE_URL}/current-user`;
 
     beforeEach(async () => {
-      return loginLinkRepository.insertOne({
+      await loginLinkRepository.insertOne({
         _id: linkId,
         userId: user._id,
       } as any);

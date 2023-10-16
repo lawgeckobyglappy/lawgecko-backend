@@ -6,7 +6,7 @@ import {
   User,
   UserInput,
   UserRolesList,
-} from '@/shared/types';
+} from '@types';
 import { userRepository } from '../repositories';
 
 import { validateEmail, validateString } from './shared';

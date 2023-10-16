@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { makeServer } from '../../src/app';
 import { User, UserRole } from '../../src/shared/types';

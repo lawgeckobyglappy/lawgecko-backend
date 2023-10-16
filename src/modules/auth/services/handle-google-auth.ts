@@ -1,6 +1,6 @@
 import { OAuth2Client } from 'google-auth-library';
 
-import config from '@config/env';
+import { config } from '@config';
 import { handleError } from '../utils';
 import { handleAuthProvider } from './helpers';
 

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-import { logger } from '@/shared/logger';
+import { logger } from '@shared';
 import config from './env';
 
 const { environment } = config;

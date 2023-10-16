@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-const config = {
+export const config = {
   authProviders: {
     google: {
       clientId: process.env.GOOGLE_AUTH_CLIENT_ID,
