@@ -8,6 +8,7 @@ import morgan from './shared/middlewares/morgan.middleware';
 
 import { router } from './api/v1';
 import exampleRoutes from './api/v1/example';
+import { scheduler } from '@config/scheduler';
 
 const { environment, port, db } = config;
 
@@ -33,8 +34,11 @@ app.use((_, res: Response) => {
 connectdb(String(db.dbURI));
 
 function makeServer() {
-  return app.listen(port, () => {
-    if (environment !== 'test') logger.info(`Listening to port ${port}`);
+  return app.listen(port, async () => {
+    if (environment !== 'test') {
+      await scheduler.start();
+      logger.info(`Listening to port ${port}`);
+    }
   });
 }
 

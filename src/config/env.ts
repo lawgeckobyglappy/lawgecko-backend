@@ -17,7 +17,7 @@ const config = {
   },
   environment: process.env.NODE_ENV || 'development',
   port: process.env.NODE_ENV == 'test' ? 0 : process.env.PORT || 5000,
-  db: { dbURI: process.env.MONGODB_URI },
+  db: { dbURI: process.env.MONGODB_URI! },
   LOGIN_LINK_EXPIRATION_MINUTES: parseInt(
     process.env.LOGIN_LINK_EXPIRATION_MINUTES ?? '15',
   ),

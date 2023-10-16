@@ -8,9 +8,9 @@
     "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/server.js",
     "build": "tsc -p tsconfig.json",
     "format": "prettier \"**/*\" --ignore-unknown",
-    "test": "jest --verbose --forceExit --detectOpenHandles --maxWorkers=1",
-    "test:coverage": "jest --coverage --forceExit --detectOpenHandles  --maxWorkers=1",
-    "test:watch": "jest --verbose --watchAll --forceExit --detectOpenHandles --maxWorkers=1"
+    "test": "jest --verbose --forceExit --maxWorkers=1",
+    "test:coverage": "jest --coverage --forceExit  --maxWorkers=1",
+    "test:watch": "jest --verbose --watchAll --forceExit --maxWorkers=1"
   },
   "author": "lawgecko-developers",
   "license": "ISC",
@@ -39,6 +39,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@hokify/agenda": "^6.3.0",
     "apitoolz": "^0.3.14",
     "clean-schema": "^4.0.0",
     "cors": "^2.8.5",

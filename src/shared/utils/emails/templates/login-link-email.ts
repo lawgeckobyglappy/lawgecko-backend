@@ -5,12 +5,12 @@ import { sendMail } from '../sendMail';
 
 export { sendLoginLinkEmail };
 
-type Options = {
+export type LoginLinkProps = {
   linkId: string;
   user: User;
 };
 
-function sendLoginLinkEmail({ user, linkId }: Options) {
+function sendLoginLinkEmail({ user, linkId }: LoginLinkProps) {
   const { email, firstName } = user;
 
   const link = `${config.FRONTEND_URL}/verify-link/?id=${linkId}`;
