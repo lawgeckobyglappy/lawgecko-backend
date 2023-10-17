@@ -8,7 +8,7 @@
     "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/server.js",
     "build": "tsc -p tsconfig.json",
     "format": "prettier \"**/*\" --ignore-unknown",
-    "lint": "eslint ./src --ext .ts",
+    "lint": "tsc --noEmit && eslint --fix \"src/**/*.{js,ts}\"",
     "test": "vitest run test",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest"
@@ -30,6 +30,7 @@
     "@typescript-eslint/parser": "^5.61.0",
     "@vitest/coverage-v8": "^0.34.6",
     "eslint": "^8.51.0",
+    "eslint-plugin-import": "^2.28.1",
     "nodemon": "^3.0.1",
     "pino-pretty": "^10.0.1",
     "prettier": "^3.0.0",

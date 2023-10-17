@@ -10,6 +10,7 @@ export class ExampleController {
 	getExample(req: Request, res: Response) {
 		const result = this.exampleService.getExample();
 		logger.info({ result });
-		return res.json({ message: 'Successful', data: result });
+		
+return res.json({ message: 'Successful', data: result });
 	}
 }

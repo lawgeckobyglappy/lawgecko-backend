@@ -19,7 +19,8 @@ type MailProps = {
 
 function getSender(name: EmailAccount) {
   const { user, password, service } = (emails as any)?.[name] ?? emails.default;
-  return { user, password, service };
+  
+return { user, password, service };
 }
 
 const sendMail = async ({

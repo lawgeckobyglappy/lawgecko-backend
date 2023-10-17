@@ -12,7 +12,8 @@ const stream: StreamOptions = {
 // application is not running in development mode.
 const skip = () => {
   const env = process.env.NODE_ENV || 'development';
-  return env !== 'development';
+  
+return env !== 'development';
 };
 
 const morganMiddleware = morgan(':method :url :status - :response-time ms', {
