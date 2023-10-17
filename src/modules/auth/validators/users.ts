@@ -5,6 +5,7 @@ import {
   AuthProvidersList,
   User,
   UserInput,
+  UserRoles,
   UserRolesList,
 } from '@types';
 import { userRepository } from '../repositories';
@@ -71,6 +72,6 @@ function validateUserAccountStatus(status: any) {
 
 function validateUserRole(status: any) {
   return validateString('Invalid role', {
-    enums: UserRolesList,
+    enums: UserRolesList.filter((r) => r != UserRoles.ADMIN),
   })(status);
 }

@@ -49,6 +49,15 @@ const users = [
     username: 'admin-user',
     role: 'admin',
   },
+  {
+    _id: '363',
+    email: 'admin-1@mail.com',
+    firstName: 'Admin',
+    accountStatus: 'active',
+    lastName: 'User',
+    username: 'admin-user-1',
+    role: 'admin',
+  },
 ] as User[];
 
 function addUsers() {

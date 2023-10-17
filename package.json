@@ -8,7 +8,7 @@
     "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/server.js",
     "build": "tsc -p tsconfig.json",
     "format": "prettier \"**/*\" --ignore-unknown",
-    "lint": "tsc --noEmit && eslint --fix \"src/**/*.{js,ts}\"",
+    "lint": "tsc --noEmit && eslint \"src/**/*.{js,ts}\"",
     "test": "vitest run test",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest"

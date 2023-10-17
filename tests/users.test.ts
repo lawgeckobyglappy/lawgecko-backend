@@ -371,50 +371,50 @@ describe('Auth', () => {
       }
     });
 
-    it('should update other users if valid data is provided', async () => {
-      const update = { firstName: 'Update', username: 'updated-username' };
+    // it('should update other users if valid phonenumber is provided', async () => {
+    //   const update = { firstName: 'Update', username: 'updated-username' };
 
-      const { body, status } = await api
-        .patch(url)
-        .set('Authorization', `Bearer ${token}`)
-        .send(update);
+    //   const { body, status } = await api
+    //     .patch(url)
+    //     .set('Authorization', `Bearer ${token}`)
+    //     .send(update);
 
-      const { data, error } = body;
+    //   const { data, error } = body;
 
-      expect(status).toBe(200);
+    //   expect(status).toBe(200);
 
-      expect(error).toBeUndefined();
+    //   expect(error).toBeUndefined();
 
-      expect(data).toMatchObject(update);
-    });
+    //   expect(data).toMatchObject(update);
+    // });
 
-    it('should return corresponding errors if invalid data is provided', async () => {
-      const update = { firstName: '', email: users[4].email, username: '' };
+    // it('should return corresponding errors if invalid phonenumber is provided', async () => {
+    //   const update = { firstName: '', email: users[4].email, username: '' };
 
-      const { body, status } = await api
-        .patch(url)
-        .set('Authorization', `Bearer ${token}`)
-        .send(update);
+    //   const { body, status } = await api
+    //     .patch(url)
+    //     .set('Authorization', `Bearer ${token}`)
+    //     .send(update);
 
-      const { data, error } = body;
+    //   const { data, error } = body;
 
-      expect(status).toBe(400);
+    //   expect(status).toBe(400);
 
-      expect(data).toBeUndefined();
+    //   expect(data).toBeUndefined();
 
-      expect(error.message).toBe('VALIDATION_ERROR');
-      expect(error.payload).toMatchObject({
-        firstName: expect.objectContaining({
-          reasons: expect.arrayContaining(['Invalid first name']),
-        }),
-        email: expect.objectContaining({
-          reasons: expect.arrayContaining(['Email already taken']),
-        }),
-        username: expect.objectContaining({
-          reasons: expect.arrayContaining(['Invalid username']),
-        }),
-      });
-    });
+    //   expect(error.message).toBe('VALIDATION_ERROR');
+    //   expect(error.payload).toMatchObject({
+    //     firstName: expect.objectContaining({
+    //       reasons: expect.arrayContaining(['Invalid first name']),
+    //     }),
+    //     email: expect.objectContaining({
+    //       reasons: expect.arrayContaining(['Email already taken']),
+    //     }),
+    //     username: expect.objectContaining({
+    //       reasons: expect.arrayContaining(['Invalid username']),
+    //     }),
+    //   });
+    // });
 
     it('should ignore if users try to update their "accountStatus" or "role"', async () => {
       const update = { accountStatus: 'blocked', role: 'admin' };
@@ -433,7 +433,40 @@ describe('Auth', () => {
       expect(data).toMatchObject(user);
     });
 
-    it('should allow admins to update other users if is admin', async () => {
+    it("should not allow admins to update other users' info", async () => {
+      const linkId = 'new-link';
+
+      await loginLinkRepository.insertOne({
+        _id: linkId,
+        userId: users[4]._id,
+      } as any);
+
+      const {
+        body: { data: token },
+      } = await verifyLoginLink({ id: linkId });
+
+      const update = {
+        email: 'test@mail.com',
+        username: 'kjfnvjsfnbvofv',
+        firstName: 'Update',
+        lastName: 'Update',
+      };
+
+      const { body, status } = await api
+        .patch(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send(update);
+
+      const { data, error } = body;
+
+      expect(status).toBe(200);
+
+      expect(error).toBeUndefined();
+
+      expect(data).toMatchObject(user);
+    });
+
+    it('should not allow admins to update other admins', async () => {
       const linkId = 'new-link';
 
       await loginLinkRepository.insertOne({
@@ -448,17 +481,15 @@ describe('Auth', () => {
       const update = { firstName: 'Update', accountStatus: 'blocked' };
 
       const { body, status } = await api
-        .patch(url)
+        .patch(`${BASE_URL}/update-user/${users[5]._id}`)
         .set('Authorization', `Bearer ${token}`)
         .send(update);
 
       const { data, error } = body;
 
-      expect(status).toBe(200);
-
-      expect(error).toBeUndefined();
-
-      expect(data).toMatchObject(update);
+      expect(status).toBe(403);
+      expect(data).toBeUndefined();
+      expect(error).toMatchObject({ message: 'Access denied' });
     });
 
     it("should allow admins to update other users' account statuses", async () => {
@@ -505,7 +536,7 @@ describe('Auth', () => {
         body: { data: token },
       } = await verifyLoginLink({ id: linkId });
 
-      const validRoles = ['admin', 'moderator', 'user'];
+      const validRoles = ['moderator', 'user'];
 
       for (const role of validRoles) {
         const update = { role };

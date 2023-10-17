@@ -24,7 +24,7 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
   if (isCurrentUser && user.accountStatus != 'active')
     return handleAuthError('Authentication failed');
 
-  if (!isCurrentUser && authInfo.user.role != 'admin')
+  if (!isCurrentUser && (authInfo.user.role != 'admin' || user.role == 'admin'))
     return handleAuthError('Access denied');
 
   if (isCurrentUser)
