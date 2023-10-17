@@ -52,6 +52,7 @@ type UserInput = {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string;
   role: UserRole;
   username: string;
 
@@ -66,6 +67,7 @@ type User = {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string;
   role: UserRole;
   username: string;
   updatedAt: Date | string;

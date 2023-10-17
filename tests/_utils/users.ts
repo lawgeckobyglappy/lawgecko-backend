@@ -12,6 +12,7 @@ const users = [
     lastName: 'Doe',
     username: 'john-d',
     role: 'user',
+    phoneNumber: '+46 70 712 34 51',
   },
   {
     _id: '2',
@@ -21,6 +22,7 @@ const users = [
     lastName: 'User',
     username: 'blocked-user',
     role: 'user',
+    phoneNumber: '+46 70 712 34 52',
   },
   {
     _id: '3',
@@ -30,6 +32,7 @@ const users = [
     lastName: 'User',
     username: 'deleted-user',
     role: 'user',
+    phoneNumber: '+46 70 712 34 53',
   },
   {
     _id: '4',
@@ -39,6 +42,7 @@ const users = [
     lastName: 'User',
     username: 'other-user',
     role: 'user',
+    phoneNumber: '+46 70 712 34 54',
   },
   {
     _id: '5',
@@ -48,6 +52,7 @@ const users = [
     lastName: 'User',
     username: 'admin-user',
     role: 'admin',
+    phoneNumber: '+46 70 712 34 55',
   },
   {
     _id: '363',
@@ -57,6 +62,7 @@ const users = [
     lastName: 'User',
     username: 'admin-user-1',
     role: 'admin',
+    phoneNumber: '+46 70 712 34 56',
   },
 ] as User[];
 

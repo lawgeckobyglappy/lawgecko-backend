@@ -18,6 +18,8 @@ const userRepository = {
   },
   findById: (id: string) => dbModel.findById(id).lean(),
   findOne: (query: FilterQuery<User> = {}) => dbModel.findOne(query).lean(),
+  findByPhoneNumber: (phoneNumber: string) =>
+    dbModel.findOne({ phoneNumber }).lean(),
   updateOne: (query: FilterQuery<User> = {}, updates: Partial<User>) => {
     return dbModel.updateOne(query, { $set: updates }, { new: true }).lean();
   },

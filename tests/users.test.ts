@@ -53,6 +53,7 @@ describe('Auth', () => {
         username: 'test-user',
         accountStatus: 'blocked',
         role: 'admin',
+        phoneNumber: '+46 70 712 34 26',
       });
 
       const { data, error } = body;
@@ -124,6 +125,62 @@ describe('Auth', () => {
         username: expect.objectContaining({
           reasons: expect.arrayContaining(['Username already taken']),
         }),
+      });
+    });
+
+    describe('Phone number', () => {
+      it('should reject registration if phone number is too short', async () => {
+        const { body, status } = await api.post(url).send({ phoneNumber: ' ' });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Too short']),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+          }),
+        });
+      });
+
+      it('should reject registration if phone number is too long', async () => {
+        const { body, status } = await api
+          .post(url)
+          .send({ phoneNumber: Array(17).fill('4').join('') });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Too long']),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+          }),
+        });
+      });
+
+      it('should reject registration if phone number is taken', async () => {
+        const { body, status } = await api
+          .post(url)
+          .send({ phoneNumber: users[4].phoneNumber });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Phone number already taken']),
+          }),
+        });
       });
     });
   });
@@ -371,51 +428,6 @@ describe('Auth', () => {
       }
     });
 
-    // it('should update other users if valid phonenumber is provided', async () => {
-    //   const update = { firstName: 'Update', username: 'updated-username' };
-
-    //   const { body, status } = await api
-    //     .patch(url)
-    //     .set('Authorization', `Bearer ${token}`)
-    //     .send(update);
-
-    //   const { data, error } = body;
-
-    //   expect(status).toBe(200);
-
-    //   expect(error).toBeUndefined();
-
-    //   expect(data).toMatchObject(update);
-    // });
-
-    // it('should return corresponding errors if invalid phonenumber is provided', async () => {
-    //   const update = { firstName: '', email: users[4].email, username: '' };
-
-    //   const { body, status } = await api
-    //     .patch(url)
-    //     .set('Authorization', `Bearer ${token}`)
-    //     .send(update);
-
-    //   const { data, error } = body;
-
-    //   expect(status).toBe(400);
-
-    //   expect(data).toBeUndefined();
-
-    //   expect(error.message).toBe('VALIDATION_ERROR');
-    //   expect(error.payload).toMatchObject({
-    //     firstName: expect.objectContaining({
-    //       reasons: expect.arrayContaining(['Invalid first name']),
-    //     }),
-    //     email: expect.objectContaining({
-    //       reasons: expect.arrayContaining(['Email already taken']),
-    //     }),
-    //     username: expect.objectContaining({
-    //       reasons: expect.arrayContaining(['Invalid username']),
-    //     }),
-    //   });
-    // });
-
     it('should ignore if users try to update their "accountStatus" or "role"', async () => {
       const update = { accountStatus: 'blocked', role: 'admin' };
 
@@ -554,6 +566,86 @@ describe('Auth', () => {
 
         expect(data).toMatchObject(update);
       }
+    });
+
+    describe('Phone number', () => {
+      it('should reject registration if phone number is too short', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ phoneNumber: ' ' });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Too short']),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+          }),
+        });
+      });
+
+      it('should reject registration if phone number is too long', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ phoneNumber: Array(17).fill('4').join('') });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Too long']),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+          }),
+        });
+      });
+
+      it('should reject registration if phone number is of invalid format', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ phoneNumber: '+46 677 123 456' });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Invalid phone format']),
+          }),
+        });
+      });
+
+      it('should reject registration if phone number is taken', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ phoneNumber: users[4].phoneNumber });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Phone number already taken']),
+          }),
+        });
+      });
     });
   });
 

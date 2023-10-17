@@ -1,3 +1,4 @@
+import { parsePhoneNumber } from 'awesome-phonenumber';
 import { Summary } from 'clean-schema';
 
 import {
@@ -17,6 +18,7 @@ export {
   validateUserAccountStatus,
   validateUserEmail,
   validateUsername,
+  validateUserPhone,
   validateUserRole,
 };
 
@@ -32,6 +34,24 @@ async function validateUserEmail(val: any) {
   if (isTaken) return { valid: false, reason: 'Email already taken' };
 
   return isValid;
+}
+
+async function validateUserPhone(val: any) {
+  const isValid = validateString('', { minLength: 5, maxLength: 16 })(val);
+
+  if (!isValid.valid) return isValid;
+
+  const pn = parsePhoneNumber(isValid.validated);
+
+  if (!pn.valid) return { valid: false, reason: 'Invalid phone format' };
+
+  const validated = pn.number.international;
+
+  const isTaken = await userRepository.findByPhoneNumber(validated);
+
+  return isTaken
+    ? { valid: false, reason: 'Phone number already taken' }
+    : { valid: true, validated };
 }
 
 async function validateUsername(val: any) {

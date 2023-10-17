@@ -15,13 +15,13 @@ function validateString<T extends string = string>(
   options?: StringOptions<T>,
 ) {
   return (val: any) => {
-    const validation = isStringOk<T>(val, {
+    const isValid = isStringOk<T>(val, {
       trim: true,
       ...options,
     } as any);
 
-    if (!validation.valid && msg) validation.reasons.unshift(msg);
+    if (!isValid.valid && msg) isValid.reasons.unshift(msg);
 
-    return validation;
+    return isValid;
   };
 }
