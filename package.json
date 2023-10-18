@@ -43,7 +43,7 @@
     "@hokify/agenda": "^6.3.0",
     "apitoolz": "^0.3.14",
     "awesome-phonenumber": "^6.1.0",
-    "clean-schema": "^4.0.0",
+    "clean-schema": "^4.0.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.9",
     "dotenv": "^16.3.1",

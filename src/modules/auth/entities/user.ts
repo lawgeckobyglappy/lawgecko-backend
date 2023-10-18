@@ -36,19 +36,13 @@ const UserModel = new Schema<UserInput, User>(
       shouldInit: false,
       validator: validateUserAccountStatus,
     },
-    email: {
-      required: true,
-      shouldUpdate: () => false,
-      validator: validateUserEmail,
-    },
+    email: { readonly: true, validator: validateUserEmail },
     firstName: {
-      required: true,
-      shouldUpdate: () => false,
+      readonly: true,
       validator: validateString('Invalid first name'),
     },
     lastName: {
-      required: true,
-      shouldUpdate: () => false,
+      readonly: true,
       validator: validateString('Invalid last name'),
     },
     role: {
@@ -63,7 +57,7 @@ const UserModel = new Schema<UserInput, User>(
           `${firstName?.trim() || ''}-${lastName?.trim() || ''}`,
         );
       },
-      shouldUpdate: () => false,
+      shouldUpdate: false,
       validator: validateUsername,
     },
     _addAuthProvider: { virtual: true, validator: validateAuthProvider },
