@@ -1,31 +1,31 @@
 import jwt from 'jsonwebtoken';
-
-import config from '@/config/env';
-import { AuthInfo, AuthInfoInput } from '@/shared/types';
 import { Request } from 'express';
 
-const { secret, accessExpirationDays } = config.jwt;
+import { config } from '@config';
+import { AuthInfo, AuthInfoInput } from '@types';
+
+const { JWT_SECRET, JWT_ACCESS_EXPIRATION_DAYS } = config.jwt;
 
 export { createToken, parseAuth };
 
 function createToken({ userId, userRole, sessionId }: AuthInfoInput) {
-	return jwt.sign(
-		{ user: { _id: userId, role: userRole }, sessionId } as AuthInfo,
-		secret!,
-		{ expiresIn: `${accessExpirationDays}d` },
-	);
+  return jwt.sign(
+    { user: { _id: userId, role: userRole }, sessionId } as AuthInfo,
+    JWT_SECRET!,
+    { expiresIn: `${JWT_ACCESS_EXPIRATION_DAYS}d` },
+  );
 }
 
 function getAuthInfo(token: string) {
-	try {
-		return jwt.verify(token, secret!) as AuthInfo;
-	} catch (err: any) {
-		return null;
-	}
+  try {
+    return jwt.verify(token, JWT_SECRET!) as AuthInfo;
+  } catch (err: any) {
+    return null;
+  }
 }
 
 function parseAuth(req: Request) {
-	const bearerToken = req.headers['authorization']?.split(' ');
+  const bearerToken = req.headers['authorization']?.split(' ');
 
-	return bearerToken?.[0] === 'Bearer' ? getAuthInfo(bearerToken[1]) : null;
+  return bearerToken?.[0] === 'Bearer' ? getAuthInfo(bearerToken[1]) : null;
 }

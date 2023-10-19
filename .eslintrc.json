@@ -1,37 +1,30 @@
 {
-	"root": true,
-	"parser": "@typescript-eslint/parser",
-	"parserOptions": {
-		"warnOnUnsupportedTypeScriptVersion": false,
-		"sourceType": "module"
-	},
-	"extends": [
-		"eslint:recommended",
-		"plugin:@typescript-eslint/recommended",
-		"prettier"
-	],
-	"env": {
-		"node": true,
-		"es6": true
-	},
-	"plugins": [
-		"@typescript-eslint",
-		"no-null",
-		"import",
-		"eslint-plugin-local",
-		"simple-import-sort"
-	],
-	"ignorePatterns": ["**/node_modules/**", "/built/**", "/tests/**"],
-	"rules": {
-		//	"indent": ["error", 2],
-		"prettier/prettier": [
-			//or whatever plugin that is causing the clash
-			"error",
-			{
-				"tabWidth": 2
-			}
-		]
-	},
-
-	"overrides": []
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "import/no-anonymous-default-export": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    // add new line above return
+    "newline-before-return": "error",
+    // add new line below import
+    "import/newline-after-import": ["error", { "count": 1 }],
+    "@typescript-eslint/ban-types": [
+      "error",
+      { "extendDefaults": true, "types": { "{}": false } }
+    ]
+  },
+  "plugins": ["import"],
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": ["./tsconfig.json"]
+      }
+    }
+  }
 }

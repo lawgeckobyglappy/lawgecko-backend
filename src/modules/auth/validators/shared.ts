@@ -1,27 +1,27 @@
-import { validate, StringOptions } from 'clean-schema';
+import { StringOptions, isEmailOk, isStringOk } from 'clean-schema';
 
 export { validateEmail, validateString };
 
 function validateEmail(val: any) {
-	const validation = validate.isEmailOk(val);
+  const validation = isEmailOk(val);
 
-	if (!validation.valid) validation.reasons = ['Invalid email'];
+  if (!validation.valid) validation.reasons = ['Invalid email'];
 
-	return validation;
+  return validation;
 }
 
 function validateString<T extends string = string>(
-	msg?: string,
-	options?: StringOptions<T>,
+  msg?: string,
+  options?: StringOptions<T>,
 ) {
-	return (val: any) => {
-		const validation = validate.isStringOk(val, {
-			trim: true,
-			...options,
-		} as any);
+  return (val: any) => {
+    const isValid = isStringOk<T>(val, {
+      trim: true,
+      ...options,
+    } as any);
 
-		if (!validation.valid && msg) validation.reasons.unshift(msg);
+    if (!isValid.valid && msg) isValid.reasons.unshift(msg);
 
-		return validation;
-	};
+    return isValid;
+  };
 }

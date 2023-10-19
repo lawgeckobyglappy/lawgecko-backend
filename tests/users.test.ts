@@ -1,502 +1,655 @@
 import request from 'supertest';
-import { cleanupDp } from './_utils';
-import { addUsers, users } from './_utils/users';
 import {
-	loginLinkRepository,
-	userRepository,
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from 'vitest';
+
+import { makeServer } from '../src/app';
+import {
+  loginLinkRepository,
+  userRepository,
 } from '../src/modules/auth/repositories';
+
+import { cleanupDp } from './_utils';
 import { expectAuthError } from './_utils/auth';
+import { addUsers, users } from './_utils/users';
 
 let api: request.SuperTest<request.Test>, server: any;
 
 const BASE_URL = '/api/v1/auth';
 const REQUEST_LOGIN_LINK_URL = `${BASE_URL}/request-login-link`;
 
+makeServer;
+
 describe('Auth', () => {
-	beforeAll(() => {
-		jest.isolateModules(async () => {
-			server = (await import('../src/server')).server;
-			api = request(server);
-		});
-	});
+  beforeAll(() => {
+    server = makeServer();
+    api = request(server);
+  });
+
+  afterAll(async () => {
+    await server?.close();
+  });
+
+  beforeEach(async () => {
+    await addUsers();
+  });
+
+  afterEach(async () => await cleanupDp());
+
+  describe('POST /auth/register', () => {
+    const url = `${BASE_URL}/register`;
+
+    it('should allow users to register if correct infomation is provided', async () => {
+      const { body, status } = await api.post(url).send({
+        email: '1@1.com ',
+        firstName: ' test',
+        lastName: 'user',
+        username: 'test-user',
+        accountStatus: 'blocked',
+        role: 'admin',
+        phoneNumber: '+46 70 712 34 26',
+      });
+
+      const { data, error } = body;
+
+      expect(status).toBe(201);
+
+      expect(error).toBeUndefined();
+
+      expect(data).toMatchObject({
+        email: '1@1.com',
+        firstName: 'test',
+        lastName: 'user',
+        username: 'test-user',
+        accountStatus: 'active',
+        role: 'user',
+      });
+    });
+
+    it('should reject registration if invalid data is provided', async () => {
+      const { body, status } = await api.post(url).send({
+        email: ' ',
+        firstName: '  ',
+        lastName: ' ',
+        username: ' ',
+      });
+
+      const { data, error } = body;
+
+      expect(status).toBe(400);
+
+      expect(data).toBeUndefined();
+
+      expect(error.payload).toMatchObject({
+        email: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid email']),
+        }),
+        firstName: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid first name']),
+        }),
+        lastName: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid last name']),
+        }),
+        username: expect.objectContaining({
+          reasons: expect.arrayContaining(['Invalid username']),
+        }),
+      });
+    });
+
+    it('should reject registration if email or user name provided are already taken', async () => {
+      const existingUser = users[0];
+
+      const { body, status } = await api.post(url).send({
+        email: existingUser.email,
+        firstName: ' test',
+        lastName: 'user',
+        username: existingUser.username,
+      });
+
+      const { data, error } = body;
+
+      expect(status).toBe(400);
+
+      expect(data).toBeUndefined();
+
+      expect(error.payload).toMatchObject({
+        email: expect.objectContaining({
+          reasons: expect.arrayContaining(['Email already taken']),
+        }),
+        username: expect.objectContaining({
+          reasons: expect.arrayContaining(['Username already taken']),
+        }),
+      });
+    });
 
-	afterAll(async () => {
-		await server?.close();
+    describe('Phone number', () => {
+      it('should reject registration if phone number is too short', async () => {
+        const { body, status } = await api.post(url).send({ phoneNumber: ' ' });
 
-		jest.resetModules();
-	});
+        const { data, error } = body;
 
-	beforeEach(async () => await addUsers());
+        expect(status).toBe(400);
 
-	afterEach(async () => await cleanupDp());
+        expect(data).toBeUndefined();
 
-	describe('POST /auth/register', () => {
-		const url = `${BASE_URL}/register`;
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Too short']),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+          }),
+        });
+      });
 
-		it('should allow users to register if correct infomation is provided', async () => {
-			const { body, status } = await api.post(url).send({
-				email: '1@1.com ',
-				firstName: ' test',
-				lastName: 'user',
-				username: 'test-user',
-				accountStatus: 'blocked',
-				role: 'admin',
-			});
+      it('should reject registration if phone number is too long', async () => {
+        const { body, status } = await api
+          .post(url)
+          .send({ phoneNumber: Array(17).fill('4').join('') });
 
-			const { data, error } = body;
+        const { data, error } = body;
 
-			expect(status).toBe(201);
+        expect(status).toBe(400);
 
-			expect(error).toBeUndefined();
+        expect(data).toBeUndefined();
 
-			expect(data).toMatchObject({
-				email: '1@1.com',
-				firstName: 'test',
-				lastName: 'user',
-				username: 'test-user',
-				accountStatus: 'active',
-				role: 'user',
-			});
-		});
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Too long']),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+          }),
+        });
+      });
 
-		it('should reject registration if invalid data is provided', async () => {
-			const { body, status } = await api.post(url).send({
-				email: ' ',
-				firstName: '  ',
-				lastName: ' ',
-				username: ' ',
-			});
+      it('should reject registration if phone number is taken', async () => {
+        const { body, status } = await api
+          .post(url)
+          .send({ phoneNumber: users[4].phoneNumber });
 
-			const { data, error } = body;
+        const { data, error } = body;
 
-			expect(status).toBe(400);
+        expect(status).toBe(400);
 
-			expect(data).toBeUndefined();
+        expect(data).toBeUndefined();
 
-			expect(error.payload).toMatchObject({
-				email: expect.arrayContaining(['Invalid email']),
-				firstName: expect.arrayContaining(['Invalid first name']),
-				lastName: expect.arrayContaining(['Invalid last name']),
-				username: expect.arrayContaining(['Invalid username']),
-			});
-		});
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Phone number already taken']),
+          }),
+        });
+      });
+    });
+  });
 
-		it('should reject registration if email or user name provided are already taken', async () => {
-			const existingUser = users[0];
+  describe('POST /auth/request-login-link', () => {
+    it('should reject if invalid email is provided', async () => {
+      const { body, status } = await api
+        .post(REQUEST_LOGIN_LINK_URL)
+        .send({ email: ' ' });
 
-			const { body, status } = await api.post(url).send({
-				email: existingUser.email,
-				firstName: ' test',
-				lastName: 'user',
-				username: existingUser.username,
-			});
+      const { data, error } = body;
 
-			const { data, error } = body;
+      expect(status).toBe(400);
 
-			expect(status).toBe(400);
+      expect(data).toBeUndefined();
 
-			expect(data).toBeUndefined();
+      expect(error.message).toBe('Invalid email');
+    });
 
-			expect(error.payload).toMatchObject({
-				email: expect.arrayContaining(['Email already taken']),
-				username: expect.arrayContaining(['Username already taken']),
-			});
-		});
-	});
+    it('should respond with positive message when email is valid even if user does not exist', async () => {
+      const emails = [users[0].email, '1@1.com'];
 
-	describe('POST /auth/request-login-link', () => {
-		it('should reject if invalid email is provided', async () => {
-			const { body, status } = await api
-				.post(REQUEST_LOGIN_LINK_URL)
-				.send({ email: ' ' });
+      for (const email of emails) {
+        const { body, status } = await api
+          .post(REQUEST_LOGIN_LINK_URL)
+          .send({ email });
 
-			const { data, error } = body;
+        const { data, error } = body;
 
-			expect(status).toBe(400);
+        expect(status).toBe(200);
 
-			expect(data).toBeUndefined();
+        expect(error).toBeUndefined();
 
-			expect(error.message).toBe('Invalid email');
-		});
+        expect(data).toBe('Success');
+      }
+    });
+  });
 
-		it('should respond with positive message when email is valid even if user does not exist', async () => {
-			const emails = [users[0].email, '1@1.com'];
+  describe('POST /auth/verify-login-link', () => {
+    it('should reject if invalid link id is provided', async () => {
+      const { body, status } = await verifyLoginLink({ id: ' ' });
 
-			for (const email of emails) {
-				const { body, status } = await api
-					.post(REQUEST_LOGIN_LINK_URL)
-					.send({ email });
+      const { data, error } = body;
 
-				const { data, error } = body;
+      expect(status).toBe(400);
 
-				expect(status).toBe(200);
+      expect(data).toBeUndefined();
 
-				expect(error).toBeUndefined();
+      expect(error.message).toBe('Invalid link');
+    });
 
-				expect(data).toBe('Success');
-			}
-		});
-	});
+    it('should reject with "Authentication failed" error if owner of link is not active', async () => {
+      const ids = ['2', '3'];
 
-	describe('POST /auth/verify-login-link', () => {
-		it('should reject if invalid link id is provided', async () => {
-			const { body, status } = await verifyLoginLink({ id: ' ' });
+      for (const _id of ids) {
+        await loginLinkRepository.insertOne({ _id, userId: _id } as any);
 
-			const { data, error } = body;
+        const { body, status } = await verifyLoginLink({ id: _id });
 
-			expect(status).toBe(400);
+        const { data, error } = body;
 
-			expect(data).toBeUndefined();
+        expect(status).toBe(401);
 
-			expect(error.message).toBe('Invalid link');
-		});
+        expect(data).toBeUndefined();
 
-		it('should reject with "Authentication failed" error if owner of link is not active', async () => {
-			const ids = ['2', '3'];
+        expect(error.message).toBe('Authentication failed');
+      }
+    });
 
-			for (const _id of ids) {
-				await loginLinkRepository.insertOne({ _id, userId: _id } as any);
+    it('should return the accessToken if the link id is valid and the owner is active', async () => {
+      const _id = 'valid-link-id';
 
-				const { body, status } = await verifyLoginLink({ id: _id });
+      await loginLinkRepository.insertOne({ _id, userId: users[0]._id } as any);
 
-				const { data, error } = body;
+      const { body, status } = await verifyLoginLink({ id: _id });
 
-				expect(status).toBe(401);
+      const { data, error } = body;
 
-				expect(data).toBeUndefined();
+      expect(status).toBe(200);
 
-				expect(error.message).toBe('Authentication failed');
-			}
-		});
+      expect(error).toBeUndefined();
 
-		it('should return the accessToken if the link id is valid and the owner is active', async () => {
-			const _id = 'valid-link-id';
+      expect(typeof data).toBe('string');
+    });
+  });
 
-			await loginLinkRepository.insertOne({ _id, userId: users[0]._id } as any);
+  describe('GET /auth/current-user', () => {
+    const linkId = 'valid-link-id',
+      user = users[0],
+      url = `${BASE_URL}/current-user`;
 
-			const { body, status } = await verifyLoginLink({ id: _id });
+    beforeEach(async () => {
+      await loginLinkRepository.insertOne({
+        _id: linkId,
+        userId: user._id,
+      } as any);
+    });
 
-			const { data, error } = body;
+    expectAuthError({
+      description:
+        'should reject with "Authentication failed" if no token is provided',
+      errorCode: 401,
+      errorMessage: 'Authentication failed',
+      method: 'get',
+      role: '',
+      url,
+    });
 
-			expect(status).toBe(200);
+    it('should reject with "Authentication failed" error if user is not active', async () => {
+      const statusToReject = ['blocked', 'deleted'];
 
-			expect(error).toBeUndefined();
+      const {
+        body: { data: token },
+      } = await verifyLoginLink({ id: linkId });
 
-			expect(typeof data).toBe('string');
-		});
-	});
+      for (const accountStatus of statusToReject) {
+        await userRepository.updateOne({ _id: user._id }, {
+          accountStatus,
+        } as any);
 
-	describe('GET /auth/current-user', () => {
-		const linkId = 'valid-link-id',
-			user = users[0],
-			url = `${BASE_URL}/current-user`;
+        const { body, status } = await api
+          .get(url)
+          .set('Authorization', `Bearer ${token}`);
 
-		beforeEach(async () => {
-			return loginLinkRepository.insertOne({
-				_id: linkId,
-				userId: user._id,
-			} as any);
-		});
+        const { data, error } = body;
 
-		expectAuthError({
-			description:
-				'should reject with "Authentication failed" if no token is provided',
-			errorCode: 401,
-			errorMessage: 'Authentication failed',
-			method: 'get',
-			role: '',
-			url,
-		});
+        expect(status).toBe(401);
 
-		it('should reject with "Authentication failed" error if user is not active', async () => {
-			const statusToReject = ['blocked', 'deleted'];
+        expect(data).toBeUndefined();
 
-			const {
-				body: { data: token },
-			} = await verifyLoginLink({ id: linkId });
+        expect(error.message).toBe('Authentication failed');
+      }
+    });
 
-			for (const accountStatus of statusToReject) {
-				await userRepository.updateOne({ _id: user._id }, {
-					accountStatus,
-				} as any);
+    it('should return user info if valid token is provided', async () => {
+      const {
+        body: { data: token },
+      } = await verifyLoginLink({ id: linkId });
 
-				const { body, status } = await api
-					.get(url)
-					.set('Authorization', `Bearer ${token}`);
+      const { body, status } = await api
+        .get(url)
+        .set('Authorization', `Bearer ${token}`);
 
-				const { data, error } = body;
+      const { data, error } = body;
 
-				expect(status).toBe(401);
+      expect(status).toBe(200);
 
-				expect(data).toBeUndefined();
+      expect(error).toBeUndefined();
 
-				expect(error.message).toBe('Authentication failed');
-			}
-		});
+      expect(data).toMatchObject(user);
+    });
+  });
 
-		it('should return user info if valid token is provided', async () => {
-			const {
-				body: { data: token },
-			} = await verifyLoginLink({ id: linkId });
+  describe('PATCH /auth/update-user', () => {
+    let token = '';
 
-			const { body, status } = await api
-				.get(url)
-				.set('Authorization', `Bearer ${token}`);
+    const linkId = 'valid-link-id',
+      user = users[0],
+      url = `${BASE_URL}/update-user/${user._id}`;
 
-			const { data, error } = body;
+    beforeEach(async () => {
+      await loginLinkRepository.insertOne({
+        _id: linkId,
+        userId: user._id,
+      } as any);
 
-			expect(status).toBe(200);
+      const {
+        body: { data },
+      } = await verifyLoginLink({ id: linkId });
 
-			expect(error).toBeUndefined();
+      token = data;
+    });
 
-			expect(data).toMatchObject(user);
-		});
-	});
+    expectAuthError({
+      description:
+        'should reject with "Authentication failed" if no token is provided',
+      errorCode: 401,
+      errorMessage: 'Authentication failed',
+      method: 'patch',
+      role: '',
+      url,
+    });
 
-	describe('PATCH /auth/update-user', () => {
-		let token = '';
+    it('should reject with "User not found" error if user does not exist', async () => {
+      const { body, status } = await api
+        .patch(url + 'id-that-is-not-in-db')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ firstName: 'Update' });
 
-		const linkId = 'valid-link-id',
-			user = users[0],
-			url = `${BASE_URL}/update-user/${user._id}`;
+      const { data, error } = body;
 
-		beforeEach(async () => {
-			await loginLinkRepository.insertOne({
-				_id: linkId,
-				userId: user._id,
-			} as any);
+      expect(status).toBe(404);
 
-			const {
-				body: { data },
-			} = await verifyLoginLink({ id: linkId });
+      expect(data).toBeUndefined();
 
-			token = data;
-		});
+      expect(error.message).toBe('User not found');
+    });
 
-		expectAuthError({
-			description:
-				'should reject with "Authentication failed" if no token is provided',
-			errorCode: 401,
-			errorMessage: 'Authentication failed',
-			method: 'patch',
-			role: '',
-			url,
-		});
+    it('should reject with "Access denied" error if user is not ower of accout and is not admin', async () => {
+      const linkId = 'new-link';
 
-		it('should reject with "User not found" error if user does not exist', async () => {
-			const { body, status } = await api
-				.patch(url + 'id-that-is-not-in-db')
-				.set('Authorization', `Bearer ${token}`)
-				.send({ firstName: 'Update' });
+      await loginLinkRepository.insertOne({
+        _id: linkId,
+        userId: users[3]._id,
+      } as any);
 
-			const { data, error } = body;
+      const {
+        body: { data: token },
+      } = await verifyLoginLink({ id: linkId });
 
-			expect(status).toBe(404);
+      const { body, status } = await api
+        .patch(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ firstName: 'Update' });
 
-			expect(data).toBeUndefined();
+      const { data, error } = body;
 
-			expect(error.message).toBe('User not found');
-		});
+      expect(status).toBe(403);
 
-		it('should reject with "Access denied" error if user is not ower of accout and is not admin', async () => {
-			const linkId = 'new-link';
+      expect(data).toBeUndefined();
 
-			await loginLinkRepository.insertOne({
-				_id: linkId,
-				userId: users[3]._id,
-			} as any);
+      expect(error.message).toBe('Access denied');
+    });
 
-			const {
-				body: { data: token },
-			} = await verifyLoginLink({ id: linkId });
+    it('should reject with "Authentication failed" error if user is not active', async () => {
+      const statusToReject = ['blocked', 'deleted'];
 
-			const { body, status } = await api
-				.patch(url)
-				.set('Authorization', `Bearer ${token}`)
-				.send({ firstName: 'Update' });
+      for (const accountStatus of statusToReject) {
+        await userRepository.updateOne({ _id: user._id }, {
+          accountStatus,
+        } as any);
 
-			const { data, error } = body;
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ firstName: 'Update' });
 
-			expect(status).toBe(403);
+        const { data, error } = body;
 
-			expect(data).toBeUndefined();
+        expect(status).toBe(401);
 
-			expect(error.message).toBe('Access denied');
-		});
+        expect(data).toBeUndefined();
 
-		it('should reject with "Authentication failed" error if user is not active', async () => {
-			const statusToReject = ['blocked', 'deleted'];
+        expect(error.message).toBe('Authentication failed');
+      }
+    });
 
-			for (const accountStatus of statusToReject) {
-				await userRepository.updateOne({ _id: user._id }, {
-					accountStatus,
-				} as any);
+    it('should ignore if users try to update their "accountStatus" or "role"', async () => {
+      const update = { accountStatus: 'blocked', role: 'admin' };
 
-				const { body, status } = await api
-					.patch(url)
-					.set('Authorization', `Bearer ${token}`)
-					.send({ firstName: 'Update' });
+      const { body, status } = await api
+        .patch(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send(update);
 
-				const { data, error } = body;
+      const { data, error } = body;
 
-				expect(status).toBe(401);
+      expect(status).toBe(200);
 
-				expect(data).toBeUndefined();
+      expect(error).toBeUndefined();
 
-				expect(error.message).toBe('Authentication failed');
-			}
-		});
+      expect(data).toMatchObject(user);
+    });
 
-		it('should update other users if valid data is provided', async () => {
-			const update = { firstName: 'Update', username: 'updated-username' };
+    it("should not allow admins to update other users' info", async () => {
+      const linkId = 'new-link';
 
-			const { body, status } = await api
-				.patch(url)
-				.set('Authorization', `Bearer ${token}`)
-				.send(update);
+      await loginLinkRepository.insertOne({
+        _id: linkId,
+        userId: users[4]._id,
+      } as any);
 
-			const { data, error } = body;
+      const {
+        body: { data: token },
+      } = await verifyLoginLink({ id: linkId });
 
-			expect(status).toBe(200);
+      const update = {
+        email: 'test@mail.com',
+        username: 'kjfnvjsfnbvofv',
+        firstName: 'Update',
+        lastName: 'Update',
+      };
 
-			expect(error).toBeUndefined();
+      const { body, status } = await api
+        .patch(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send(update);
 
-			expect(data).toMatchObject(update);
-		});
+      const { data, error } = body;
 
-		it('should return corresponding errors if invalid data is provided', async () => {
-			const update = { firstName: '', email: users[4].email, username: '' };
+      expect(status).toBe(200);
 
-			const { body, status } = await api
-				.patch(url)
-				.set('Authorization', `Bearer ${token}`)
-				.send(update);
+      expect(error).toBeUndefined();
 
-			const { data, error } = body;
+      expect(data).toMatchObject(user);
+    });
 
-			expect(status).toBe(400);
+    it('should not allow admins to update other admins', async () => {
+      const linkId = 'new-link';
 
-			expect(data).toBeUndefined();
+      await loginLinkRepository.insertOne({
+        _id: linkId,
+        userId: users[4]._id,
+      } as any);
 
-			expect(error.message).toBe('Validation Error');
-			expect(error.payload).toMatchObject({
-				firstName: expect.arrayContaining(['Invalid first name']),
-				email: expect.arrayContaining(['Email already taken']),
-				username: expect.arrayContaining(['Invalid username']),
-			});
-		});
+      const {
+        body: { data: token },
+      } = await verifyLoginLink({ id: linkId });
 
-		it('should ignore if users try to update their "accountStatus" or "role"', async () => {
-			const update = { accountStatus: 'blocked', role: 'admin' };
+      const update = { firstName: 'Update', accountStatus: 'blocked' };
 
-			const { body, status } = await api
-				.patch(url)
-				.set('Authorization', `Bearer ${token}`)
-				.send(update);
+      const { body, status } = await api
+        .patch(`${BASE_URL}/update-user/${users[5]._id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(update);
 
-			const { data, error } = body;
+      const { data, error } = body;
 
-			expect(status).toBe(200);
+      expect(status).toBe(403);
+      expect(data).toBeUndefined();
+      expect(error).toMatchObject({ message: 'Access denied' });
+    });
 
-			expect(error).toBeUndefined();
+    it("should allow admins to update other users' account statuses", async () => {
+      const linkId = 'new-link';
 
-			expect(data).toMatchObject(user);
-		});
+      await loginLinkRepository.insertOne({
+        _id: linkId,
+        userId: users[4]._id,
+      } as any);
 
-		it('should allow admins to update other users if is admin', async () => {
-			const linkId = 'new-link';
+      const {
+        body: { data: token },
+      } = await verifyLoginLink({ id: linkId });
 
-			await loginLinkRepository.insertOne({
-				_id: linkId,
-				userId: users[4]._id,
-			} as any);
+      const validStatuses = ['active', 'blocked', 'deleted'];
 
-			const {
-				body: { data: token },
-			} = await verifyLoginLink({ id: linkId });
+      for (const accountStatus of validStatuses) {
+        const update = { accountStatus };
 
-			const update = { firstName: 'Update', accountStatus: 'blocked' };
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send(update);
 
-			const { body, status } = await api
-				.patch(url)
-				.set('Authorization', `Bearer ${token}`)
-				.send(update);
+        const { data, error } = body;
 
-			const { data, error } = body;
+        expect(status).toBe(200);
 
-			expect(status).toBe(200);
+        expect(error).toBeUndefined();
 
-			expect(error).toBeUndefined();
+        expect(data).toMatchObject(update);
+      }
+    });
 
-			expect(data).toMatchObject(update);
-		});
+    it("should allow admins to update other users' roles", async () => {
+      const linkId = 'new-link';
 
-		it("should allow admins to update other users' account statuses", async () => {
-			const linkId = 'new-link';
+      await loginLinkRepository.insertOne({
+        _id: linkId,
+        userId: users[4]._id,
+      } as any);
 
-			await loginLinkRepository.insertOne({
-				_id: linkId,
-				userId: users[4]._id,
-			} as any);
+      const {
+        body: { data: token },
+      } = await verifyLoginLink({ id: linkId });
 
-			const {
-				body: { data: token },
-			} = await verifyLoginLink({ id: linkId });
+      const validRoles = ['moderator', 'user'];
 
-			const validStatuses = ['active', 'blocked', 'deleted'];
+      for (const role of validRoles) {
+        const update = { role };
 
-			for (const accountStatus of validStatuses) {
-				const update = { accountStatus };
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send(update);
 
-				const { body, status } = await api
-					.patch(url)
-					.set('Authorization', `Bearer ${token}`)
-					.send(update);
+        const { data, error } = body;
 
-				const { data, error } = body;
+        expect(status).toBe(200);
 
-				expect(status).toBe(200);
+        expect(error).toBeUndefined();
 
-				expect(error).toBeUndefined();
+        expect(data).toMatchObject(update);
+      }
+    });
 
-				expect(data).toMatchObject(update);
-			}
-		});
+    describe('Phone number', () => {
+      it('should reject registration if phone number is too short', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ phoneNumber: ' ' });
 
-		it("should allow admins to update other users' roles", async () => {
-			const linkId = 'new-link';
+        const { data, error } = body;
 
-			await loginLinkRepository.insertOne({
-				_id: linkId,
-				userId: users[4]._id,
-			} as any);
+        expect(status).toBe(400);
 
-			const {
-				body: { data: token },
-			} = await verifyLoginLink({ id: linkId });
+        expect(data).toBeUndefined();
 
-			const validRoles = ['admin', 'moderator', 'user'];
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Too short']),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+          }),
+        });
+      });
 
-			for (const role of validRoles) {
-				const update = { role };
+      it('should reject registration if phone number is too long', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ phoneNumber: Array(17).fill('4').join('') });
 
-				const { body, status } = await api
-					.patch(url)
-					.set('Authorization', `Bearer ${token}`)
-					.send(update);
+        const { data, error } = body;
 
-				const { data, error } = body;
+        expect(status).toBe(400);
 
-				expect(status).toBe(200);
+        expect(data).toBeUndefined();
 
-				expect(error).toBeUndefined();
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Too long']),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+          }),
+        });
+      });
 
-				expect(data).toMatchObject(update);
-			}
-		});
-	});
+      it('should reject registration if phone number is of invalid format', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ phoneNumber: '+46 677 123 456' });
 
-	function verifyLoginLink(requestBody: any) {
-		return api.post(`${BASE_URL}/verify-login-link`).send(requestBody);
-	}
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Invalid phone format']),
+          }),
+        });
+      });
+
+      it('should reject registration if phone number is taken', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ phoneNumber: users[4].phoneNumber });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload).toMatchObject({
+          phoneNumber: expect.objectContaining({
+            reasons: expect.arrayContaining(['Phone number already taken']),
+          }),
+        });
+      });
+    });
+  });
+
+  function verifyLoginLink(requestBody: any) {
+    return api.post(`${BASE_URL}/verify-login-link`).send(requestBody);
+  }
 });
