@@ -42,7 +42,8 @@ const UserModel = new Schema<UserInput, User>(
       validator: validateString('Invalid first name'),
     },
     lastName: {
-      readonly: true,
+      default: '',
+      shouldUpdate: false,
       validator: validateString('Invalid last name'),
     },
     phoneNumber: {
