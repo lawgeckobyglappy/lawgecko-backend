@@ -10,10 +10,12 @@ export type LoginLinkProps = {
   user: User;
 };
 
+const { FRONTEND_URL, LOGIN_LINK_EXPIRATION_MINUTES } = config;
+
 function sendLoginLinkEmail({ user, linkId }: LoginLinkProps) {
   const { email, firstName } = user;
 
-  const link = `${config.FRONTEND_URL}/verify-link/?id=${linkId}`;
+  const link = `${FRONTEND_URL}/verify-link/?id=${linkId}`;
 
   const html = `
           <html>
@@ -24,9 +26,9 @@ function sendLoginLinkEmail({ user, linkId }: LoginLinkProps) {
                     <p style="font-size: 18px; margin-bottom: 10px;">Hi ${firstName},</p>
                     <p style="font-size: 16px; margin-bottom: 10px;">Use the link below to log into your account:</p>
                     <p style="font-size: 16px; margin-bottom: 20px;">
-                    <a href="${link}" style="color: #007bff; text-decoration: none;"><button>Verify Email</button></a>
+                    <a href="${link}" style="color: #007bff; text-decoration: none;"><button>Login</button></a>
                     </p>
-                    <p style="font-size: 16px; margin-bottom: 20px;">Please hurry, the link will expire shortly.</p>
+                    <p style="font-size: 16px; margin-bottom: 20px;">Please hurry, the link will expire in ${LOGIN_LINK_EXPIRATION_MINUTES} minutes.</p>
                     <p style="font-size: 16px;">Regards,</p>
                     <p style="font-size: 16px;">Lawgecko Team</p>
                </body>
