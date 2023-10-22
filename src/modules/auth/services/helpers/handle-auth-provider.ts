@@ -11,7 +11,7 @@ export { handleAuthProvider };
 type UserInfo = {
   email: string;
   firstName: string;
-  lastName: string;
+  lastName?: string;
 };
 
 type Options = {
@@ -48,6 +48,8 @@ async function handleAuthProvider({ userInfo, isLogin, provider }: Options) {
   }
 
   if (!user) {
+    if (!userInfo.lastName) delete userInfo.lastName;
+
     const { data, error } = await UserModel.create({
       ...userInfo,
       _addAuthProvider: provider,
