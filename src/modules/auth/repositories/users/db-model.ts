@@ -12,7 +12,7 @@ const userSchema = new Schema<User>(
     email: { type: String, index: true, required: true, unique: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    phoneNumber: { type: String, required: true, index: true, unique: true },
+    phoneNumber: { type: String, required: true, index: true },
     role: { type: String, enum: UserRolesList, default: 'user' },
     username: { type: String, default: '', index: true, unique: true },
   },

@@ -45,12 +45,22 @@ const UserModel = new Schema<UserInput, User>(
       readonly: true,
       validator: validateString('Invalid last name'),
     },
+    phoneNumber: {
+      default: '',
+      required({ operation, context }) {
+        return (
+          operation == 'creation' &&
+          !context._addAuthProvider &&
+          !context.phoneNumber
+        );
+      },
+      validator: validateUserPhone,
+    },
     role: {
       default: UserRoles.USER,
       shouldInit: false,
       validator: validateUserRole,
     },
-    phoneNumber: { required: true, validator: validateUserPhone },
     username: {
       default({ firstName, lastName }) {
         return generateUsername(
