@@ -19,13 +19,16 @@ export const config = {
   environment: process.env.NODE_ENV || 'development',
   port: process.env.NODE_ENV == 'test' ? 0 : process.env.PORT || 5000,
   db: { dbURI: process.env.MONGODB_URI! },
-  LOGIN_LINK_EXPIRATION_MINUTES: parseInt(
+  LOGIN_LINK_EXPIRATION_MINUTES: parseFloat(
     process.env.LOGIN_LINK_EXPIRATION_MINUTES ?? '15',
   ),
   jwt: {
     JWT_SECRET: process.env.JWT_SECRET ?? 'test-secret',
-    JWT_ACCESS_EXPIRATION_DAYS: parseInt(
-      process.env.JWT_ACCESS_EXPIRATION_DAYS ?? '25',
+    JWT_ACCESS_EXPIRATION_HOURS: parseFloat(
+      process.env.JWT_ACCESS_EXPIRATION_HOURS ?? '168',
+    ),
+    ADMIN_JWT_ACCESS_EXPIRATION_HOURS: parseFloat(
+      process.env.ADMIN_JWT_ACCESS_EXPIRATION_HOURS ?? '2',
     ),
   },
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5000',

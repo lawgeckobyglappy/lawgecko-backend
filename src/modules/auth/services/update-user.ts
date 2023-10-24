@@ -1,13 +1,15 @@
 import { sanitize } from 'apitoolz';
 import { VALIDATION_ERRORS } from 'clean-schema';
 
-import { AuthInfo, User } from '@types';
+import { AuthInfo, User, UserRoles } from '@types';
 
 import { UserModel } from '../entities';
 import { userRepository } from '../repositories';
 import { handleAuthError, handleError } from '../utils';
 
 export { updateUser };
+
+const {SYSTEM_ADMIN, SUPER_ADMIN} = UserRoles
 
 type Options = {
   id: string;
@@ -19,13 +21,22 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
 
   if (!user) return handleError({ message: 'User not found', statusCode: 404 });
 
-  const isCurrentUser = user._id == authInfo.user._id;
+  const currentUser = authInfo.user
+  const isCurrentUser = user._id == currentUser._id;
 
   if (isCurrentUser && user.accountStatus != 'active')
     return handleAuthError('Authentication failed');
+  
+  if (!isCurrentUser){
+    if (![SUPER_ADMIN, SYSTEM_ADMIN].includes(currentUser.role as any))
+      return handleAuthError('Access denied');
 
-  if (!isCurrentUser && (authInfo.user.role != 'admin' || user.role == 'admin'))
-    return handleAuthError('Access denied');
+    if (user.role == SUPER_ADMIN)
+      return handleAuthError('Access denied');
+
+    if ((currentUser.role != SUPER_ADMIN && user.role == SYSTEM_ADMIN))
+      return handleAuthError('Access denied');
+  }
 
   if (isCurrentUser)
     updates = sanitize(updates, { remove: ['accountStatus', 'role'] });

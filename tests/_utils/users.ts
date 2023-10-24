@@ -1,7 +1,9 @@
 import { User } from '../../src/shared/types';
 import { userRepository } from '../../src/modules/auth/repositories';
-
+import { UserRoles } from '../../src/shared/types';
 export { users, addUsers };
+
+const {SYSTEM_ADMIN, SUPER_ADMIN} = UserRoles
 
 const users = [
   {
@@ -51,7 +53,7 @@ const users = [
     accountStatus: 'active',
     lastName: 'User',
     username: 'admin-user',
-    role: 'admin',
+    role: SYSTEM_ADMIN,
     phoneNumber: '+46 70 712 34 55',
   },
   {
@@ -61,8 +63,18 @@ const users = [
     accountStatus: 'active',
     lastName: 'User',
     username: 'admin-user-1',
-    role: 'admin',
+    role: SYSTEM_ADMIN,
     phoneNumber: '+46 70 712 34 56',
+  },
+  {
+    _id: '999',
+    email: 'sup-admin-1@mail.com',
+    firstName: 'Admin',
+    accountStatus: 'active',
+    lastName: 'User',
+    username: 'super-admin-user-1',
+    role: SUPER_ADMIN,
+    phoneNumber: '+46 70 712 34 57',
   },
 ] as User[];
 

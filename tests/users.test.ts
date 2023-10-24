@@ -18,6 +18,9 @@ import {
 import { cleanupDp } from './_utils';
 import { expectAuthError } from './_utils/auth';
 import { addUsers, users } from './_utils/users';
+import { UserRoles } from '../src/shared/types';
+
+const {SYSTEM_ADMIN, SUPER_ADMIN, USER} = UserRoles
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -536,7 +539,7 @@ describe('Auth', () => {
       }
     });
 
-    it("should allow admins to update other users' roles", async () => {
+    it("should not allow admins to update roles", async () => {
       const linkId = 'new-link';
 
       await loginLinkRepository.insertOne({
@@ -548,7 +551,7 @@ describe('Auth', () => {
         body: { data: token },
       } = await verifyLoginLink({ id: linkId });
 
-      const validRoles = ['moderator', 'user'];
+      const validRoles = [SYSTEM_ADMIN, USER];
 
       for (const role of validRoles) {
         const update = { role };
@@ -564,7 +567,7 @@ describe('Auth', () => {
 
         expect(error).toBeUndefined();
 
-        expect(data).toMatchObject(update);
+        expect(data).toMatchObject({role: user.role});
       }
     });
 

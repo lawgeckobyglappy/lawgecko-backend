@@ -36,8 +36,8 @@ const AccountStatusList = ['active', 'blocked', 'deleted'] as const;
 type UserAccountStatus = (typeof AccountStatusList)[number];
 
 const UserRoles = {
-  ADMIN: 'admin',
-  MODERATOR: 'moderator',
+  SYSTEM_ADMIN: 'system-admin',
+  SUPER_ADMIN: 'super-admin',
   USER: 'user',
 } as const;
 type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
@@ -49,10 +49,13 @@ type AuthProvider = (typeof AuthProvidersList)[number];
 
 type UserInput = {
   accountStatus: UserAccountStatus;
+  bio: string;
   email: string;
   firstName: string;
+  governmentID: string;
   lastName: string;
   phoneNumber: string;
+  profilePicture: string;
   role: UserRole;
   username: string;
 
@@ -63,11 +66,14 @@ type User = {
   _id: string;
   accountStatus: UserAccountStatus;
   authProviders?: AuthProvider[];
+  bio: string;
   createdAt: Date | string;
   email: string;
   firstName: string;
+  governmentID: string;
   lastName: string;
   phoneNumber: string;
+  profilePicture: string;
   role: UserRole;
   username: string;
   updatedAt: Date | string;

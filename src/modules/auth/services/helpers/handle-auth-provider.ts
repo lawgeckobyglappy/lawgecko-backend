@@ -1,4 +1,4 @@
-import { AuthProvider } from '@types';
+import { AuthProvider, UserRoles } from '@types';
 
 import { UserModel } from '../../entities';
 import { userRepository } from '../../repositories';
@@ -52,6 +52,7 @@ async function handleAuthProvider({ userInfo, isLogin, provider }: Options) {
 
     const { data, error } = await UserModel.create({
       ...userInfo,
+      role: UserRoles.USER,
       _addAuthProvider: provider,
     });
 

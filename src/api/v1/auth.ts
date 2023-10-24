@@ -2,11 +2,13 @@ import { Router } from 'express';
 
 import { requireAuth } from '@middlewares';
 import { controllers } from '../../modules/auth/controllers';
+import { UserRoles } from '@types';
 
 export { router as authRouter };
 
 const router = Router();
 
+router.post('/system-admin', requireAuth(UserRoles.SUPER_ADMIN), controllers.createSysAdmin)
 router.post('/register', controllers.register);
 router.post('/handle-google-auth', controllers.handleGoogleAuth);
 router.get('/current-user', requireAuth(), controllers.getCurrentUser);

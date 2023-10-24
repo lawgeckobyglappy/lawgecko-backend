@@ -1,5 +1,4 @@
-import { UserInput } from '@types';
-
+import { UserInput, UserRoles } from '@types';
 import { UserModel } from '../entities';
 import { handleError } from '../utils';
 import { userRepository } from '../repositories';
@@ -9,7 +8,7 @@ import { createLoginLink } from './create-login-link';
 export { register };
 
 const register = async (values: Partial<UserInput>) => {
-  const { data, error } = await UserModel.create(values);
+  const { data, error } = await UserModel.create({...values, role: UserRoles.USER});
 
   if (error) return handleError(error);
 

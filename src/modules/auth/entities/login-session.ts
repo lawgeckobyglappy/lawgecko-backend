@@ -7,7 +7,7 @@ import { LoginSession, LoginSessionInput } from '@types';
 
 import { validateString } from '../validators';
 
-const { JWT_ACCESS_EXPIRATION_DAYS } = config.jwt;
+const { JWT_ACCESS_EXPIRATION_HOURS: JWT_ACCESS_EXPIRATION_DAYS } = config.jwt;
 
 export { LoginSessionModel };
 

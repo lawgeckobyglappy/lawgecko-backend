@@ -36,10 +36,23 @@ const UserModel = new Schema<UserInput, User>(
       shouldInit: false,
       validator: validateUserAccountStatus,
     },
+    bio: {
+      default: "",
+    },
     email: { readonly: true, validator: validateUserEmail },
     firstName: {
       readonly: true,
       validator: validateString('Invalid first name'),
+    },
+    governmentID: {
+      default: "",
+      readonly: true,
+      required({ context }) {
+        const {role, governmentID, } = context
+
+        return role == UserRoles.SYSTEM_ADMIN ? !governmentID : false
+      },
+      validator: validateString('Invalid Government ID', {minLength: 5}),
     },
     lastName: {
       default: '',
@@ -57,9 +70,11 @@ const UserModel = new Schema<UserInput, User>(
       },
       validator: validateUserPhone,
     },
+    profilePicture: {
+      default: "",
+    },
     role: {
-      default: UserRoles.USER,
-      shouldInit: false,
+      readonly: true,
       validator: validateUserRole,
     },
     username: {

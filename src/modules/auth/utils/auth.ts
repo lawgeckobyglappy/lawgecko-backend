@@ -2,17 +2,19 @@ import jwt from 'jsonwebtoken';
 import { Request } from 'express';
 
 import { config } from '@config';
-import { AuthInfo, AuthInfoInput } from '@types';
+import { AuthInfo, AuthInfoInput, UserRoles } from '@types';
 
-const { JWT_SECRET, JWT_ACCESS_EXPIRATION_DAYS } = config.jwt;
+const { JWT_SECRET } = config.jwt;
 
 export { createToken, parseAuth };
 
 function createToken({ userId, userRole, sessionId }: AuthInfoInput) {
+  const expiresIn = UserRoles.USER == userRole ? config.jwt.JWT_ACCESS_EXPIRATION_HOURS : config.jwt.ADMIN_JWT_ACCESS_EXPIRATION_HOURS
+  
   return jwt.sign(
     { user: { _id: userId, role: userRole }, sessionId } as AuthInfo,
     JWT_SECRET!,
-    { expiresIn: `${JWT_ACCESS_EXPIRATION_DAYS}d` },
+    { expiresIn: `${expiresIn}h` },
   );
 }
 

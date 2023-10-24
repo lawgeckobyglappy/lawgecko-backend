@@ -90,8 +90,9 @@ function validateUserAccountStatus(status: any) {
   })(status);
 }
 
+const enums = UserRolesList.filter((r) => r != UserRoles.SUPER_ADMIN)
 function validateUserRole(status: any) {
   return validateString('Invalid role', {
-    enums: UserRolesList.filter((r) => r != UserRoles.ADMIN),
+    enums
   })(status);
 }
