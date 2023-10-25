@@ -16,7 +16,7 @@ import {
 } from '../src/modules/auth/repositories';
 
 import { cleanupDp } from './_utils';
-import { expectAuthError } from './_utils/auth';
+import { expectAuthError, generateToken } from './_utils/auth';
 import { addUsers, users } from './_utils/users';
 import { UserRoles } from '../src/shared/types';
 
@@ -273,14 +273,8 @@ describe('Auth', () => {
   describe('GET /auth/current-user', () => {
     const linkId = 'valid-link-id',
       user = users[0],
-      url = `${BASE_URL}/current-user`;
-
-    beforeEach(async () => {
-      await loginLinkRepository.insertOne({
-        _id: linkId,
-        userId: user._id,
-      } as any);
-    });
+      url = `${BASE_URL}/current-user`,
+      token = generateToken({ user });
 
     expectAuthError({
       description:
@@ -294,10 +288,6 @@ describe('Auth', () => {
 
     it('should reject with "Authentication failed" error if user is not active', async () => {
       const statusToReject = ['blocked', 'deleted'];
-
-      const {
-        body: { data: token },
-      } = await verifyLoginLink({ id: linkId });
 
       for (const accountStatus of statusToReject) {
         await userRepository.updateOne({ _id: user._id }, {
@@ -319,10 +309,6 @@ describe('Auth', () => {
     });
 
     it('should return user info if valid token is provided', async () => {
-      const {
-        body: { data: token },
-      } = await verifyLoginLink({ id: linkId });
-
       const { body, status } = await api
         .get(url)
         .set('Authorization', `Bearer ${token}`);
@@ -340,21 +326,11 @@ describe('Auth', () => {
   describe('PATCH /auth/update-user', () => {
     let token = '';
 
-    const linkId = 'valid-link-id',
-      user = users[0],
+    const user = users[0],
       url = `${BASE_URL}/update-user/${user._id}`;
 
-    beforeEach(async () => {
-      await loginLinkRepository.insertOne({
-        _id: linkId,
-        userId: user._id,
-      } as any);
-
-      const {
-        body: { data },
-      } = await verifyLoginLink({ id: linkId });
-
-      token = data;
+    beforeEach(() => {
+      token = generateToken({ user });
     });
 
     expectAuthError({
@@ -382,17 +358,8 @@ describe('Auth', () => {
       expect(error.message).toBe('User not found');
     });
 
-    it('should reject with "Access denied" error if user is not ower of accout and is not admin', async () => {
-      const linkId = 'new-link';
-
-      await loginLinkRepository.insertOne({
-        _id: linkId,
-        userId: users[3]._id,
-      } as any);
-
-      const {
-        body: { data: token },
-      } = await verifyLoginLink({ id: linkId });
+    it('should reject with "Access denied" error if user is not ower of account and is not admin', async () => {
+      token = generateToken({ user: users[3] });
 
       const { body, status } = await api
         .patch(url)
@@ -449,16 +416,7 @@ describe('Auth', () => {
     });
 
     it("should not allow admins to update other users' info", async () => {
-      const linkId = 'new-link';
-
-      await loginLinkRepository.insertOne({
-        _id: linkId,
-        userId: users[4]._id,
-      } as any);
-
-      const {
-        body: { data: token },
-      } = await verifyLoginLink({ id: linkId });
+      token = generateToken({ user: users[4] });
 
       const update = {
         email: 'test@mail.com',
@@ -482,16 +440,7 @@ describe('Auth', () => {
     });
 
     it('should not allow admins to update other admins', async () => {
-      const linkId = 'new-link';
-
-      await loginLinkRepository.insertOne({
-        _id: linkId,
-        userId: users[4]._id,
-      } as any);
-
-      const {
-        body: { data: token },
-      } = await verifyLoginLink({ id: linkId });
+      token = generateToken({ user: users[4] });
 
       const update = { firstName: 'Update', accountStatus: 'blocked' };
 
@@ -508,16 +457,7 @@ describe('Auth', () => {
     });
 
     it("should allow admins to update other users' account statuses", async () => {
-      const linkId = 'new-link';
-
-      await loginLinkRepository.insertOne({
-        _id: linkId,
-        userId: users[4]._id,
-      } as any);
-
-      const {
-        body: { data: token },
-      } = await verifyLoginLink({ id: linkId });
+      token = generateToken({ user: users[4] });
 
       const validStatuses = ['active', 'blocked', 'deleted'];
 
@@ -540,16 +480,7 @@ describe('Auth', () => {
     });
 
     it('should not allow admins to update roles', async () => {
-      const linkId = 'new-link';
-
-      await loginLinkRepository.insertOne({
-        _id: linkId,
-        userId: users[4]._id,
-      } as any);
-
-      const {
-        body: { data: token },
-      } = await verifyLoginLink({ id: linkId });
+      token = generateToken({ user: users[4] });
 
       const validRoles = [SYSTEM_ADMIN, USER];
 
