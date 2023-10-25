@@ -2,9 +2,9 @@ import { parsePhoneNumber } from 'awesome-phonenumber';
 import { Summary } from 'clean-schema';
 
 import {
-  AccountStatusList,
   AuthProvidersList,
   User,
+  UserAccountStatusList,
   UserInput,
   UserRoles,
   UserRolesList,
@@ -86,13 +86,11 @@ function validateAuthProvider(provider: any, summary: UserValidationSummary) {
 
 function validateUserAccountStatus(status: any) {
   return validateString('Invalid account status', {
-    enums: AccountStatusList,
+    enums: UserAccountStatusList,
   })(status);
 }
 
-const enums = UserRolesList.filter((r) => r != UserRoles.SUPER_ADMIN)
+const enums = UserRolesList.filter((r) => r != UserRoles.SUPER_ADMIN);
 function validateUserRole(status: any) {
-  return validateString('Invalid role', {
-    enums
-  })(status);
+  return validateString('Invalid role', { enums })(status);
 }

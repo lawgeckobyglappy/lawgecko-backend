@@ -20,7 +20,7 @@ import { expectAuthError } from './_utils/auth';
 import { addUsers, users } from './_utils/users';
 import { UserRoles } from '../src/shared/types';
 
-const {SYSTEM_ADMIN, SUPER_ADMIN, USER} = UserRoles
+const { SYSTEM_ADMIN, USER } = UserRoles;
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -539,7 +539,7 @@ describe('Auth', () => {
       }
     });
 
-    it("should not allow admins to update roles", async () => {
+    it('should not allow admins to update roles', async () => {
       const linkId = 'new-link';
 
       await loginLinkRepository.insertOne({
@@ -567,7 +567,7 @@ describe('Auth', () => {
 
         expect(error).toBeUndefined();
 
-        expect(data).toMatchObject({role: user.role});
+        expect(data).toMatchObject({ role: user.role });
       }
     });
 

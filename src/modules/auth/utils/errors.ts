@@ -1,10 +1,8 @@
-import { IApiError } from '@types';
-
 export { handleError, handleAuthError };
 
 type ErrorType = {
   message: string;
-  payload?: any;
+  payload?: Record<string, any>;
   statusCode?: number;
 };
 
@@ -18,6 +16,6 @@ function handleAuthError(message: 'Access denied' | 'Authentication failed') {
       message,
       payload: {},
       statusCode: message == 'Access denied' ? 403 : 401,
-    } as IApiError,
+    },
   };
 }

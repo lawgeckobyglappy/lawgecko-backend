@@ -1,13 +1,18 @@
-export { AccountStatusList, AuthProvidersList, UserRoles, UserRolesList };
+export {
+  UserAccountStatusList,
+  AuthProvidersList,
+  UserAccountStatus,
+  UserRoles,
+  UserRolesList,
+};
 
 export type {
   AuthInfo,
   AuthInfoInput,
   AuthProvider,
-  IApiError,
   User,
   UserInput,
-  UserAccountStatus,
+  IUserAccountStatus,
   UserRole,
   LoginLink,
   LoginLinkInput,
@@ -26,18 +31,22 @@ type AuthInfo = {
   sessionId: string;
 };
 
-type IApiError = {
-  message: string;
-  payload: Record<string, string[]>;
-  statusCode: number;
-};
+const UserAccountStatus = {
+  ACTIVE: 'active',
+  BLOCKED: 'blocked',
+  DELETED: 'deleted',
+} as const;
 
-const AccountStatusList = ['active', 'blocked', 'deleted'] as const;
-type UserAccountStatus = (typeof AccountStatusList)[number];
+type IUserAccountStatus =
+  (typeof UserAccountStatus)[keyof typeof UserAccountStatus];
+
+const UserAccountStatusList = Object.values(
+  UserAccountStatus,
+) as IUserAccountStatus[];
 
 const UserRoles = {
-  SYSTEM_ADMIN: 'system-admin',
   SUPER_ADMIN: 'super-admin',
+  SYSTEM_ADMIN: 'system-admin',
   USER: 'user',
 } as const;
 type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
@@ -48,7 +57,7 @@ const AuthProvidersList = ['google'] as const;
 type AuthProvider = (typeof AuthProvidersList)[number];
 
 type UserInput = {
-  accountStatus: UserAccountStatus;
+  accountStatus: IUserAccountStatus;
   bio: string;
   email: string;
   firstName: string;
@@ -64,7 +73,7 @@ type UserInput = {
 
 type User = {
   _id: string;
-  accountStatus: UserAccountStatus;
+  accountStatus: IUserAccountStatus;
   authProviders?: AuthProvider[];
   bio: string;
   createdAt: Date | string;
