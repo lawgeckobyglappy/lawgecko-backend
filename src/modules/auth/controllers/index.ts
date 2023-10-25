@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 
 import {
   getCurrentuser,
@@ -13,8 +13,10 @@ import {
 export { controllers };
 
 const controllers = {
-  createSysAdmin: makeController((req) => createSysAdmin(req.body, req.authInfo!)),
-  getCurrentUser: makeController((req) => getCurrentuser(req.authInfo!)),
+  createSysAdmin: makeController((req) =>
+    createSysAdmin(req.body, req.authInfo),
+  ),
+  getCurrentUser: makeController((req) => getCurrentuser(req.authInfo)),
   handleGoogleAuth: makeController((req) => handleGoogleAuth(req.body)),
   register: makeController((req) => register(req.body), 201),
   requestLoginLink: makeController((req) => requestLoginLink(req.body.email)),
@@ -24,23 +26,31 @@ const controllers = {
   verifyLoginLink: makeController((req) => verifyLoginLink(req.body.id)),
 };
 
-/* eslint-disable-next-line no-unused-vars */
-type Handler = (req: Request, res: Response, next?: NextFunction) => any;
+type ApiResponse = {
+  data?: any;
+  error?: {
+    message: string;
+    payload: Record<string, any>;
+    statusCode: number;
+  };
+};
 
 function makeController(
-  handler: Handler,
+  handler: (req: Request, res: Response) => ApiResponse | Promise<ApiResponse>,
   successCode?: number,
   errorCode?: number,
 ) {
-  return async (req: Request, res: Response, next?: NextFunction) => {
+  return async (req: Request, res: Response) => {
     try {
-      const results = await handler(req, res, next);
+      const results = await handler(req, res);
 
       return adaptResponse({ res, results, successCode, errorCode });
     } catch (err: any) {
       return adaptResponse({
         res,
-        results: { message: err.message, statusCode: 500 },
+        results: {
+          error: { message: err.message, payload: {}, statusCode: 500 },
+        },
         errorCode: 500,
       });
     }
@@ -49,7 +59,7 @@ function makeController(
 
 type Options = {
   res: Response;
-  results: any;
+  results: ApiResponse;
   successCode?: number;
   errorCode?: number;
 };
