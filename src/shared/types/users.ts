@@ -7,6 +7,7 @@ export {
 };
 
 export type {
+  Address,
   AuthInfo,
   AuthInfoInput,
   AuthProvider,
@@ -18,6 +19,12 @@ export type {
   LoginLinkInput,
   LoginSession,
   LoginSessionInput,
+};
+
+type Address = {
+  city: string;
+  country: string;
+  street: string;
 };
 
 type AuthInfoInput = {
@@ -58,6 +65,7 @@ type AuthProvider = (typeof AuthProvidersList)[number];
 
 type UserInput = {
   accountStatus: IUserAccountStatus;
+  address: Address;
   bio: string;
   email: string;
   firstName: string;
@@ -74,6 +82,7 @@ type UserInput = {
 type User = {
   _id: string;
   accountStatus: IUserAccountStatus;
+  address: Address | null;
   authProviders?: AuthProvider[];
   bio: string;
   createdAt: Date | string;

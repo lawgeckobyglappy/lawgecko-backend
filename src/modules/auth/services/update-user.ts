@@ -1,7 +1,7 @@
 import { sanitize } from 'apitoolz';
 import { VALIDATION_ERRORS } from 'clean-schema';
 
-import { AuthInfo, User, UserRoles } from '@types';
+import { AuthInfo, UserInput, UserRoles } from '@types';
 
 import { UserModel } from '../entities';
 import { userRepository } from '../repositories';
@@ -13,7 +13,7 @@ const { SECURITY_ADMIN, SUPER_ADMIN } = UserRoles;
 
 type Options = {
   id: string;
-  updates: Partial<User>;
+  updates: Partial<UserInput>;
   authInfo: AuthInfo;
 };
 const updateUser = async ({ id, updates, authInfo }: Options) => {
@@ -39,7 +39,9 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
 
   if (isCurrentUser)
     updates = sanitize(updates, { remove: ['accountStatus', 'role'] });
+
   const { data, error } = await UserModel.update(user, updates);
+
   if (error) {
     if (error.message == VALIDATION_ERRORS.NOTHING_TO_UPDATE)
       return { data: user };

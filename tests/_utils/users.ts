@@ -7,11 +7,17 @@ const { SECURITY_ADMIN, SUPER_ADMIN, USER } = UserRoles;
 const { ACTIVE, BLOCKED, DELETED } = UserAccountStatus;
 
 const assetLink = 'http://cdn.com/asset.png';
+const address = {
+  city: 'Boston',
+  country: 'US',
+  street: 'North Main St',
+};
 
 const users = {
   ACTIVE_USER: {
     _id: '1',
     accountStatus: ACTIVE,
+    address: null,
     bio: '',
     email: 'john@mail.com',
     firstName: 'John',
@@ -23,6 +29,7 @@ const users = {
   ACTIVE_USER_1: {
     _id: '4',
     accountStatus: ACTIVE,
+    address: null,
     bio: '',
     email: 'other-user@mail.com',
     firstName: 'Other',
@@ -34,6 +41,7 @@ const users = {
   BLOCKED_USER: {
     _id: '2',
     accountStatus: BLOCKED,
+    address: null,
     bio: '',
     email: 'blocked@mail.com',
     firstName: 'Blocked',
@@ -45,6 +53,7 @@ const users = {
   DELETED_USER: {
     _id: '3',
     accountStatus: DELETED,
+    address: null,
     bio: '',
     email: 'deleted@mail.com',
     firstName: 'Deleted',
@@ -56,6 +65,7 @@ const users = {
   SECURITY_ADMIN: {
     _id: '5',
     accountStatus: ACTIVE,
+    address,
     bio: '',
     email: 'admin@mail.com',
     firstName: 'Admin',
@@ -69,6 +79,7 @@ const users = {
   SECURITY_ADMIN_1: {
     _id: '363',
     accountStatus: ACTIVE,
+    address,
     bio: '',
     email: 'admin-1@mail.com',
     firstName: 'Admin',
@@ -82,6 +93,7 @@ const users = {
   SUPER_ADMIN: {
     _id: '999',
     accountStatus: ACTIVE,
+    address,
     bio: '',
     email: 'sup-admin-1@mail.com',
     firstName: 'Admin',

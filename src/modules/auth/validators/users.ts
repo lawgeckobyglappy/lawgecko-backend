@@ -1,5 +1,5 @@
-import { parsePhoneNumber } from 'awesome-phonenumber';
-import { Summary } from 'clean-schema';
+import { parsePhoneNumber, getSupportedRegionCodes } from 'awesome-phonenumber';
+import { Summary, isObject } from 'clean-schema';
 
 import {
   AuthProvidersList,
@@ -14,6 +14,7 @@ import { userRepository } from '../repositories';
 import { validateEmail, validateString } from './shared';
 
 export {
+  validateAddress,
   validateAuthProvider,
   validateUserAccountStatus,
   validateUserEmail,
@@ -88,6 +89,39 @@ function validateUserAccountStatus(status: any) {
   return validateString('Invalid account status', {
     enums: UserAccountStatusList,
   })(status);
+}
+
+const countryCodes = getSupportedRegionCodes();
+
+function validateAddress(val: any) {
+  if (!val || !isObject(val))
+    return { valid: false, reason: 'Invalid address' };
+
+  let reasons: string[] = [];
+
+  if (!countryCodes.includes(val.country)) reasons.push('Invalid country');
+
+  const isCityValid = validateString('Invalid city', { minLength: 2 })(
+      val.city,
+    ),
+    isStreetValid = validateString('Invalid street', {
+      minLength: 5,
+      maxLength: 50,
+    })(val.street);
+
+  if (!isCityValid.valid) reasons = reasons.concat(isCityValid.reasons);
+  if (!isStreetValid.valid) reasons = reasons.concat(isStreetValid.reasons);
+
+  if (reasons.length) return { valid: false, reasons };
+
+  return {
+    valid: true,
+    validated: {
+      city: (isCityValid as any).validated,
+      country: val.country,
+      street: (isStreetValid as any).validated,
+    },
+  };
 }
 
 const enums = UserRolesList.filter((r) => r != UserRoles.SUPER_ADMIN);

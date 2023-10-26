@@ -8,6 +8,7 @@ const userSchema = new Schema<User>(
   {
     _id: { type: String, required: true },
     accountStatus: { type: String, enum: UserAccountStatusList },
+    address: { type: Object, default: null },
     authProviders: { default: [], type: Array },
     bio: { default: '', type: String },
     email: { type: String, index: true, required: true, unique: true },

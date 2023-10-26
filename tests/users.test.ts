@@ -203,6 +203,11 @@ describe('Auth', () => {
         username: 'john-sys',
         phoneNumber: '+1 2813450560',
         governmentID: 'http://cdn.com/somewhere.png',
+        address: {
+          city: 'Boston',
+          country: 'US',
+          street: 'North Main St',
+        },
       };
 
       const { body, status } = await api

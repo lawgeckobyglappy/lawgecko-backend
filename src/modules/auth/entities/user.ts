@@ -4,6 +4,7 @@ import { generateId } from '@utils';
 import { User, UserAccountStatus, UserInput, UserRoles } from '@types';
 
 import {
+  validateAddress,
   validateAuthProvider,
   validateString,
   validateUrl,
@@ -24,6 +25,13 @@ const UserModel = new Schema<UserInput, User>(
       default: UserAccountStatus.ACTIVE,
       shouldInit: false,
       validator: validateUserAccountStatus,
+    },
+    address: {
+      default: null,
+      required({ context: { address, role } }) {
+        return role == UserRoles.SECURITY_ADMIN ? !address : false;
+      },
+      validator: validateAddress,
     },
     authProviders: {
       default: [],
