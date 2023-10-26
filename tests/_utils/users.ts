@@ -1,5 +1,5 @@
 import { UserAccountStatus } from '../../src/shared/types';
-import { userRepository } from '../../src/modules/auth/repositories';
+import { userRepository } from '../../src/modules/accounts/repositories';
 import { UserRoles } from '../../src/shared/types';
 export { users, addUsers };
 

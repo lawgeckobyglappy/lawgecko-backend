@@ -1,9 +1,9 @@
 import { User } from '@types';
 
-import { LoginLinkModel } from '../entities';
-import { handleError } from '../utils/errors';
-import { triggerSendLoginLinkEmail } from '../jobs';
-import { loginLinkRepository } from '../repositories';
+import { LoginLinkModel } from '../../entities';
+import { handleError } from '../../utils/errors';
+import { triggerSendLoginLinkEmail } from '../../jobs';
+import { loginLinkRepository } from '../../repositories';
 
 export { createLoginLink };
 

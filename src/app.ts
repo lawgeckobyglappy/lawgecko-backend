@@ -7,7 +7,6 @@ import { logger } from './shared/logger';
 import morgan from './shared/middlewares/morgan.middleware';
 
 import { router } from './api/v1';
-import exampleRoutes from './api/v1/example';
 
 const { environment, port, db } = config;
 
@@ -21,7 +20,6 @@ app.use(express.json());
 
 app.get('/', (_, res) => res.json({ message: 'live' }));
 
-app.use('/api/v1', exampleRoutes);
 app.use('/api/v1', router);
 
 app.use((_, res) => {

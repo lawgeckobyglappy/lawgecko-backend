@@ -3,9 +3,9 @@ import { Router } from 'express';
 import { UserRoles } from '@types';
 import { requireAuth } from '@middlewares';
 
-import { controllers } from '../../modules/auth/controllers';
+import { controllers } from '../../modules/accounts/controllers';
 
-export { router as authRouter };
+export { router as accountsRouter };
 
 const router = Router();
 

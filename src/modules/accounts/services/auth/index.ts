@@ -1,5 +1,4 @@
 export { register } from './register';
-export { updateUser } from './update-user';
 export { getCurrentuser } from './get-current-user';
 export { createLoginLink } from './create-login-link';
 export { handleGoogleAuth } from './handle-google-auth';

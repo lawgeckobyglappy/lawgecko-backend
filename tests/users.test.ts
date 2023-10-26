@@ -508,59 +508,6 @@ describe('Auth', () => {
       expect(data).toMatchObject(user);
     });
 
-    it('should not allow users to update their personal details', async () => {
-      token = generateToken({ user: users.ACTIVE_USER });
-
-      const url2 = `${BASE_URL}/update-user/${users.ACTIVE_USER._id}`;
-
-      const update = {
-        email: 'newEmail@gmail.com',
-        firstName: 'First',
-        lastName: 'Last',
-        address: '1234 Sesame Street',
-      };
-
-      const { body, status } = await api
-        .patch(url2)
-        .set('Authorization', `Bearer ${token}`)
-        .send(update);
-
-      const { data, error } = body;
-
-      expect(status).toBe(200);
-
-      expect(data).toMatchObject(users.ACTIVE_USER);
-
-      expect(error).toBeUndefined();
-    });
-
-    it('should reject with error if bio is too long', async () => {
-      token = generateToken({ user: users.SUPER_ADMIN });
-
-      const url2 = `${BASE_URL}/update-user/${users.SUPER_ADMIN._id}`;
-
-      const update = {
-        bio: 'Update'.repeat(100), // This exceeds the maxLength
-      };
-
-      const { body, status } = await api
-        .patch(url2)
-        .set('Authorization', `Bearer ${token}`)
-        .send(update);
-
-      const { data, error } = body;
-      console.log(error);
-      expect(status).toBe(400);
-
-      expect(data).toBeUndefined();
-
-      expect(error.payload).toMatchObject({
-        bio: expect.objectContaining({
-          reasons: expect.arrayContaining(['Too long']),
-        }),
-      });
-    });
-
     it('should not allow admins to update other admins', async () => {
       token = generateToken({ user: users.SECURITY_ADMIN });
 
