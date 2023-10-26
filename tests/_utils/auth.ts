@@ -25,7 +25,7 @@ function generateToken({
 }: {
   role?: '' | UserRole;
   customId?: string;
-  user?: User;
+  user?: Partial<User>;
 }) {
   if (user)
     return createToken({ userId: user._id, userRole: user.role } as any);

@@ -106,7 +106,7 @@ describe('Auth', () => {
     });
 
     it('should reject registration if email or user name provided are already taken', async () => {
-      const existingUser = users[0];
+      const existingUser = users.ACTIVE_USER;
 
       const { body, status } = await api.post(url).send({
         email: existingUser.email,
@@ -171,7 +171,7 @@ describe('Auth', () => {
       it('should reject registration if phone number is taken', async () => {
         const { body, status } = await api
           .post(url)
-          .send({ phoneNumber: users[4].phoneNumber });
+          .send({ phoneNumber: users.ACTIVE_USER.phoneNumber });
 
         const { data, error } = body;
 
@@ -188,13 +188,13 @@ describe('Auth', () => {
     });
   });
 
-  describe('POST /auth/sec-admin', () => {
+  describe('POST /auth/security-admin', () => {
     let token = '';
 
-    const url = `${BASE_URL}/sec-admin`;
+    const url = `${BASE_URL}/security-admin`;
 
     it('should allow Super Admins to create Security Admins if correct information is provided', async () => {
-      token = generateToken({ user: users[6] }); // role is 'super-admin'
+      token = generateToken({ user: users.SUPER_ADMIN });
 
       const { body, status } = await api
         .post(url)
@@ -228,7 +228,7 @@ describe('Auth', () => {
     });
 
     it('should not allow Security Admins to create Security Admins', async () => {
-      token = generateToken({ user: users[5] }); // role is 'security-admin'
+      token = generateToken({ user: users.SECURITY_ADMIN });
 
       const { body, status } = await api
         .post(url)
@@ -252,7 +252,7 @@ describe('Auth', () => {
     });
 
     it('should not allow users to create Security Admins', async () => {
-      token = generateToken({ user: users[1] }); // role is 'user'
+      token = generateToken({ user: users.ACTIVE_USER });
 
       const { body, status } = await api
         .post(url)
@@ -292,7 +292,7 @@ describe('Auth', () => {
     });
 
     it('should respond with positive message when email is valid even if user does not exist', async () => {
-      const emails = [users[0].email, '1@1.com'];
+      const emails = [users.ACTIVE_USER.email, '1@1.com'];
 
       for (const email of emails) {
         const { body, status } = await api
@@ -344,7 +344,10 @@ describe('Auth', () => {
     it('should return the accessToken if the link id is valid and the owner is active', async () => {
       const _id = 'valid-link-id';
 
-      await loginLinkRepository.insertOne({ _id, userId: users[0]._id } as any);
+      await loginLinkRepository.insertOne({
+        _id,
+        userId: users.ACTIVE_USER._id,
+      } as any);
 
       const { body, status } = await verifyLoginLink({ id: _id });
 
@@ -359,8 +362,7 @@ describe('Auth', () => {
   });
 
   describe('GET /auth/current-user', () => {
-    const linkId = 'valid-link-id',
-      user = users[0],
+    const user = users.ACTIVE_USER,
       url = `${BASE_URL}/current-user`,
       token = generateToken({ user });
 
@@ -414,7 +416,7 @@ describe('Auth', () => {
   describe('PATCH /auth/update-user', () => {
     let token = '';
 
-    const user = users[0],
+    const user = users.ACTIVE_USER,
       url = `${BASE_URL}/update-user/${user._id}`;
 
     beforeEach(() => {
@@ -447,7 +449,7 @@ describe('Auth', () => {
     });
 
     it('should reject with "Access denied" error if user is not owner of account and is not admin', async () => {
-      token = generateToken({ user: users[3] });
+      token = generateToken({ user: users.ACTIVE_USER_1 });
 
       const { body, status } = await api
         .patch(url)
@@ -504,12 +506,12 @@ describe('Auth', () => {
     });
 
     it('should not allow admins to update other admins', async () => {
-      token = generateToken({ user: users[4] });
+      token = generateToken({ user: users.SECURITY_ADMIN });
 
       const update = { firstName: 'Update', accountStatus: 'blocked' };
 
       const { body, status } = await api
-        .patch(`${BASE_URL}/update-user/${users[5]._id}`)
+        .patch(`${BASE_URL}/update-user/${users.SECURITY_ADMIN_1._id}`)
         .set('Authorization', `Bearer ${token}`)
         .send(update);
 
@@ -521,7 +523,7 @@ describe('Auth', () => {
     });
 
     it("should allow admins to update other users' account statuses", async () => {
-      token = generateToken({ user: users[4] });
+      token = generateToken({ user: users.SECURITY_ADMIN });
 
       const validStatuses = ['active', 'blocked', 'deleted'];
 
@@ -544,7 +546,7 @@ describe('Auth', () => {
     });
 
     it('should not allow admins to update roles', async () => {
-      token = generateToken({ user: users[4] });
+      token = generateToken({ user: users.SECURITY_ADMIN });
 
       const validRoles = [SECURITY_ADMIN, USER];
 
@@ -567,11 +569,9 @@ describe('Auth', () => {
     });
 
     it('should allow Super Admin to update user if correct information is provided', async () => {
-      token = generateToken({ user: users[6] }); // Super admin
+      token = generateToken({ user: users.SUPER_ADMIN });
 
-      const user2 = users[0];
-
-      const url2 = `${BASE_URL}/update-user/${user2._id}`;
+      const url2 = `${BASE_URL}/update-user/${user._id}`;
 
       const update = {
         bio: 'this is a new bio',
@@ -596,11 +596,9 @@ describe('Auth', () => {
     });
 
     it('should allow Security Admin to update user if correct information is provided', async () => {
-      token = generateToken({ user: users[5] }); // Super admin
+      token = generateToken({ user: users.SECURITY_ADMIN });
 
-      const user2 = users[0];
-
-      const url2 = `${BASE_URL}/update-user/${user2._id}`;
+      const url2 = `${BASE_URL}/update-user/${user._id}`;
 
       const update = {
         bio: 'this is a new bio',
@@ -625,9 +623,9 @@ describe('Auth', () => {
     });
 
     it('should allow Super Admin to update Security Admin if correct information is provided', async () => {
-      token = generateToken({ user: users[6] }); // Super admin
+      token = generateToken({ user: users.SUPER_ADMIN }); // Super admin
 
-      const user2 = users[5]; // Security Admin
+      const user2 = users.SECURITY_ADMIN; // Security Admin
 
       const url2 = `${BASE_URL}/update-user/${user2._id}`;
 
@@ -654,11 +652,9 @@ describe('Auth', () => {
     });
 
     it('should not allow Security Admin to update Super Admin', async () => {
-      token = generateToken({ user: users[5] }); // Security admin
+      token = generateToken({ user: users.SECURITY_ADMIN });
 
-      const user2 = users[6]; // Super Admin
-
-      const url2 = `${BASE_URL}/update-user/${user2._id}`;
+      const url2 = `${BASE_URL}/update-user/${users.SUPER_ADMIN._id}`;
 
       const update = {
         bio: 'this is a new bio',
@@ -746,7 +742,7 @@ describe('Auth', () => {
         const { body, status } = await api
           .patch(url)
           .set('Authorization', `Bearer ${token}`)
-          .send({ phoneNumber: users[4].phoneNumber });
+          .send({ phoneNumber: users.SECURITY_ADMIN.phoneNumber });
 
         const { data, error } = body;
 

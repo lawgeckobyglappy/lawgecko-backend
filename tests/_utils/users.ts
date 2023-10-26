@@ -1,58 +1,59 @@
-import { User } from '../../src/shared/types';
+import { User, UserAccountStatus } from '../../src/shared/types';
 import { userRepository } from '../../src/modules/auth/repositories';
 import { UserRoles } from '../../src/shared/types';
 export { users, addUsers };
 
-const { SECURITY_ADMIN, SUPER_ADMIN } = UserRoles;
+const { SECURITY_ADMIN, SUPER_ADMIN, USER } = UserRoles;
+const { ACTIVE, BLOCKED, DELETED } = UserAccountStatus;
 
-const users = [
-  {
+const users = {
+  ACTIVE_USER: {
     _id: '1',
-    accountStatus: 'active',
+    accountStatus: ACTIVE,
     bio: '',
     email: 'john@mail.com',
     firstName: 'John',
     phoneNumber: '+46 70 712 34 51',
     lastName: 'Doe',
     username: 'john-d',
-    role: 'user',
+    role: USER,
   },
-  {
-    _id: '2',
-    accountStatus: 'blocked',
-    bio: '',
-    email: 'blocked@mail.com',
-    firstName: 'Blocked',
-    phoneNumber: '+46 70 712 34 52',
-    lastName: 'User',
-    username: 'blocked-user',
-    role: 'user',
-  },
-  {
-    _id: '3',
-    accountStatus: 'deleted',
-    bio: '',
-    email: 'deleted@mail.com',
-    firstName: 'Deleted',
-    phoneNumber: '+46 70 712 34 53',
-    lastName: 'User',
-    username: 'deleted-user',
-    role: 'user',
-  },
-  {
+  ACTIVE_USER_1: {
     _id: '4',
-    accountStatus: 'active',
+    accountStatus: ACTIVE,
     bio: '',
     email: 'other-user@mail.com',
     firstName: 'Other',
     phoneNumber: '+46 70 712 34 54',
     lastName: 'User',
     username: 'other-user',
-    role: 'user',
+    role: USER,
   },
-  {
+  BLOCKED_USER: {
+    _id: '2',
+    accountStatus: BLOCKED,
+    bio: '',
+    email: 'blocked@mail.com',
+    firstName: 'Blocked',
+    phoneNumber: '+46 70 712 34 52',
+    lastName: 'User',
+    username: 'blocked-user',
+    role: USER,
+  },
+  DELETED_USER: {
+    _id: '3',
+    accountStatus: DELETED,
+    bio: '',
+    email: 'deleted@mail.com',
+    firstName: 'Deleted',
+    phoneNumber: '+46 70 712 34 53',
+    lastName: 'User',
+    username: 'deleted-user',
+    role: USER,
+  },
+  SECURITY_ADMIN: {
     _id: '5',
-    accountStatus: 'active',
+    accountStatus: ACTIVE,
     bio: '',
     email: 'admin@mail.com',
     firstName: 'Admin',
@@ -63,9 +64,9 @@ const users = [
     username: 'admin-user',
     role: SECURITY_ADMIN,
   },
-  {
+  SECURITY_ADMIN_1: {
     _id: '363',
-    accountStatus: 'active',
+    accountStatus: ACTIVE,
     bio: '',
     email: 'admin-1@mail.com',
     firstName: 'Admin',
@@ -76,9 +77,9 @@ const users = [
     username: 'admin-user-1',
     role: SECURITY_ADMIN,
   },
-  {
+  SUPER_ADMIN: {
     _id: '999',
-    accountStatus: 'active',
+    accountStatus: ACTIVE,
     bio: '',
     email: 'sup-admin-1@mail.com',
     firstName: 'Admin',
@@ -89,8 +90,8 @@ const users = [
     username: 'super-admin-user-1',
     role: SUPER_ADMIN,
   },
-] as User[];
+};
 
 function addUsers() {
-  return userRepository.insertMany(users);
+  return userRepository.insertMany(Object.values(users));
 }

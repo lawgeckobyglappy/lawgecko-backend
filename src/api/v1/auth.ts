@@ -10,7 +10,7 @@ export { router as authRouter };
 const router = Router();
 
 router.post(
-  '/sec-admin',
+  '/security-admin',
   requireAuth(UserRoles.SUPER_ADMIN),
   controllers.createSecAdmin,
 );
