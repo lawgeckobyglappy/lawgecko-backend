@@ -23,7 +23,7 @@ let api: request.SuperTest<request.Test>, server: any;
 
 const BASE_URL = '/api/v1/accounts';
 
-describe('Auth', () => {
+describe('Accounts', () => {
   beforeAll(() => {
     server = makeServer();
     api = request(server);
