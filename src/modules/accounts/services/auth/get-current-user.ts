@@ -1,7 +1,7 @@
 import { AuthInfo } from '@types';
 
-import { handleAuthError } from '../utils';
-import { userRepository } from '../repositories';
+import { handleAuthError } from '../../utils';
+import { userRepository } from '../../repositories';
 
 export { getCurrentuser };
 

@@ -1,7 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 
 import { config } from '@config';
-import { handleError } from '../utils';
+import { handleError } from '../../utils';
 import { handleAuthProvider } from './helpers';
 
 export { handleGoogleAuth };
