@@ -43,7 +43,13 @@ const UserModel = new Schema<UserInput, User>(
         return authProviders;
       },
     },
-    bio: { default: '' },
+    bio: {
+      default: '',
+      validator: validateString('Invalid Bio', {
+        minLength: 0,
+        maxLength: 255,
+      }),
+    },
     email: { readonly: true, validator: validateUserEmail },
     firstName: {
       default: '',

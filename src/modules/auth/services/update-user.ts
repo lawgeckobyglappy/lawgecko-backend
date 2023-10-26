@@ -37,8 +37,13 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
       return handleAuthError('Access denied');
   }
 
-  if (isCurrentUser)
+  if (isCurrentUser) {
     updates = sanitize(updates, { remove: ['accountStatus', 'role'] });
+    if (currentUser.role == UserRoles.USER)
+      updates = sanitize(updates, {
+        remove: ['email', 'firstName', 'lastName', 'address'],
+      });
+  }
 
   const { data, error } = await UserModel.update(user, updates);
 
