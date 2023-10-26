@@ -37,20 +37,18 @@ const UserModel = new Schema<UserInput, User>(
     bio: { default: '' },
     email: { readonly: true, validator: validateUserEmail },
     firstName: {
-      readonly: true,
+      default: '',
       validator: validateString('Invalid first name'),
     },
     governmentID: {
       default: '',
-      readonly: true,
       required({ context: { role, governmentID } }) {
-        return role == UserRoles.SYSTEM_ADMIN ? !governmentID : false;
+        return role == UserRoles.SECURITY_ADMIN ? !governmentID : false;
       },
       validator: validateString('Invalid Government ID', { minLength: 5 }),
     },
     lastName: {
       default: '',
-      shouldUpdate: false,
       validator: validateString('Invalid last name'),
     },
     phoneNumber: {
@@ -72,7 +70,6 @@ const UserModel = new Schema<UserInput, User>(
           `${firstName?.trim() || ''}-${lastName?.trim() || ''}`,
         );
       },
-      shouldUpdate: false,
       validator: validateUsername,
     },
     _addAuthProvider: { virtual: true, validator: validateAuthProvider },

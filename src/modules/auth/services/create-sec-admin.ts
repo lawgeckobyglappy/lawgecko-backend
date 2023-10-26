@@ -6,9 +6,9 @@ import { handleAuthError, handleError } from '../utils';
 
 import { createLoginLink } from './create-login-link';
 
-export { createSysAdmin };
+export { createSecAdmin };
 
-const createSysAdmin = async (
+const createSecAdmin = async (
   values: Partial<UserInput>,
   authInfo: AuthInfo,
 ) => {
@@ -17,7 +17,7 @@ const createSysAdmin = async (
 
   const { data, error } = await UserModel.create({
     ...values,
-    role: UserRoles.SYSTEM_ADMIN,
+    role: UserRoles.SECURITY_ADMIN,
   });
 
   if (error) return handleError(error);

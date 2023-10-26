@@ -20,7 +20,7 @@ import { expectAuthError, generateToken } from './_utils/auth';
 import { addUsers, users } from './_utils/users';
 import { UserRoles } from '../src/shared/types';
 
-const { SYSTEM_ADMIN, USER } = UserRoles;
+const { SECURITY_ADMIN, USER } = UserRoles;
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -185,6 +185,94 @@ describe('Auth', () => {
           }),
         });
       });
+    });
+  });
+
+  describe('POST /auth/sec-admin', () => {
+    let token = '';
+
+    const url = `${BASE_URL}/sec-admin`;
+
+    it('should allow Super Admins to create Security Admins if correct information is provided', async () => {
+      token = generateToken({ user: users[6] }); // role is 'super-admin'
+
+      const { body, status } = await api
+        .post(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          email: 'secadmin1@gmail.com',
+          firstName: 'John Doe',
+          lastName: 'John Doe',
+          username: 'john-sys',
+          phoneNumber: '+1 2813450560',
+          governmentID: 'somewhere.png',
+        });
+
+      const { data, error } = body;
+
+      expect(status).toBe(200);
+
+      expect(error).toBeUndefined();
+
+      expect(data).toMatchObject({
+        email: 'secadmin1@gmail.com',
+        firstName: 'John Doe',
+        lastName: 'John Doe',
+        username: 'john-sys',
+        governmentID: 'somewhere.png',
+        phoneNumber: '+1 281-345-0560',
+        profilePicture: '',
+        bio: '',
+        role: SECURITY_ADMIN,
+      });
+    });
+
+    it('should not allow Security Admins to create Security Admins', async () => {
+      token = generateToken({ user: users[5] }); // role is 'security-admin'
+
+      const { body, status } = await api
+        .post(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          email: 'secadmin1@gmail.com',
+          firstName: 'John Doe',
+          lastName: 'John Doe',
+          username: 'john-sys',
+          phoneNumber: '+1 2813450560',
+          governmentID: 'somewhere.png',
+        });
+
+      const { data, error } = body;
+
+      expect(status).toBe(403);
+
+      expect(error.message).toMatchObject('Access denied');
+
+      expect(data).toBeUndefined();
+    });
+
+    it('should not allow users to create Security Admins', async () => {
+      token = generateToken({ user: users[1] }); // role is 'user'
+
+      const { body, status } = await api
+        .post(url)
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          email: 'sysadmin1@gmail.com',
+          firstName: 'John Doe',
+          lastName: 'John Doe',
+          username: 'john-sys',
+          phoneNumber: '+1 2813450560',
+          governmentID: 'somewhere.png',
+        });
+
+      const { data, error } = body;
+
+      expect(status).toBe(403);
+
+      expect(error.message).toMatchObject('Access denied');
+
+      expect(data).toBeUndefined();
     });
   });
 
@@ -358,7 +446,7 @@ describe('Auth', () => {
       expect(error.message).toBe('User not found');
     });
 
-    it('should reject with "Access denied" error if user is not ower of account and is not admin', async () => {
+    it('should reject with "Access denied" error if user is not owner of account and is not admin', async () => {
       token = generateToken({ user: users[3] });
 
       const { body, status } = await api
@@ -400,30 +488,6 @@ describe('Auth', () => {
 
     it('should ignore if users try to update their "accountStatus" or "role"', async () => {
       const update = { accountStatus: 'blocked', role: 'admin' };
-
-      const { body, status } = await api
-        .patch(url)
-        .set('Authorization', `Bearer ${token}`)
-        .send(update);
-
-      const { data, error } = body;
-
-      expect(status).toBe(200);
-
-      expect(error).toBeUndefined();
-
-      expect(data).toMatchObject(user);
-    });
-
-    it("should not allow admins to update other users' info", async () => {
-      token = generateToken({ user: users[4] });
-
-      const update = {
-        email: 'test@mail.com',
-        username: 'kjfnvjsfnbvofv',
-        firstName: 'Update',
-        lastName: 'Update',
-      };
 
       const { body, status } = await api
         .patch(url)
@@ -482,7 +546,7 @@ describe('Auth', () => {
     it('should not allow admins to update roles', async () => {
       token = generateToken({ user: users[4] });
 
-      const validRoles = [SYSTEM_ADMIN, USER];
+      const validRoles = [SECURITY_ADMIN, USER];
 
       for (const role of validRoles) {
         const update = { role };
@@ -500,6 +564,122 @@ describe('Auth', () => {
 
         expect(data).toMatchObject({ role: user.role });
       }
+    });
+
+    it('should allow Super Admin to update user if correct information is provided', async () => {
+      token = generateToken({ user: users[6] }); // Super admin
+
+      const user2 = users[0];
+
+      const url2 = `${BASE_URL}/update-user/${user2._id}`;
+
+      const update = {
+        bio: 'this is a new bio',
+        profilePicture: 'somePath.jpeg',
+        firstName: 'newFirst',
+        lastName: 'newLast',
+        username: 'newUsername',
+      };
+
+      const { body, status } = await api
+        .patch(url2)
+        .set('Authorization', `Bearer ${token}`)
+        .send(update);
+
+      const { data, error } = body;
+
+      expect(status).toBe(200);
+
+      expect(error).toBeUndefined();
+
+      expect(data).toMatchObject(update);
+    });
+
+    it('should allow Security Admin to update user if correct information is provided', async () => {
+      token = generateToken({ user: users[5] }); // Super admin
+
+      const user2 = users[0];
+
+      const url2 = `${BASE_URL}/update-user/${user2._id}`;
+
+      const update = {
+        bio: 'this is a new bio',
+        profilePicture: 'somePath.jpeg',
+        firstName: 'newFirst',
+        lastName: 'newLast',
+        username: 'newUsername',
+      };
+
+      const { body, status } = await api
+        .patch(url2)
+        .set('Authorization', `Bearer ${token}`)
+        .send(update);
+
+      const { data, error } = body;
+
+      expect(status).toBe(200);
+
+      expect(error).toBeUndefined();
+
+      expect(data).toMatchObject(update);
+    });
+
+    it('should allow Super Admin to update Security Admin if correct information is provided', async () => {
+      token = generateToken({ user: users[6] }); // Super admin
+
+      const user2 = users[5]; // Security Admin
+
+      const url2 = `${BASE_URL}/update-user/${user2._id}`;
+
+      const update = {
+        bio: 'this is a new bio',
+        profilePicture: 'somePath.jpeg',
+        firstName: 'newFirst',
+        lastName: 'newLast',
+        username: 'newUsername',
+      };
+
+      const { body, status } = await api
+        .patch(url2)
+        .set('Authorization', `Bearer ${token}`)
+        .send(update);
+
+      const { data, error } = body;
+
+      expect(status).toBe(200);
+
+      expect(error).toBeUndefined();
+
+      expect(data).toMatchObject(update);
+    });
+
+    it('should not allow Security Admin to update Super Admin', async () => {
+      token = generateToken({ user: users[5] }); // Security admin
+
+      const user2 = users[6]; // Super Admin
+
+      const url2 = `${BASE_URL}/update-user/${user2._id}`;
+
+      const update = {
+        bio: 'this is a new bio',
+        profilePicture: 'somePath.jpeg',
+        firstName: 'newFirst',
+        lastName: 'newLast',
+        username: 'newUsername',
+      };
+
+      const { body, status } = await api
+        .patch(url2)
+        .set('Authorization', `Bearer ${token}`)
+        .send(update);
+
+      const { data, error } = body;
+
+      expect(status).toBe(403);
+
+      expect(data).toBeUndefined();
+
+      expect(error.message).toBe('Access denied');
     });
 
     describe('Phone number', () => {

@@ -10,9 +10,9 @@ export { router as authRouter };
 const router = Router();
 
 router.post(
-  '/system-admin',
+  '/sec-admin',
   requireAuth(UserRoles.SUPER_ADMIN),
-  controllers.createSysAdmin,
+  controllers.createSecAdmin,
 );
 router.post('/register', controllers.register);
 router.post('/handle-google-auth', controllers.handleGoogleAuth);

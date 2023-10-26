@@ -46,7 +46,7 @@ const UserAccountStatusList = Object.values(
 
 const UserRoles = {
   SUPER_ADMIN: 'super-admin',
-  SYSTEM_ADMIN: 'system-admin',
+  SECURITY_ADMIN: 'security-admin',
   USER: 'user',
 } as const;
 type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
