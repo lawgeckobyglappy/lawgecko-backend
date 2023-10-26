@@ -12,7 +12,7 @@ const router = Router();
 router.post(
   '/security-admin',
   requireAuth(UserRoles.SUPER_ADMIN),
-  controllers.createSecAdmin,
+  controllers.createSecurityAdmin,
 );
 router.post('/register', controllers.register);
 router.post('/handle-google-auth', controllers.handleGoogleAuth);

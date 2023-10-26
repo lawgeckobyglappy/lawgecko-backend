@@ -6,9 +6,9 @@ import { handleAuthError, handleError } from '../../utils';
 
 import { createLoginLink } from './create-login-link';
 
-export { createSecAdmin };
+export { createSecurityAdmin };
 
-const createSecAdmin = async (
+const createSecurityAdmin = async (
   values: Partial<UserInput>,
   authInfo: AuthInfo,
 ) => {

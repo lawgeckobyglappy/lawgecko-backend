@@ -7,14 +7,14 @@ import {
   requestLoginLink,
   updateUser,
   verifyLoginLink,
-  createSecAdmin,
+  createSecurityAdmin,
 } from '../services';
 
 export { controllers };
 
 const controllers = {
-  createSecAdmin: makeController((req) =>
-    createSecAdmin(req.body, req.authInfo),
+  createSecurityAdmin: makeController((req) =>
+    createSecurityAdmin(req.body, req.authInfo),
   ),
   getCurrentUser: makeController((req) => getCurrentuser(req.authInfo)),
   handleGoogleAuth: makeController((req) => handleGoogleAuth(req.body)),
