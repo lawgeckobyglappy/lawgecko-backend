@@ -1,10 +1,12 @@
-import { User, UserAccountStatus } from '../../src/shared/types';
+import { UserAccountStatus } from '../../src/shared/types';
 import { userRepository } from '../../src/modules/auth/repositories';
 import { UserRoles } from '../../src/shared/types';
 export { users, addUsers };
 
 const { SECURITY_ADMIN, SUPER_ADMIN, USER } = UserRoles;
 const { ACTIVE, BLOCKED, DELETED } = UserAccountStatus;
+
+const assetLink = 'http://cdn.com/asset.png';
 
 const users = {
   ACTIVE_USER: {
@@ -57,10 +59,10 @@ const users = {
     bio: '',
     email: 'admin@mail.com',
     firstName: 'Admin',
-    governmentID: 'govID.png',
+    governmentID: assetLink,
     lastName: 'User',
     phoneNumber: '+46 70 712 34 55',
-    profilePicture: 'profilePic.png',
+    profilePicture: assetLink,
     username: 'admin-user',
     role: SECURITY_ADMIN,
   },
@@ -70,10 +72,10 @@ const users = {
     bio: '',
     email: 'admin-1@mail.com',
     firstName: 'Admin',
-    governmentID: 'govID.png',
+    governmentID: assetLink,
     lastName: 'User',
     phoneNumber: '+46 70 712 34 56',
-    profilePicture: 'profilePic.png',
+    profilePicture: assetLink,
     username: 'admin-user-1',
     role: SECURITY_ADMIN,
   },
@@ -83,10 +85,10 @@ const users = {
     bio: '',
     email: 'sup-admin-1@mail.com',
     firstName: 'Admin',
-    governmentID: 'govID.png',
+    governmentID: assetLink,
     lastName: 'User',
     phoneNumber: '+46 70 712 34 57',
-    profilePicture: 'profilePic.png',
+    profilePicture: assetLink,
     username: 'super-admin-user-1',
     role: SUPER_ADMIN,
   },

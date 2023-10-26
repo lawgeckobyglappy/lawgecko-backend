@@ -196,17 +196,19 @@ describe('Auth', () => {
     it('should allow Super Admins to create Security Admins if correct information is provided', async () => {
       token = generateToken({ user: users.SUPER_ADMIN });
 
+      const input = {
+        email: 'secadmin1@gmail.com',
+        firstName: 'John Doe',
+        lastName: 'John Doe',
+        username: 'john-sys',
+        phoneNumber: '+1 2813450560',
+        governmentID: 'http://cdn.com/somewhere.png',
+      };
+
       const { body, status } = await api
         .post(url)
         .set('Authorization', `Bearer ${token}`)
-        .send({
-          email: 'secadmin1@gmail.com',
-          firstName: 'John Doe',
-          lastName: 'John Doe',
-          username: 'john-sys',
-          phoneNumber: '+1 2813450560',
-          governmentID: 'somewhere.png',
-        });
+        .send(input);
 
       const { data, error } = body;
 
@@ -215,11 +217,7 @@ describe('Auth', () => {
       expect(error).toBeUndefined();
 
       expect(data).toMatchObject({
-        email: 'secadmin1@gmail.com',
-        firstName: 'John Doe',
-        lastName: 'John Doe',
-        username: 'john-sys',
-        governmentID: 'somewhere.png',
+        ...input,
         phoneNumber: '+1 281-345-0560',
         profilePicture: '',
         bio: '',
@@ -575,7 +573,7 @@ describe('Auth', () => {
 
       const update = {
         bio: 'this is a new bio',
-        profilePicture: 'somePath.jpeg',
+        profilePicture: 'http://cdn.com/somePath.jpeg',
         firstName: 'newFirst',
         lastName: 'newLast',
         username: 'newUsername',
@@ -602,7 +600,7 @@ describe('Auth', () => {
 
       const update = {
         bio: 'this is a new bio',
-        profilePicture: 'somePath.jpeg',
+        profilePicture: 'http://cdn.com/somePath.jpeg',
         firstName: 'newFirst',
         lastName: 'newLast',
         username: 'newUsername',
@@ -631,7 +629,7 @@ describe('Auth', () => {
 
       const update = {
         bio: 'this is a new bio',
-        profilePicture: 'somePath.jpeg',
+        profilePicture: 'http://cdn.com/somePath.jpeg',
         firstName: 'newFirst',
         lastName: 'newLast',
         username: 'newUsername',

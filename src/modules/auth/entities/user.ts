@@ -6,6 +6,7 @@ import { User, UserAccountStatus, UserInput, UserRoles } from '@types';
 import {
   validateAuthProvider,
   validateString,
+  validateUrl,
   validateUserAccountStatus,
   validateUserEmail,
   validateUserPhone,
@@ -45,7 +46,7 @@ const UserModel = new Schema<UserInput, User>(
       required({ context: { role, governmentID } }) {
         return role == UserRoles.SECURITY_ADMIN ? !governmentID : false;
       },
-      validator: validateString('Invalid Government ID', { minLength: 5 }),
+      validator: validateUrl('Invalid Government ID', true),
     },
     lastName: {
       default: '',
@@ -62,7 +63,10 @@ const UserModel = new Schema<UserInput, User>(
       },
       validator: validateUserPhone,
     },
-    profilePicture: { default: '' },
+    profilePicture: {
+      default: '',
+      validator: validateUrl('Invalid profile picture', true),
+    },
     role: { readonly: true, validator: validateUserRole },
     username: {
       default({ firstName, lastName }) {
