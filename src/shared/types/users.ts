@@ -1,18 +1,30 @@
-export { AccountStatusList, AuthProvidersList, UserRoles, UserRolesList };
+export {
+  UserAccountStatusList,
+  AuthProvidersList,
+  UserAccountStatus,
+  UserRoles,
+  UserRolesList,
+};
 
 export type {
+  Address,
   AuthInfo,
   AuthInfoInput,
   AuthProvider,
-  IApiError,
   User,
   UserInput,
-  UserAccountStatus,
+  IUserAccountStatus,
   UserRole,
   LoginLink,
   LoginLinkInput,
   LoginSession,
   LoginSessionInput,
+};
+
+type Address = {
+  city: string;
+  country: string;
+  street: string;
 };
 
 type AuthInfoInput = {
@@ -26,18 +38,22 @@ type AuthInfo = {
   sessionId: string;
 };
 
-type IApiError = {
-  message: string;
-  payload: Record<string, string[]>;
-  statusCode: number;
-};
+const UserAccountStatus = {
+  ACTIVE: 'active',
+  BLOCKED: 'blocked',
+  DELETED: 'deleted',
+} as const;
 
-const AccountStatusList = ['active', 'blocked', 'deleted'] as const;
-type UserAccountStatus = (typeof AccountStatusList)[number];
+type IUserAccountStatus =
+  (typeof UserAccountStatus)[keyof typeof UserAccountStatus];
+
+const UserAccountStatusList = Object.values(
+  UserAccountStatus,
+) as IUserAccountStatus[];
 
 const UserRoles = {
-  ADMIN: 'admin',
-  MODERATOR: 'moderator',
+  SUPER_ADMIN: 'super-admin',
+  SECURITY_ADMIN: 'security-admin',
   USER: 'user',
 } as const;
 type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
@@ -48,11 +64,15 @@ const AuthProvidersList = ['google'] as const;
 type AuthProvider = (typeof AuthProvidersList)[number];
 
 type UserInput = {
-  accountStatus: UserAccountStatus;
+  accountStatus: IUserAccountStatus;
+  address: Address;
+  bio: string;
   email: string;
   firstName: string;
+  governmentID: string;
   lastName: string;
   phoneNumber: string;
+  profilePicture: string;
   role: UserRole;
   username: string;
 
@@ -61,13 +81,17 @@ type UserInput = {
 
 type User = {
   _id: string;
-  accountStatus: UserAccountStatus;
+  accountStatus: IUserAccountStatus;
+  address: Address | null;
   authProviders?: AuthProvider[];
+  bio: string;
   createdAt: Date | string;
   email: string;
   firstName: string;
+  governmentID: string;
   lastName: string;
   phoneNumber: string;
+  profilePicture: string;
   role: UserRole;
   username: string;
   updatedAt: Date | string;

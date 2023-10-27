@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { makeServer } from '../../src/app';
 import { User, UserRole } from '../../src/shared/types';
-import { createToken } from '../../src/modules/auth/utils';
+import { createToken } from '../../src/modules/accounts/utils';
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -25,7 +25,7 @@ function generateToken({
 }: {
   role?: '' | UserRole;
   customId?: string;
-  user?: User;
+  user?: Partial<User>;
 }) {
   if (user)
     return createToken({ userId: user._id, userRole: user.role } as any);
