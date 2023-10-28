@@ -10,7 +10,7 @@ const DEPLOYMENT_MODE = {
 } as const;
 type DeploymentMode = (typeof DEPLOYMENT_MODE)[keyof typeof DEPLOYMENT_MODE];
 
-const NODE_ENV = process.env.NODE_ENV;
+const NODE_ENV = process.env.NODE_ENV || DEPLOYMENT_MODE.DEV;
 
 const currentDeployment = {
   isDev: NODE_ENV == DEPLOYMENT_MODE.DEV,
