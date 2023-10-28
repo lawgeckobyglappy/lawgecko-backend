@@ -8,11 +8,11 @@ import morgan from './shared/middlewares/morgan.middleware';
 
 import { router } from './api/v1';
 
-const { environment, port, db } = config;
+const { currentDeployment, port, db } = config;
 
 const app = express();
 
-if (config.environment !== 'test') app.use(morgan);
+if (!currentDeployment.isTest) app.use(morgan);
 
 app.use(cors({ origin: '*' }));
 
@@ -30,7 +30,7 @@ connectdb(String(db.dbURI));
 
 function makeServer() {
   return app.listen(port, async () => {
-    if (environment == 'test') return;
+    if (currentDeployment.isTest) return;
 
     await scheduler.start();
     logger.info(`Listening to port ${port}`);

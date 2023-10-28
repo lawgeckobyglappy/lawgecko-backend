@@ -39,6 +39,7 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
 
   if (isCurrentUser) {
     updates = sanitize(updates, { remove: ['accountStatus', 'role'] });
+
     if (currentUser.role == UserRoles.USER)
       updates = sanitize(updates, {
         remove: ['email', 'firstName', 'lastName', 'address'],
