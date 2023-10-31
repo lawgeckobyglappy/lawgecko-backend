@@ -1,12 +1,16 @@
-import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+import express from 'express';
+
+import { config, connectdb, scheduler } from '@config';
+
+import { logger } from './shared/logger';
 import morgan from './shared/middlewares/morgan.middleware';
-import config from './config/env';
 
 import { router } from './api/v1';
-import exampleRoutes from './api/v1/example';
 
-const app: Application = express();
+const { environment, port, db } = config;
+
+const app = express();
 
 if (config.environment !== 'test') app.use(morgan);
 
@@ -14,15 +18,23 @@ app.use(cors({ origin: '*' }));
 
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-	res.json({ message: 'live' });
-});
+app.get('/', (_, res) => res.json({ message: 'live' }));
 
-app.use('/api/v1', exampleRoutes);
 app.use('/api/v1', router);
 
-app.use((_, res: Response) => {
-	res.status(404).json({ message: 'Resource not found' });
+app.use((_, res) => {
+  res.status(404).json({ message: 'Resource not found' });
 });
 
-export default app;
+connectdb(String(db.dbURI));
+
+function makeServer() {
+  return app.listen(port, async () => {
+    if (environment == 'test') return;
+
+    await scheduler.start();
+    logger.info(`Listening to port ${port}`);
+  });
+}
+
+export { makeServer };

@@ -16,5 +16,6 @@ jobs:
         with:
           node-version: 18.12.1
       - run: npm ci
+      - run: npm run lint
       - run: npm run build
       - run: npm run test
