@@ -8,7 +8,6 @@ const DEPLOYMENT_MODE = {
   PROD: 'production',
   TEST: 'test',
 } as const;
-type DeploymentMode = (typeof DEPLOYMENT_MODE)[keyof typeof DEPLOYMENT_MODE];
 
 const NODE_ENV = process.env.NODE_ENV || DEPLOYMENT_MODE.DEV;
 
@@ -67,9 +66,15 @@ const constants = loadVariables({
     parser: (v) => parseFloat(v ?? '15'),
   },
 
-  MONGODB_URI: { required: !currentDeployment.isTest, default: '' },
-  NODE_ENV: DEPLOYMENT_MODE.DEV as DeploymentMode,
+  SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES: {
+    required: currentDeployment.isProduction,
+    default: 15,
+    parser: (v) => parseFloat(v ?? '15'),
+  },
 
+  MONGODB_URI: { required: !currentDeployment.isTest, default: '' },
+
+  PINO_LOG_LEVEL: 'info',
   PORT: {
     required: currentDeployment.isProduction,
     default: () => (currentDeployment.isTest ? 0 : 5000),
@@ -95,16 +100,16 @@ export const config = {
   port: constants.PORT,
   db: { dbURI: constants.MONGODB_URI! },
   LOGIN_LINK_EXPIRATION_MINUTES: constants.LOGIN_LINK_EXPIRATION_MINUTES,
+  SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES:
+    constants.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES,
   jwt: {
     JWT_SECRET: constants.JWT_SECRET ?? 'test-secret',
     JWT_ACCESS_EXPIRATION_HOURS: constants.JWT_ACCESS_EXPIRATION_HOURS,
     ADMIN_JWT_ACCESS_EXPIRATION_HOURS:
       constants.ADMIN_JWT_ACCESS_EXPIRATION_HOURS,
   },
-  FRONTEND_URL: constants.FRONTEND_URL || 'http://localhost:5000',
-  logs: {
-    level: process.env.PINO_LOG_LEVEL || 'info',
-  },
+  FRONTEND_URL: constants.FRONTEND_URL,
+  logs: { level: constants.PINO_LOG_LEVEL },
 };
 
 export default config;

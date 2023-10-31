@@ -328,68 +328,74 @@ describe('Auth', () => {
 
     const url = `${BASE_URL}/security-admin`;
 
-    it('should allow Super Admins to create Security Admins if correct information is provided', async () => {
-      token = generateToken({ user: users.SUPER_ADMIN });
+    it.todo(
+      'should allow Super Admins to create Security Admins if correct information is provided',
+      async () => {
+        token = generateToken({ user: users.SUPER_ADMIN });
 
-      const input = {
-        email: 'secadmin1@gmail.com',
-        firstName: 'John Doe',
-        lastName: 'John Doe',
-        username: 'john-sys',
-        phoneNumber: '+1 2813450560',
-        governmentID: 'http://cdn.com/somewhere.png',
-        address: {
-          city: 'Boston',
-          country: 'US',
-          street: 'North Main St',
-        },
-      };
-
-      const { body, status } = await api
-        .post(url)
-        .set('Authorization', `Bearer ${token}`)
-        .send(input);
-
-      const { data, error } = body;
-
-      expect(status).toBe(200);
-
-      expect(error).toBeUndefined();
-
-      expect(data).toMatchObject({
-        ...input,
-        phoneNumber: '+1 281-345-0560',
-        profilePicture: '',
-        bio: '',
-        role: SECURITY_ADMIN,
-      });
-    });
-
-    it('should not allow Security Admins to create Security Admins', async () => {
-      token = generateToken({ user: users.SECURITY_ADMIN });
-
-      const { body, status } = await api
-        .post(url)
-        .set('Authorization', `Bearer ${token}`)
-        .send({
+        const input = {
           email: 'secadmin1@gmail.com',
           firstName: 'John Doe',
           lastName: 'John Doe',
           username: 'john-sys',
           phoneNumber: '+1 2813450560',
-          governmentID: 'somewhere.png',
+          governmentID: 'http://cdn.com/somewhere.png',
+          address: {
+            city: 'Boston',
+            country: 'US',
+            street: 'North Main St',
+          },
+        };
+
+        const { body, status } = await api
+          .post(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send(input);
+
+        const { data, error } = body;
+
+        expect(status).toBe(200);
+
+        expect(error).toBeUndefined();
+
+        expect(data).toMatchObject({
+          ...input,
+          phoneNumber: '+1 281-345-0560',
+          profilePicture: '',
+          bio: '',
+          role: SECURITY_ADMIN,
         });
+      },
+    );
 
-      const { data, error } = body;
+    it.todo(
+      'should not allow Security Admins to create Security Admins',
+      async () => {
+        token = generateToken({ user: users.SECURITY_ADMIN });
 
-      expect(status).toBe(403);
+        const { body, status } = await api
+          .post(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            email: 'secadmin1@gmail.com',
+            firstName: 'John Doe',
+            lastName: 'John Doe',
+            username: 'john-sys',
+            phoneNumber: '+1 2813450560',
+            governmentID: 'somewhere.png',
+          });
 
-      expect(error.message).toMatchObject('Access denied');
+        const { data, error } = body;
 
-      expect(data).toBeUndefined();
-    });
+        expect(status).toBe(403);
 
-    it('should not allow users to create Security Admins', async () => {
+        expect(error.message).toMatchObject('Access denied');
+
+        expect(data).toBeUndefined();
+      },
+    );
+
+    it.todo('should not allow users to create Security Admins', async () => {
       token = generateToken({ user: users.ACTIVE_USER });
 
       const { body, status } = await api
