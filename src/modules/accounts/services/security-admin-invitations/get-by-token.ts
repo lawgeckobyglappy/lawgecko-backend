@@ -1,7 +1,7 @@
 import { sanitize } from 'apitoolz';
 
-import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
 import { SecurityAdminInvitation } from '../../types';
+import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
 
 export { getSecurityAdminInvitationByToken };
 

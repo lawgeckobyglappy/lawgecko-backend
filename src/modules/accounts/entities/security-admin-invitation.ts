@@ -16,6 +16,7 @@ import {
 } from '../validators';
 import { userRepository } from '../repositories';
 import { triggerSendSecurityAdminInvitationEmail } from '../jobs';
+import { SecurityAdminInvitationRepo } from '../repositories/security-admin-invitation';
 
 export { SecurityAdminInvitationModel };
 
@@ -38,7 +39,7 @@ const SecurityAdminInvitationModel = new Schema<
   },
   createdBy: { readonly: true, validator: validateSuperAdminId },
   details: { default: null },
-  email: { readonly: true, validator: validateEmail },
+  email: { readonly: true, validator: validateInvitationEmail },
   expiresAt: {
     constant: true,
     value: () =>
@@ -48,7 +49,7 @@ const SecurityAdminInvitationModel = new Schema<
   },
   name: {
     readonly: true,
-    validator: validateString('Invalid name', { minLength: 10 }),
+    validator: validateString('Invalid name', { minLength: 5, maxLength: 50 }),
   },
   token: {
     default: generateInvitationToken,
@@ -68,6 +69,20 @@ const SecurityAdminInvitationModel = new Schema<
 
 function generateInvitationToken() {
   return generateId('sa-tk-');
+}
+
+async function validateInvitationEmail(val: any) {
+  const isValid = validateEmail(val);
+
+  if (!isValid.valid) return isValid;
+
+  const invitation = await SecurityAdminInvitationRepo.findByEmail(
+    isValid.validated,
+  );
+
+  return invitation
+    ? { valid: false, reasons: ['Invitation already sent'] }
+    : isValid;
 }
 
 async function validateSuperAdminId(val: any) {

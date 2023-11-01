@@ -20,7 +20,7 @@ router.post(
   controllers.inviteSecurityAdmin,
 );
 router.patch(
-  '/security-admins/resend',
+  '/security-admins/resend/:id',
   requireAuth(UserRoles.SUPER_ADMIN),
   controllers.resendSecurityAdminInvitation,
 );

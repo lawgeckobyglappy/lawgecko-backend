@@ -23,6 +23,7 @@ const dbModel = model('security-admin-invitations', schema);
 
 const SecurityAdminInvitationRepo = {
   find: () => dbModel.find().lean(),
+  findByEmail: (email: string) => dbModel.findOne({ email }).lean(),
   findById: (id: string) => dbModel.findById(id).lean(),
   findByToken: (token: SecurityAdminInvitation['token']) =>
     dbModel.findOne({ token }).lean(),

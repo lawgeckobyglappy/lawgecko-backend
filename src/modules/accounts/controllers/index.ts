@@ -25,8 +25,9 @@ const controllers = {
   getSecurityAdminInvitationByToken: makeController((req) =>
     getSecurityAdminInvitationByToken(req.params.t),
   ),
-  inviteSecurityAdmin: makeController((req) =>
-    inviteSecurityAdmin(req.body, req.authInfo),
+  inviteSecurityAdmin: makeController(
+    (req) => inviteSecurityAdmin(req.body, req.authInfo),
+    201,
   ),
   resendSecurityAdminInvitation: makeController((req) =>
     resendSecurityAdminInvitation(req.params.id, req.authInfo),
