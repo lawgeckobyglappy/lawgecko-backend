@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.12.1
-      - run: yarn add –-frozen-lockfile --ignore-engines
+      - run: yarn
       - run: yarn build
       - run: yarn lint
       - run: yarn test
