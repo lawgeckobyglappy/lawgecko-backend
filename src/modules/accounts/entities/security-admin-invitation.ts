@@ -8,11 +8,12 @@ import { UserAccountStatus, UserRoles } from '@types';
 import {
   SecurityAdminInvitation,
   SecurityAdminInvitationInput,
+  SECURITY_ADMIN_INVITATION_DETAILS_KEYS,
 } from '../types';
 import {
   validateEmail,
   validateString,
-  validateUserEmail,
+  // validateUserEmail,
 } from '../validators';
 import { userRepository } from '../repositories';
 import { triggerSendSecurityAdminInvitationEmail } from '../jobs';
@@ -25,17 +26,10 @@ const SecurityAdminInvitationModel = new Schema<
   SecurityAdminInvitation
 >({
   _id: { constant: true, value: () => generateId() },
-  approvedAt: {
+  changesRequested: {
     default: null,
-    readonly: true,
-    dependsOn: '_approve',
-    resolver: () => new Date(),
-  },
-  approvedBy: {
-    default: null,
-    readonly: true,
-    dependsOn: '_approve',
-    resolver: ({ context: { _approve } }) => _approve.approvedBy,
+    shouldInit: false,
+    validator: validateChangesRequested,
   },
   createdBy: { readonly: true, validator: validateSuperAdminId },
   details: { default: null },
@@ -53,19 +47,35 @@ const SecurityAdminInvitationModel = new Schema<
   },
   token: {
     default: generateInvitationToken,
-    dependsOn: '_resend',
+    dependsOn: ['changesRequested', '_resend'],
     resolver: generateInvitationToken,
     onSuccess: ({ context }) =>
       triggerSendSecurityAdminInvitationEmail(context),
   },
 
-  _approve: {
-    virtual: true,
-    shouldInit: false,
-    validator: validateApproveAction,
-  },
   _resend: { virtual: true, shouldInit: false, validator: () => true },
 }).getModel();
+
+function validateChangesRequested(val: any) {
+  if (val == null) return true;
+
+  if (!val || !isObject(val)) return { valid: false, reason: 'Invalid data' };
+
+  const validated = {} as any;
+
+  Object.entries(val).forEach(([key, value]) => {
+    value = value?.trim();
+
+    if (
+      SECURITY_ADMIN_INVITATION_DETAILS_KEYS.includes(key) &&
+      value &&
+      typeof value == 'string'
+    )
+      validated[key] = value;
+  });
+
+  return { valid: true, validated };
+}
 
 function generateInvitationToken() {
   return generateId('sa-tk-');
@@ -105,34 +115,34 @@ async function validateSuperAdminId(val: any) {
   return isValid;
 }
 
-async function validateApproveAction(val: any) {
-  if (!null || !isObject(val)) return { valid: false, reason: 'Invalid data' };
+// async function validateApproveAction(val: any) {
+//   if (!val || !isObject(val)) return { valid: false, reason: 'Invalid data' };
 
-  const [approverValidation, emailValidation, passwordValidation] =
-    await Promise.all([
-      await validateSuperAdminId(val.approvedBy),
-      await validateUserEmail(val.adminEmail),
-      validateString('Invalid password', { minLength: 5 })(val.password),
-    ]);
+//   const [approverValidation, emailValidation, passwordValidation] =
+//     await Promise.all([
+//       await validateSuperAdminId(val.approvedBy),
+//       await validateUserEmail(val.adminEmail),
+//       validateString('Invalid password', { minLength: 5 })(val.password),
+//     ]);
 
-  let reasons: string[] = [];
+//   let reasons: string[] = [];
 
-  if (!approverValidation.valid)
-    reasons = reasons.concat(approverValidation.reasons);
+//   if (!approverValidation.valid)
+//     reasons = reasons.concat(approverValidation.reasons);
 
-  if (!emailValidation.valid) reasons = reasons.concat(emailValidation.reasons);
+//   if (!emailValidation.valid) reasons = reasons.concat(emailValidation.reasons);
 
-  if (!passwordValidation.valid)
-    reasons = reasons.concat(passwordValidation.reasons);
+//   if (!passwordValidation.valid)
+//     reasons = reasons.concat(passwordValidation.reasons);
 
-  if (reasons.length) return { valid: false, reasons };
+//   if (reasons.length) return { valid: false, reasons };
 
-  return {
-    valid: true,
-    validated: {
-      approvedBy: (approverValidation as any).validated,
-      adminEmail: (emailValidation as any).validated,
-      password: (passwordValidation as any).validated,
-    },
-  };
-}
+//   return {
+//     valid: true,
+//     validated: {
+//       approvedBy: (approverValidation as any).validated,
+//       adminEmail: (emailValidation as any).validated,
+//       password: (passwordValidation as any).validated,
+//     },
+//   };
+// }

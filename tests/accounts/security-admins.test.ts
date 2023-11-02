@@ -356,8 +356,7 @@ describe('Security Admins', () => {
 
       expect(data.token).toBeUndefined();
       expect(data).toMatchObject({
-        approvedAt: null,
-        approvedBy: null,
+        changesRequested: null,
         createdBy: superAdmin._id,
         details: null,
         email: 'test@mail.com',

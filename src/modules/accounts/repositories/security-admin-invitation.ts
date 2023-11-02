@@ -8,9 +8,8 @@ const schema = new Schema<SecurityAdminInvitation>(
   {
     _id: { type: String, required: true },
     expiresAt: { type: Date, expires: 0 },
-    approvedAt: { type: Date, default: null },
-    approvedBy: { type: String, default: null },
     details: { type: Object, default: null },
+    changesRequested: { type: Object, default: null },
     createdBy: { type: String },
     email: { type: String },
     name: { type: String },
