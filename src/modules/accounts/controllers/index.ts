@@ -1,21 +1,38 @@
-import { Request, Response } from 'express';
-
 import {
+  deleteSecurityAdminInvitation,
   getCurrentuser,
+  getSecurityAdminInvitationByToken,
+  getSecurityAdminInvitations,
   handleGoogleAuth,
+  inviteSecurityAdmin,
   register,
   requestLoginLink,
+  resendSecurityAdminInvitation,
   updateUser,
   verifyLoginLink,
-  createSecurityAdmin,
 } from '../services';
+import { makeController } from 'src/shared/utils/api';
 
 export { controllers };
 
 const controllers = {
-  createSecurityAdmin: makeController((req) =>
-    createSecurityAdmin(req.body, req.authInfo),
+  deleteSecurityAdminInvitation: makeController((req) =>
+    deleteSecurityAdminInvitation(req.params.id, req.authInfo),
   ),
+  getSecurityAdminInvitations: makeController((req) =>
+    getSecurityAdminInvitations(req.authInfo),
+  ),
+  getSecurityAdminInvitationByToken: makeController((req) =>
+    getSecurityAdminInvitationByToken(req.params.t),
+  ),
+  inviteSecurityAdmin: makeController(
+    (req) => inviteSecurityAdmin(req.body, req.authInfo),
+    201,
+  ),
+  resendSecurityAdminInvitation: makeController((req) =>
+    resendSecurityAdminInvitation(req.params.id, req.authInfo),
+  ),
+
   getCurrentUser: makeController((req) => getCurrentuser(req.authInfo)),
   handleGoogleAuth: makeController((req) => handleGoogleAuth(req.body)),
   register: makeController((req) => register(req.body), 201),
@@ -25,54 +42,3 @@ const controllers = {
   }),
   verifyLoginLink: makeController((req) => verifyLoginLink(req.body.id)),
 };
-
-type ApiResponse = {
-  data?: any;
-  error?: {
-    message: string;
-    payload: Record<string, any>;
-    statusCode: number;
-  };
-};
-
-function makeController(
-  handler: (req: Request, res: Response) => ApiResponse | Promise<ApiResponse>,
-  successCode?: number,
-  errorCode?: number,
-) {
-  return async (req: Request, res: Response) => {
-    try {
-      const results = await handler(req, res);
-
-      return adaptResponse({ res, results, successCode, errorCode });
-    } catch (err: any) {
-      return adaptResponse({
-        res,
-        results: {
-          error: { message: err.message, payload: {}, statusCode: 500 },
-        },
-        errorCode: 500,
-      });
-    }
-  };
-}
-
-type Options = {
-  res: Response;
-  results: ApiResponse;
-  successCode?: number;
-  errorCode?: number;
-};
-function adaptResponse({
-  res,
-  results,
-  successCode = 200,
-  errorCode = 400,
-}: Options) {
-  if (results?.error)
-    return res
-      .status(results.error?.statusCode ?? errorCode)
-      .json({ error: results.error });
-
-  return res.status(successCode).json({ data: results?.data ?? null });
-}

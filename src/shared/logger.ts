@@ -13,7 +13,7 @@ const levels = {
 };
 
 export const logger = pino({
-  ...(isDev()
+  ...(config.currentDeployment.isDev
     ? {
         transport: {
           target: 'pino-pretty',
@@ -30,7 +30,3 @@ export const logger = pino({
   customLevels: levels,
   useOnlyCustomLevels: true,
 });
-
-function isDev() {
-  return config.environment == 'development';
-}

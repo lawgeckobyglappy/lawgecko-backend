@@ -32,7 +32,7 @@ async function validateUserEmail(val: any) {
 
   const isTaken = await userRepository.findOne({ email: isValid.validated });
 
-  if (isTaken) return { valid: false, reason: 'Email already taken' };
+  if (isTaken) return { valid: false, reasons: ['Email already taken'] };
 
   return isValid;
 }

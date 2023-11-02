@@ -9,10 +9,29 @@ export { router as accountsRouter };
 
 const router = Router();
 
-router.post(
-  '/security-admin',
+router.delete(
+  '/security-admins/:id',
   requireAuth(UserRoles.SUPER_ADMIN),
-  controllers.createSecurityAdmin,
+  controllers.deleteSecurityAdminInvitation,
+);
+router.post(
+  '/security-admins/invite',
+  requireAuth(UserRoles.SUPER_ADMIN),
+  controllers.inviteSecurityAdmin,
+);
+router.patch(
+  '/security-admins/resend/:id',
+  requireAuth(UserRoles.SUPER_ADMIN),
+  controllers.resendSecurityAdminInvitation,
+);
+router.get(
+  '/security-admins/:t',
+  controllers.getSecurityAdminInvitationByToken,
+);
+router.get(
+  '/security-admins',
+  requireAuth(UserRoles.SUPER_ADMIN),
+  controllers.getSecurityAdminInvitations,
 );
 router.post('/register', controllers.register);
 router.post('/handle-google-auth', controllers.handleGoogleAuth);

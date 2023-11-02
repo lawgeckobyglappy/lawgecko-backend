@@ -4,4 +4,3 @@ export { createLoginLink } from './create-login-link';
 export { handleGoogleAuth } from './handle-google-auth';
 export { requestLoginLink } from './request-login-link';
 export { verifyLoginLink } from './verify-login-link';
-export { createSecurityAdmin } from './create-security-admin';
