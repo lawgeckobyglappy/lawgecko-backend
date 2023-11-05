@@ -7,7 +7,7 @@ export { SecurityAdminInvitationRepo };
 const schema = new Schema<SecurityAdminInvitation>(
   {
     _id: { type: String, required: true },
-    expiresAt: { type: Date, expires: 0 },
+    expiresAt: { type: Date },
     details: { type: Object, default: null },
     changesRequested: { type: Object, default: null },
     createdBy: { type: String },
@@ -17,6 +17,8 @@ const schema = new Schema<SecurityAdminInvitation>(
   },
   { timestamps: true },
 );
+
+schema.clearIndexes();
 
 const dbModel = model('security-admin-invitations', schema);
 
@@ -35,7 +37,9 @@ const SecurityAdminInvitationRepo = {
     query: FilterQuery<SecurityAdminInvitation> = {},
     updates: Partial<SecurityAdminInvitation>,
   ) => {
-    return dbModel.updateOne(query, { $set: updates }, { new: true }).lean();
+    return dbModel
+      .findOneAndUpdate(query, { $set: updates }, { new: true })
+      .lean() as Promise<SecurityAdminInvitation>;
   },
   deleteById: (_id: string) => dbModel.deleteOne({ _id }).lean(),
 };

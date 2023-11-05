@@ -52,24 +52,24 @@ const constants = loadVariables({
   JWT_ACCESS_EXPIRATION_HOURS: {
     required: currentDeployment.isProduction,
     default: 168,
-    parser: (v) => parseFloat(v ?? '168'),
+    parser: (v: any) => parseFloat(v ?? '168'),
   },
   ADMIN_JWT_ACCESS_EXPIRATION_HOURS: {
     required: currentDeployment.isProduction,
-    default: 2,
-    parser: (v) => parseFloat(v ?? '2'),
+    default: currentDeployment.isDev ? 168 : 2,
+    parser: (v: any) => parseFloat(v ?? '2'),
   },
 
   LOGIN_LINK_EXPIRATION_MINUTES: {
     required: currentDeployment.isProduction,
     default: 15,
-    parser: (v) => parseFloat(v ?? '15'),
+    parser: (v: any) => parseFloat(v ?? '15'),
   },
 
   SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES: {
     required: currentDeployment.isProduction,
-    default: 15,
-    parser: (v) => parseFloat(v ?? '15'),
+    default: currentDeployment.isDev ? 360 : 30,
+    parser: (v: any) => parseFloat(v ?? '15'),
   },
 
   MONGODB_URI: { required: !currentDeployment.isTest, default: '' },
@@ -78,7 +78,7 @@ const constants = loadVariables({
   PORT: {
     required: currentDeployment.isProduction,
     default: () => (currentDeployment.isTest ? 0 : 5000),
-    parser: (v) => (currentDeployment.isTest ? 0 : v),
+    parser: (v: any) => (currentDeployment.isTest ? 0 : Number(v)),
   },
 });
 
@@ -103,7 +103,7 @@ export const config = {
   SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES:
     constants.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES,
   jwt: {
-    JWT_SECRET: constants.JWT_SECRET ?? 'test-secret',
+    JWT_SECRET: constants.JWT_SECRET,
     JWT_ACCESS_EXPIRATION_HOURS: constants.JWT_ACCESS_EXPIRATION_HOURS,
     ADMIN_JWT_ACCESS_EXPIRATION_HOURS:
       constants.ADMIN_JWT_ACCESS_EXPIRATION_HOURS,

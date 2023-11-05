@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { fileManager } from 'apitoolz';
 
 import { UserRoles } from '@types';
 import { requireAuth } from '@middlewares';
@@ -9,6 +10,13 @@ export { router as accountsRouter };
 
 const router = Router();
 
+const multipartParser = fileManager.parseMultipartData()({
+  filesConfig: { governmentID: {}, profilePicture: {} },
+  pathOnly: false,
+  uploadDir: 'public/tmp',
+});
+
+// security admins
 router.delete(
   '/security-admins/:id',
   requireAuth(UserRoles.SUPER_ADMIN),
@@ -24,6 +32,11 @@ router.patch(
   requireAuth(UserRoles.SUPER_ADMIN),
   controllers.resendSecurityAdminInvitation,
 );
+router.patch(
+  '/security-admins/:token',
+  multipartParser,
+  controllers.setSecurityAdminInvitationDetails,
+);
 router.get(
   '/security-admins/:t',
   controllers.getSecurityAdminInvitationByToken,
@@ -33,6 +46,8 @@ router.get(
   requireAuth(UserRoles.SUPER_ADMIN),
   controllers.getSecurityAdminInvitations,
 );
+
+// users
 router.post('/register', controllers.register);
 router.post('/handle-google-auth', controllers.handleGoogleAuth);
 router.get('/current-user', requireAuth(), controllers.getCurrentUser);

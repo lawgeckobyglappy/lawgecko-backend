@@ -8,6 +8,7 @@ import {
   register,
   requestLoginLink,
   resendSecurityAdminInvitation,
+  setSecurityAdminInvitationDetails,
   updateUser,
   verifyLoginLink,
 } from '../services';
@@ -31,6 +32,9 @@ const controllers = {
   ),
   resendSecurityAdminInvitation: makeController((req) =>
     resendSecurityAdminInvitation(req.params.id, req.authInfo),
+  ),
+  setSecurityAdminInvitationDetails: makeController((req) =>
+    setSecurityAdminInvitationDetails(req.params.token, req.body),
   ),
 
   getCurrentUser: makeController((req) => getCurrentuser(req.authInfo)),

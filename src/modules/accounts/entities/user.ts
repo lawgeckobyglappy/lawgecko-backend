@@ -52,11 +52,12 @@ const UserModel = new Schema<UserInput, User>(
     },
     email: { readonly: true, validator: validateUserEmail },
     firstName: {
-      default: '',
+      required: true,
       validator: validateString('Invalid first name'),
     },
     governmentID: {
       default: '',
+      readonly: true,
       required({ context: { role, governmentID } }) {
         return role == UserRoles.SECURITY_ADMIN ? !governmentID : false;
       },
@@ -90,6 +91,7 @@ const UserModel = new Schema<UserInput, User>(
       },
       validator: validateUsername,
     },
+
     _addAuthProvider: { virtual: true, validator: validateAuthProvider },
   },
   { setMissingDefaultsOnUpdate: true },

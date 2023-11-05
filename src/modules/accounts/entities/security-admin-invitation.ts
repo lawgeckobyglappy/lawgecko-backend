@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import { Schema, isObject } from 'clean-schema';
+import { fileManager } from 'apitoolz';
+import { Schema, Summary, isObject } from 'clean-schema';
 
 import { config } from '@config';
 import { generateId } from '@utils';
@@ -9,17 +10,21 @@ import {
   SecurityAdminInvitation,
   SecurityAdminInvitationInput,
   SECURITY_ADMIN_INVITATION_DETAILS_KEYS,
+  InvitationDetailsInput,
+  InvitationDetails,
+  InvitationDetailsInputAlias,
 } from '../types';
 import {
+  validateAddress,
   validateEmail,
   validateString,
-  // validateUserEmail,
+  validateUserPhone,
 } from '../validators';
 import { userRepository } from '../repositories';
 import { triggerSendSecurityAdminInvitationEmail } from '../jobs';
 import { SecurityAdminInvitationRepo } from '../repositories/security-admin-invitation';
 
-export { SecurityAdminInvitationModel };
+export { SecurityAdminInvitationModel, UserDetailsModel };
 
 const SecurityAdminInvitationModel = new Schema<
   SecurityAdminInvitationInput,
@@ -54,6 +59,59 @@ const SecurityAdminInvitationModel = new Schema<
   },
 
   _resend: { virtual: true, shouldInit: false, validator: () => true },
+}).getModel();
+
+type DetailsSummary = Summary<InvitationDetailsInput, InvitationDetails>;
+
+const UserDetailsModel = new Schema<
+  InvitationDetailsInput,
+  InvitationDetails,
+  InvitationDetailsInputAlias
+>({
+  address: { required: true, validator: validateAddress },
+  bio: {
+    default: '',
+    validator: validateString('Invalid Bio', {
+      minLength: 0,
+      maxLength: 255,
+    }),
+  },
+  firstName: {
+    required: true,
+    validator: validateString('Invalid first name'),
+  },
+  governmentID: {
+    default: '',
+    dependsOn: '_governmentID',
+    resolver: ({ context: { _governmentID } }) => _governmentID.path,
+  },
+  lastName: {
+    default: '',
+    validator: validateString('Invalid last name'),
+  },
+  phoneNumber: { required: true, validator: validateUserPhone },
+  profilePicture: {
+    default: '',
+    dependsOn: '_profilePicture',
+    resolver: ({ context: { _profilePicture } }) => _profilePicture.path,
+  },
+
+  _governmentID: {
+    alias: 'governmentID',
+    virtual: true,
+    sanitizer: handleFileUpload('_governmentID'),
+    required: ({ context: { _governmentID, governmentID } }) =>
+      !governmentID && !_governmentID,
+    validator: () => true,
+  },
+  _profilePicture: {
+    alias: 'profilePicture',
+    virtual: true,
+    sanitizer: handleFileUpload('_profilePicture'),
+    required: ({ context: { _profilePicture, profilePicture } }) =>
+      !profilePicture && !_profilePicture,
+    validator: () => true,
+  },
 }).getModel();
 
 function validateChangesRequested(val: any) {
@@ -113,6 +171,36 @@ async function validateSuperAdminId(val: any) {
     return { valid: false, reasons: ['Invalid operation'] };
 
   return isValid;
+}
+
+type FileInputFields = '_governmentID' | '_profilePicture';
+
+const fileInputToOutputMap = {
+  _governmentID: 'governmentID',
+  _profilePicture: 'profilePicture',
+} as const;
+
+function handleFileUpload(inputField: FileInputFields) {
+  return ({ context, previousValues }: DetailsSummary) => {
+    const outputField = fileInputToOutputMap[inputField];
+
+    const fileInfo = context[inputField],
+      path = fileInfo.path,
+      filename = path.split('/').at(-1),
+      newPath = `public/static/security-admin-info/${filename}`;
+
+    // upload to cloud
+    fileManager.cutFile(path, newPath);
+
+    // delete previous image if available
+    if (previousValues?.[outputField])
+      try {
+        fileManager.deleteFile(previousValues[outputField]);
+      } catch (_) {}
+
+    //  return sanitized values
+    return { ...fileInfo, path: newPath };
+  };
 }
 
 // async function validateApproveAction(val: any) {
