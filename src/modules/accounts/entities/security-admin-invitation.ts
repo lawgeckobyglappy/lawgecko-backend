@@ -1,8 +1,8 @@
 import { add } from 'date-fns';
 import { fileManager } from 'apitoolz';
-import { Context, Schema, Summary, isObject } from 'clean-schema';
+import { Context, Schema, Summary, isEqual, isObject } from 'clean-schema';
 
-import { config } from '@config';
+import { config, scheduler } from '@config';
 import { generateId } from '@utils';
 import { UserAccountStatus, UserRoles } from '@types';
 
@@ -21,7 +21,7 @@ import {
   validateUserPhone,
 } from '../validators';
 import { userRepository } from '../repositories';
-import { triggerSendSecurityAdminInvitationEmail } from '../jobs';
+import { tasks, triggerSendSecurityAdminInvitationEmail } from '../jobs';
 import { SecurityAdminInvitationRepo } from '../repositories/security-admin-invitation';
 
 export { SecurityAdminInvitationModel, UserDetailsModel };
@@ -29,40 +29,57 @@ export { SecurityAdminInvitationModel, UserDetailsModel };
 const SecurityAdminInvitationModel = new Schema<
   SecurityAdminInvitationInput,
   SecurityAdminInvitation
->({
-  _id: { constant: true, value: () => generateId() },
-  changesRequested: {
-    default: null,
-    shouldInit: false,
-    validator: validateChangesRequested,
-  },
-  createdBy: { readonly: true, validator: validateSuperAdminId },
-  details: { default: null },
-  email: { readonly: true, validator: validateInvitationEmail },
-  expiresAt: {
-    constant: true,
-    value: () =>
-      add(new Date(), {
-        minutes: config.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES,
+>(
+  {
+    _id: { constant: true, value: () => generateId() },
+    changesRequested: {
+      default: null,
+      shouldInit: false,
+      validator: validateChangesRequested,
+    },
+    createdBy: { readonly: true, validator: validateSuperAdminId },
+    details: { default: null },
+    email: { readonly: true, validator: validateInvitationEmail },
+    expiresAt: {
+      constant: true,
+      value: () =>
+        add(new Date(), {
+          minutes: config.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES,
+        }),
+      onSuccess({ context: { _id, expiresAt } }) {
+        scheduler.schedule(
+          add(expiresAt, { minutes: 5 }),
+          tasks.DELETE_EXPIRED_SECURITY_ADMIN_INVITATION,
+          _id,
+        );
+      },
+    },
+    name: {
+      readonly: true,
+      validator: validateString('Invalid name', {
+        minLength: 5,
+        maxLength: 50,
       }),
-  },
-  name: {
-    readonly: true,
-    validator: validateString('Invalid name', { minLength: 5, maxLength: 50 }),
-  },
-  token: {
-    default: generateInvitationToken,
-    dependsOn: ['changesRequested', '_resend'],
-    resolver: generateInvitationToken,
-    onSuccess: ({ context }) =>
-      triggerSendSecurityAdminInvitationEmail(context),
-  },
+    },
+    token: {
+      default: generateInvitationToken,
+      dependsOn: ['changesRequested', '_resend'],
+      resolver: generateInvitationToken,
+      onSuccess: ({ context }) =>
+        triggerSendSecurityAdminInvitationEmail(context),
+    },
 
-  _resend: { virtual: true, shouldInit: false, validator: () => true },
-}).getModel();
+    _resend: { virtual: true, shouldInit: false, validator: () => true },
+  },
+  { onDelete },
+).getModel();
 
 type DetailsCtx = Context<InvitationDetailsInput, InvitationDetails>;
 type DetailsSummary = Summary<InvitationDetailsInput, InvitationDetails>;
+type InvitationSummary = Summary<
+  SecurityAdminInvitationInput,
+  SecurityAdminInvitation
+>;
 
 const UserDetailsModel = new Schema<
   InvitationDetailsInput,
@@ -117,7 +134,12 @@ const UserDetailsModel = new Schema<
   },
 }).getModel();
 
-function validateChangesRequested(val: any) {
+function validateChangesRequested(
+  val: any,
+  { previousValues }: InvitationSummary,
+) {
+  if (!previousValues?.details) return false;
+
   if (val == null) return true;
 
   if (!val || !isObject(val)) return { valid: false, reason: 'Invalid data' };
@@ -135,7 +157,7 @@ function validateChangesRequested(val: any) {
       validated[key] = value;
   });
 
-  return { valid: true, validated };
+  return { valid: true, validated: isEqual(validated, {}) ? null : validated };
 }
 
 function generateInvitationToken() {
@@ -183,6 +205,9 @@ const fileInputToOutputMap = {
   _profilePicture: 'profilePicture',
 } as const;
 
+const appDomainAddress = `localhost:${config.port}`,
+  STATIC_PATH = config.STATIC_PATH;
+
 function handleFileUpload(inputField: FileInputFields) {
   return ({ context, previousValues }: DetailsSummary) => {
     const outputField = fileInputToOutputMap[inputField];
@@ -190,17 +215,20 @@ function handleFileUpload(inputField: FileInputFields) {
     const fileInfo = context[inputField],
       path = fileInfo.path,
       filename = path.split('/').at(-1),
-      newPath = `public/static/security-admin-info/${filename}`;
+      newPath = `${STATIC_PATH}/security-admin-info/${filename}`;
 
     // upload to cloud
     fileManager.cutFile(path, newPath);
 
     // delete previous image if available
     if (previousValues?.[outputField])
-      fileManager.deleteFile(previousValues[outputField]);
+      fileManager.deleteFile(getPathOnServer(previousValues[outputField]));
 
     //  return sanitized values
-    return { ...fileInfo, path: newPath };
+    return {
+      ...fileInfo,
+      path: `${appDomainAddress}/security-admin-info/${filename}`,
+    };
   };
 }
 
@@ -212,34 +240,16 @@ function handleFailure(inputField: FileInputFields) {
   };
 }
 
-// async function validateApproveAction(val: any) {
-//   if (!val || !isObject(val)) return { valid: false, reason: 'Invalid data' };
+function onDelete({ details }: SecurityAdminInvitation) {
+  if (!details) return;
 
-//   const [approverValidation, emailValidation, passwordValidation] =
-//     await Promise.all([
-//       await validateSuperAdminId(val.approvedBy),
-//       await validateUserEmail(val.adminEmail),
-//       validateString('Invalid password', { minLength: 5 })(val.password),
-//     ]);
+  if (details.governmentID)
+    fileManager.deleteFile(getPathOnServer(details.governmentID));
 
-//   let reasons: string[] = [];
+  if (details.profilePicture)
+    fileManager.deleteFile(getPathOnServer(details.profilePicture));
+}
 
-//   if (!approverValidation.valid)
-//     reasons = reasons.concat(approverValidation.reasons);
-
-//   if (!emailValidation.valid) reasons = reasons.concat(emailValidation.reasons);
-
-//   if (!passwordValidation.valid)
-//     reasons = reasons.concat(passwordValidation.reasons);
-
-//   if (reasons.length) return { valid: false, reasons };
-
-//   return {
-//     valid: true,
-//     validated: {
-//       approvedBy: (approverValidation as any).validated,
-//       adminEmail: (emailValidation as any).validated,
-//       password: (passwordValidation as any).validated,
-//     },
-//   };
-// }
+function getPathOnServer(path: string) {
+  return `${STATIC_PATH}/${path.split(`${appDomainAddress}/`).at(-1)}`;
+}

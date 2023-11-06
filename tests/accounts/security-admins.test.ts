@@ -18,11 +18,11 @@ import { SecurityAdminInvitationRepo } from '../../src/modules/accounts/reposito
 
 let api: request.SuperTest<request.Test>, server: any;
 
-const BASE_URL = '/api/v1/accounts/security-admins';
+const BASE_URL = '/api/v1/accounts/security-admins/invitations';
 
 const urls = {
-  invite: `${BASE_URL}/invite`,
-  resend: `${BASE_URL}/resend`,
+  invite: `${BASE_URL}`,
+  resend: (id: string) => `${BASE_URL}/${id}/resend`,
 };
 
 describe('Security Admins', () => {
@@ -216,7 +216,7 @@ describe('Security Admins', () => {
 
     it('should return null if invitation does not exist', async () => {
       const { body, status } = await api
-        .patch(`${url}/1`)
+        .patch(urls.resend('1'))
         .set('Authorization', `Bearer ${token}`)
         .send();
 
@@ -235,7 +235,7 @@ describe('Security Admins', () => {
         errorMessage: 'Authentication failed',
         method: 'patch',
         role: '',
-        url: `${url}/1`,
+        url: urls.resend('1'),
       });
 
       for (const user of [users.ACTIVE_USER, users.SECURITY_ADMIN])
@@ -245,7 +245,7 @@ describe('Security Admins', () => {
           errorMessage: 'Access denied',
           method: 'patch',
           user,
-          url: `${url}/1`,
+          url: urls.resend('1'),
         });
 
       it('should resend invitation if requested by the super admin', async () => {
@@ -256,7 +256,7 @@ describe('Security Admins', () => {
           .send({ email: 'test@mail.com', name: 'test user' });
 
         const { body, status } = await api
-          .patch(`${url}/${res.body.data._id}`)
+          .patch(urls.resend(res.body.data._id))
           .set('Authorization', `Bearer ${token}`)
           .send();
 

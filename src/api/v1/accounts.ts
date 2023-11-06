@@ -16,39 +16,49 @@ const multipartParser = fileManager.parseMultipartData()({
   uploadDir: 'public/tmp',
 });
 
-// security admins
+// security admin creation
 router.delete(
-  '/security-admins/:id',
+  '/security-admins/invitations/:id',
   requireAuth(UserRoles.SUPER_ADMIN),
   controllers.deleteSecurityAdminInvitation,
 );
 router.post(
-  '/security-admins/invite',
+  '/security-admins/invitations',
   requireAuth(UserRoles.SUPER_ADMIN),
   controllers.inviteSecurityAdmin,
 );
 router.patch(
-  '/security-admins/resend/:id',
+  '/security-admins/invitations/:id/approve',
+  requireAuth(UserRoles.SUPER_ADMIN),
+  controllers.approveSecurityAdminDetails,
+);
+router.patch(
+  '/security-admins/invitations/:id/request-changes',
+  requireAuth(UserRoles.SUPER_ADMIN),
+  controllers.requestAdminInvitationDetailsChanges,
+);
+router.patch(
+  '/security-admins/invitations/:id/resend',
   requireAuth(UserRoles.SUPER_ADMIN),
   controllers.resendSecurityAdminInvitation,
 );
 router.patch(
-  '/security-admins/:token',
+  '/security-admins/invitations/:token',
   multipartParser,
   controllers.setSecurityAdminInvitationDetails,
 );
 router.get(
-  '/security-admins/:t',
+  '/security-admins/invitations/:token',
   controllers.getSecurityAdminInvitationByToken,
 );
 router.get(
-  '/security-admins',
+  '/security-admins/invitations',
   requireAuth(UserRoles.SUPER_ADMIN),
   controllers.getSecurityAdminInvitations,
 );
 
 // users
-router.post('/register', controllers.register);
+router.post('/register', multipartParser, controllers.register);
 router.post('/handle-google-auth', controllers.handleGoogleAuth);
 router.get('/current-user', requireAuth(), controllers.getCurrentUser);
 router.patch('/update-user/:id', requireAuth(), controllers.updateUser);

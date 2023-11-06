@@ -33,8 +33,8 @@ function sendSecurityAdminInvitationEmail({
                     <p style="font-size: 16px; margin-bottom: 20px;">
                     <a href="${link}" style="color: #007bff; text-decoration: none;"><button>Update details</button></a>
                     </p>
-                    <p style="font-size: 16px; margin-bottom: 20px;">This invitation expires in ${formatRelative(
-                      expiresAt,
+                    <p style="font-size: 16px; margin-bottom: 20px;">This invitation expires ${formatRelative(
+                      new Date(expiresAt),
                       new Date(),
                     )}.</p>
                     <p style="font-size: 16px;">Regards,</p>

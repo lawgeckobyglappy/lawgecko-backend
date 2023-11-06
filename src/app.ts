@@ -8,7 +8,7 @@ import morgan from './shared/middlewares/morgan.middleware';
 
 import { router } from './api/v1';
 
-const { currentDeployment, port, db } = config;
+const { currentDeployment, port, db, STATIC_PATH } = config;
 
 const app = express();
 
@@ -17,6 +17,8 @@ if (!currentDeployment.isTest) app.use(morgan);
 app.use(cors({ origin: '*' }));
 
 app.use(express.json());
+
+app.use(express.static(STATIC_PATH));
 
 app.get('/', (_, res) => res.json({ message: 'live' }));
 

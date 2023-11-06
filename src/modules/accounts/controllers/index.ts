@@ -1,4 +1,5 @@
 import {
+  approveSecurityAdminDetails,
   deleteSecurityAdminInvitation,
   getCurrentuser,
   getSecurityAdminInvitationByToken,
@@ -6,6 +7,7 @@ import {
   handleGoogleAuth,
   inviteSecurityAdmin,
   register,
+  requestAdminInvitationDetailsChanges,
   requestLoginLink,
   resendSecurityAdminInvitation,
   setSecurityAdminInvitationDetails,
@@ -17,14 +19,21 @@ import { makeController } from 'src/shared/utils/api';
 export { controllers };
 
 const controllers = {
+  approveSecurityAdminDetails: makeController((req) =>
+    approveSecurityAdminDetails({
+      id: req.params.id,
+      authInfo: req.authInfo,
+      adminCredentials: req.body,
+    }),
+  ),
   deleteSecurityAdminInvitation: makeController((req) =>
-    deleteSecurityAdminInvitation(req.params.id, req.authInfo),
+    deleteSecurityAdminInvitation(req.params.id),
   ),
   getSecurityAdminInvitations: makeController((req) =>
     getSecurityAdminInvitations(req.authInfo),
   ),
   getSecurityAdminInvitationByToken: makeController((req) =>
-    getSecurityAdminInvitationByToken(req.params.t),
+    getSecurityAdminInvitationByToken(req.params.token),
   ),
   inviteSecurityAdmin: makeController(
     (req) => inviteSecurityAdmin(req.body, req.authInfo),
@@ -32,6 +41,13 @@ const controllers = {
   ),
   resendSecurityAdminInvitation: makeController((req) =>
     resendSecurityAdminInvitation(req.params.id, req.authInfo),
+  ),
+  requestAdminInvitationDetailsChanges: makeController((req) =>
+    requestAdminInvitationDetailsChanges({
+      id: req.params.id,
+      authInfo: req.authInfo,
+      changesRequested: req.body,
+    }),
   ),
   setSecurityAdminInvitationDetails: makeController((req) =>
     setSecurityAdminInvitationDetails(req.params.token, req.body),

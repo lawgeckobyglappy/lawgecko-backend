@@ -58,8 +58,10 @@ const UserModel = new Schema<UserInput, User>(
     governmentID: {
       default: '',
       readonly: true,
-      required({ context: { role, governmentID } }) {
-        return role == UserRoles.SECURITY_ADMIN ? !governmentID : false;
+      required({ operation, context: { role, governmentID } }) {
+        return role == UserRoles.SECURITY_ADMIN
+          ? operation == 'update' && !governmentID
+          : false;
       },
       validator: validateUrl('Invalid Government ID', true),
     },

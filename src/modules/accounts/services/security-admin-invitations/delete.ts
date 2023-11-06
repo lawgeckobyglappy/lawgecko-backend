@@ -1,18 +1,15 @@
 import { sanitize } from 'apitoolz';
-import { AuthInfo, UserRoles } from '@types';
 
 import { SecurityAdminInvitation } from '../../types';
-import { handleAuthError, handleError } from '../../utils';
+import { handleError } from '../../utils';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
+import { SecurityAdminInvitationModel } from '../../entities/security-admin-invitation';
 
 export { deleteSecurityAdminInvitation };
 
 const deleteSecurityAdminInvitation = async (
   id: SecurityAdminInvitation['_id'],
-  { user: { role } }: AuthInfo,
 ) => {
-  if (role != UserRoles.SUPER_ADMIN) return handleAuthError('Access denied');
-
   const invitation = await SecurityAdminInvitationRepo.findById(id);
 
   if (!invitation)
@@ -22,6 +19,8 @@ const deleteSecurityAdminInvitation = async (
 
   if (results.deletedCount == 0)
     return handleError({ message: 'An error occurred' });
+
+  await SecurityAdminInvitationModel.delete(invitation);
 
   return { data: sanitize(invitation, { remove: 'token' }) };
 };
