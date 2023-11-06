@@ -1,6 +1,6 @@
-import dayjs from 'dayjs';
+import { add } from 'date-fns';
 import { fileManager } from 'apitoolz';
-import { Schema, Summary, isObject } from 'clean-schema';
+import { Context, Schema, Summary, isObject } from 'clean-schema';
 
 import { config } from '@config';
 import { generateId } from '@utils';
@@ -42,9 +42,9 @@ const SecurityAdminInvitationModel = new Schema<
   expiresAt: {
     constant: true,
     value: () =>
-      dayjs(new Date())
-        .add(config.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES, 'minutes')
-        .toDate(),
+      add(new Date(), {
+        minutes: config.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES,
+      }),
   },
   name: {
     readonly: true,
@@ -61,6 +61,7 @@ const SecurityAdminInvitationModel = new Schema<
   _resend: { virtual: true, shouldInit: false, validator: () => true },
 }).getModel();
 
+type DetailsCtx = Context<InvitationDetailsInput, InvitationDetails>;
 type DetailsSummary = Summary<InvitationDetailsInput, InvitationDetails>;
 
 const UserDetailsModel = new Schema<
@@ -99,6 +100,7 @@ const UserDetailsModel = new Schema<
   _governmentID: {
     alias: 'governmentID',
     virtual: true,
+    onFailure: handleFailure('_governmentID'),
     sanitizer: handleFileUpload('_governmentID'),
     required: ({ context: { _governmentID, governmentID } }) =>
       !governmentID && !_governmentID,
@@ -107,6 +109,7 @@ const UserDetailsModel = new Schema<
   _profilePicture: {
     alias: 'profilePicture',
     virtual: true,
+    onFailure: handleFailure('_profilePicture'),
     sanitizer: handleFileUpload('_profilePicture'),
     required: ({ context: { _profilePicture, profilePicture } }) =>
       !profilePicture && !_profilePicture,
@@ -194,12 +197,18 @@ function handleFileUpload(inputField: FileInputFields) {
 
     // delete previous image if available
     if (previousValues?.[outputField])
-      try {
-        fileManager.deleteFile(previousValues[outputField]);
-      } catch (_) {}
+      fileManager.deleteFile(previousValues[outputField]);
 
     //  return sanitized values
     return { ...fileInfo, path: newPath };
+  };
+}
+
+function handleFailure(inputField: FileInputFields) {
+  return (context: DetailsCtx) => {
+    const fileInfo = context[inputField];
+
+    if (fileInfo.path) fileManager.deleteFile(fileInfo.path);
   };
 }
 

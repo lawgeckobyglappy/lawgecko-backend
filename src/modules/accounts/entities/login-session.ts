@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { add } from 'date-fns';
 import { Schema, isBooleanOk } from 'clean-schema';
 
 import { config } from '@config';
@@ -21,8 +21,7 @@ const LoginSessionModel = new Schema<LoginSessionInput, LoginSession>({
   },
   expiresAt: {
     constant: true,
-    value: () =>
-      dayjs(new Date()).add(JWT_ACCESS_EXPIRATION_HOURS, 'hours').toDate(),
+    value: () => add(new Date(), { hours: JWT_ACCESS_EXPIRATION_HOURS }),
   },
   userId: { readonly: true, validator: validateString('Invalid user id') },
 }).getModel();
