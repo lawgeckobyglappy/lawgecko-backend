@@ -1,3 +1,5 @@
+import { type FileInfo } from 'apitoolz';
+
 import { User } from '@types';
 
 export {
@@ -8,8 +10,6 @@ export {
   SecurityAdminInvitation,
   SecurityAdminInvitationInput,
 };
-
-type FileInfo = { path: string; size: number };
 
 type InvitationDetailsInputAlias = {
   governmentID: FileInfo;

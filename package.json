@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@hokify/agenda": "^6.3.0",
-    "apitoolz": "^0.3.19",
+    "apitoolz": "^0.3.26",
     "awesome-phonenumber": "^6.1.0",
     "clean-schema": "^4.0.2",
     "cors": "^2.8.5",

@@ -9,8 +9,8 @@ dependencies:
     specifier: ^6.3.0
     version: 6.3.0
   apitoolz:
-    specifier: ^0.3.19
-    version: 0.3.19
+    specifier: ^0.3.26
+    version: 0.3.26
   awesome-phonenumber:
     specifier: ^6.1.0
     version: 6.2.0
@@ -2058,8 +2058,8 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /apitoolz@0.3.19:
-    resolution: {integrity: sha512-0hmfEN+zW33CXPW5fU+ZfTDOQ5aNwmndx1Q6FsG99gGnfA6tgp8ZAwYdGMF0sr7AGoLbS08JDShaOeh4UfYang==}
+  /apitoolz@0.3.26:
+    resolution: {integrity: sha512-awfXdpwjkYxrbMjR091ge6aYuqVUFYyBkUDjC0qc5TEVIT5s6YNt1dZiDBfuSc1IoJF8K9o1TIf1b6d6N3GNJQ==}
     dependencies:
       formidable: 2.1.2
     dev: false
