@@ -67,12 +67,6 @@ const constants = loadVariables(
       parser: (v: any) => parseFloat(v ?? '15'),
     },
 
-    SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES: {
-      required: currentDeployment.isProduction,
-      default: currentDeployment.isDev ? 360 : 30,
-      parser: (v: any) => parseFloat(v ?? '15'),
-    },
-
     MONGODB_URI: { required: !currentDeployment.isTest, default: '' },
 
     PINO_LOG_LEVEL: 'info',
@@ -107,8 +101,6 @@ export const config = {
   port: constants.PORT,
   db: { dbURI: constants.MONGODB_URI! },
   LOGIN_LINK_EXPIRATION_MINUTES: constants.LOGIN_LINK_EXPIRATION_MINUTES,
-  SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES:
-    constants.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES,
   STATIC_PATH: constants.STATIC_PATH,
   jwt: {
     JWT_SECRET: constants.JWT_SECRET,

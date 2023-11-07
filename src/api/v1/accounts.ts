@@ -61,6 +61,11 @@ router.get(
 router.post('/register', multipartParser, controllers.register);
 router.post('/handle-google-auth', controllers.handleGoogleAuth);
 router.get('/current-user', requireAuth(), controllers.getCurrentUser);
-router.patch('/update-user/:id', requireAuth(), controllers.updateUser);
+router.patch(
+  '/update-user/:id',
+  requireAuth(),
+  multipartParser,
+  controllers.updateUser,
+);
 router.post('/request-login-link', controllers.requestLoginLink);
 router.post('/verify-login-link', controllers.verifyLoginLink);

@@ -1,8 +1,7 @@
-import { add } from 'date-fns';
 import { fileManager } from 'apitoolz';
 import { Context, Schema, Summary, isEqual, isObject } from 'clean-schema';
 
-import { config, scheduler } from '@config';
+import { config } from '@config';
 import { generateId } from '@utils';
 import { UserAccountStatus, UserRoles } from '@types';
 
@@ -21,7 +20,7 @@ import {
   validateUserPhone,
 } from '../validators';
 import { userRepository } from '../repositories';
-import { tasks, triggerSendSecurityAdminInvitationEmail } from '../jobs';
+import { triggerSendSecurityAdminInvitationEmail } from '../jobs';
 import { SecurityAdminInvitationRepo } from '../repositories/security-admin-invitation';
 
 export { SecurityAdminInvitationModel, UserDetailsModel };
@@ -40,20 +39,6 @@ const SecurityAdminInvitationModel = new Schema<
     createdBy: { readonly: true, validator: validateSuperAdminId },
     details: { default: null },
     email: { readonly: true, validator: validateInvitationEmail },
-    expiresAt: {
-      constant: true,
-      value: () =>
-        add(new Date(), {
-          minutes: config.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES,
-        }),
-      onSuccess({ context: { _id, expiresAt } }) {
-        scheduler.schedule(
-          add(expiresAt, { minutes: 5 }),
-          tasks.DELETE_EXPIRED_SECURITY_ADMIN_INVITATION,
-          _id,
-        );
-      },
-    },
     name: {
       readonly: true,
       validator: validateString('Invalid name', {

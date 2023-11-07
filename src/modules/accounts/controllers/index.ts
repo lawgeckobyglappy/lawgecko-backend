@@ -27,7 +27,7 @@ const controllers = {
     }),
   ),
   deleteSecurityAdminInvitation: makeController((req) =>
-    deleteSecurityAdminInvitation(req.params.id),
+    deleteSecurityAdminInvitation(req.params.id, req.authInfo),
   ),
   getSecurityAdminInvitations: makeController((req) =>
     getSecurityAdminInvitations(req.authInfo),

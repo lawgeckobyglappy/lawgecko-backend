@@ -7,7 +7,6 @@ export { SecurityAdminInvitationRepo };
 const schema = new Schema<SecurityAdminInvitation>(
   {
     _id: { type: String, required: true },
-    expiresAt: { type: Date },
     details: { type: Object, default: null },
     changesRequested: { type: Object, default: null },
     createdBy: { type: String },

@@ -1,7 +1,8 @@
 import { sanitize } from 'apitoolz';
 
+import { AuthInfo, UserRoles } from '@types';
 import { SecurityAdminInvitation } from '../../types';
-import { handleError } from '../../utils';
+import { handleAuthError, handleError } from '../../utils';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
 import { SecurityAdminInvitationModel } from '../../entities/security-admin-invitation';
 
@@ -9,7 +10,10 @@ export { deleteSecurityAdminInvitation };
 
 const deleteSecurityAdminInvitation = async (
   id: SecurityAdminInvitation['_id'],
+  { user: { role } }: AuthInfo,
 ) => {
+  if (role != UserRoles.SUPER_ADMIN) return handleAuthError('Access denied');
+
   const invitation = await SecurityAdminInvitationRepo.findById(id);
 
   if (!invitation)

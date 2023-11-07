@@ -68,7 +68,6 @@ type SecurityAdminInvitation = {
   createdBy: User['_id'];
   details: InvitationDetails | null;
   email: string;
-  expiresAt: Date;
   name: string;
   token: string;
   updatedAt: Date;

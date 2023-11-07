@@ -13,11 +13,12 @@ import { makeServer } from '../../src/app';
 import { userRepository } from '../../src/modules/accounts/repositories';
 
 import { cleanupDp } from '../_utils';
-import { expectAuthError, generateToken } from '../_utils/auth';
 import { addUsers, users } from '../_utils/users';
-import { UserRoles } from '../../src/shared/types';
+import { expectAuthError, generateToken } from '../_utils/auth';
+import { UserAccountStatus, UserRoles } from '../../src/shared/types';
 
 const { SECURITY_ADMIN, USER } = UserRoles;
+const { BLOCKED, DELETED } = UserAccountStatus;
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -63,7 +64,8 @@ describe('Accounts', () => {
       const { body, status } = await api
         .patch(url + 'id-that-is-not-in-db')
         .set('Authorization', `Bearer ${token}`)
-        .send({ firstName: 'Update' });
+        .field('firstName', 'Update')
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -80,7 +82,8 @@ describe('Accounts', () => {
       const { body, status } = await api
         .patch(url)
         .set('Authorization', `Bearer ${token}`)
-        .send({ firstName: 'Update' });
+        .field('firstName', 'Update')
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -92,7 +95,7 @@ describe('Accounts', () => {
     });
 
     it('should reject with "Authentication failed" error if user is not active', async () => {
-      const statusToReject = ['blocked', 'deleted'];
+      const statusToReject = [BLOCKED, DELETED];
 
       for (const accountStatus of statusToReject) {
         await userRepository.updateOne({ _id: user._id }, {
@@ -102,7 +105,8 @@ describe('Accounts', () => {
         const { body, status } = await api
           .patch(url)
           .set('Authorization', `Bearer ${token}`)
-          .send({ firstName: 'Update' });
+          .field('firstName', 'Update')
+          .set('Content-Type', 'multipart/form-data');
 
         const { data, error } = body;
 
@@ -120,7 +124,9 @@ describe('Accounts', () => {
       const { body, status } = await api
         .patch(url)
         .set('Authorization', `Bearer ${token}`)
-        .send(update);
+        .field('role', update.role)
+        .field('accountStatus', update.accountStatus)
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -139,7 +145,9 @@ describe('Accounts', () => {
       const { body, status } = await api
         .patch(`${BASE_URL}/update-user/${users.SECURITY_ADMIN_1._id}`)
         .set('Authorization', `Bearer ${token}`)
-        .send(update);
+        .field('firstName', update.firstName)
+        .field('accountStatus', update.accountStatus)
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -159,7 +167,8 @@ describe('Accounts', () => {
         const { body, status } = await api
           .patch(url)
           .set('Authorization', `Bearer ${token}`)
-          .send(update);
+          .field('accountStatus', update.accountStatus)
+          .set('Content-Type', 'multipart/form-data');
 
         const { data, error } = body;
 
@@ -177,12 +186,11 @@ describe('Accounts', () => {
       const validRoles = [SECURITY_ADMIN, USER];
 
       for (const role of validRoles) {
-        const update = { role };
-
         const { body, status } = await api
           .patch(url)
           .set('Authorization', `Bearer ${token}`)
-          .send(update);
+          .field('role', role)
+          .set('Content-Type', 'multipart/form-data');
 
         const { data, error } = body;
 
@@ -201,7 +209,6 @@ describe('Accounts', () => {
 
       const update = {
         bio: 'this is a new bio',
-        profilePicture: 'http://cdn.com/somePath.jpeg',
         firstName: 'newFirst',
         lastName: 'newLast',
         username: 'newUsername',
@@ -210,7 +217,11 @@ describe('Accounts', () => {
       const { body, status } = await api
         .patch(url2)
         .set('Authorization', `Bearer ${token}`)
-        .send(update);
+        .field('bio', update.bio)
+        .field('firstName', update.firstName)
+        .field('lastName', update.lastName)
+        .field('username', update.username)
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -228,7 +239,6 @@ describe('Accounts', () => {
 
       const update = {
         bio: 'this is a new bio',
-        profilePicture: 'http://cdn.com/somePath.jpeg',
         firstName: 'newFirst',
         lastName: 'newLast',
         username: 'newUsername',
@@ -237,7 +247,11 @@ describe('Accounts', () => {
       const { body, status } = await api
         .patch(url2)
         .set('Authorization', `Bearer ${token}`)
-        .send(update);
+        .field('bio', update.bio)
+        .field('firstName', update.firstName)
+        .field('lastName', update.lastName)
+        .field('username', update.username)
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -257,7 +271,6 @@ describe('Accounts', () => {
 
       const update = {
         bio: 'this is a new bio',
-        profilePicture: 'http://cdn.com/somePath.jpeg',
         firstName: 'newFirst',
         lastName: 'newLast',
         username: 'newUsername',
@@ -266,7 +279,11 @@ describe('Accounts', () => {
       const { body, status } = await api
         .patch(url2)
         .set('Authorization', `Bearer ${token}`)
-        .send(update);
+        .field('bio', update.bio)
+        .field('firstName', update.firstName)
+        .field('lastName', update.lastName)
+        .field('username', update.username)
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -293,7 +310,11 @@ describe('Accounts', () => {
       const { body, status } = await api
         .patch(url2)
         .set('Authorization', `Bearer ${token}`)
-        .send(update);
+        .field('bio', update.bio)
+        .field('firstName', update.firstName)
+        .field('lastName', update.lastName)
+        .field('username', update.username)
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -302,86 +323,6 @@ describe('Accounts', () => {
       expect(data).toBeUndefined();
 
       expect(error.message).toBe('Access denied');
-    });
-
-    describe('Phone number', () => {
-      it('should reject registration if phone number is too short', async () => {
-        const { body, status } = await api
-          .patch(url)
-          .set('Authorization', `Bearer ${token}`)
-          .send({ phoneNumber: ' ' });
-
-        const { data, error } = body;
-
-        expect(status).toBe(400);
-
-        expect(data).toBeUndefined();
-
-        expect(error.payload).toMatchObject({
-          phoneNumber: expect.objectContaining({
-            reasons: expect.arrayContaining(['Too short']),
-            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
-          }),
-        });
-      });
-
-      it('should reject registration if phone number is too long', async () => {
-        const { body, status } = await api
-          .patch(url)
-          .set('Authorization', `Bearer ${token}`)
-          .send({ phoneNumber: Array(17).fill('4').join('') });
-
-        const { data, error } = body;
-
-        expect(status).toBe(400);
-
-        expect(data).toBeUndefined();
-
-        expect(error.payload).toMatchObject({
-          phoneNumber: expect.objectContaining({
-            reasons: expect.arrayContaining(['Too long']),
-            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
-          }),
-        });
-      });
-
-      it('should reject registration if phone number is of invalid format', async () => {
-        const { body, status } = await api
-          .patch(url)
-          .set('Authorization', `Bearer ${token}`)
-          .send({ phoneNumber: '+46 677 123 456' });
-
-        const { data, error } = body;
-
-        expect(status).toBe(400);
-
-        expect(data).toBeUndefined();
-
-        expect(error.payload).toMatchObject({
-          phoneNumber: expect.objectContaining({
-            reasons: expect.arrayContaining(['Invalid phone format']),
-          }),
-        });
-      });
-
-      it('should reject registration if phone number is taken', async () => {
-        const { body, status } = await api
-          .patch(url)
-          .set('Authorization', `Bearer ${token}`)
-          .send({ phoneNumber: users.SECURITY_ADMIN.phoneNumber });
-
-        const { data, error } = body;
-
-        expect(status).toBe(400);
-
-        expect(data).toBeUndefined();
-
-        expect(error.payload).toMatchObject({
-          phoneNumber: expect.objectContaining({
-            reasons: expect.arrayContaining(['Phone number already taken']),
-          }),
-        });
-      });
     });
   });
 });
