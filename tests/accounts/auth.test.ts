@@ -134,7 +134,6 @@ describe('Auth', () => {
       it('should reject registration if phone number is too short', async () => {
         const { body, status } = await api
           .post(url)
-
           .field('phoneNumber', ' ')
           .set('Content-Type', 'multipart/form-data');
 

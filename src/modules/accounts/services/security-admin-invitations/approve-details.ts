@@ -37,7 +37,7 @@ const approveSecurityAdminDetails = async ({
 
   const { governmentID, profilePicture, ...info } = invitation.details!;
 
-  const { data, error, handleSuccess } = await UserModel.create({
+  const { data, error } = await UserModel.create({
     ...info,
     address: info.address!,
     email: validation.data.email,
@@ -51,8 +51,6 @@ const approveSecurityAdminDetails = async ({
     governmentID,
     profilePicture,
   });
-
-  await handleSuccess();
 
   // TODO: send admin welcome email
   // TODO: delete invitation

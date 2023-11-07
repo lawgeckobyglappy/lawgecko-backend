@@ -197,6 +197,7 @@ function handleFileUpload(inputField: FileInputFields) {
   return ({ context, previousValues }: DetailsSummary) => {
     const outputField = fileInputToOutputMap[inputField];
 
+    // prepare storage(remote/local) location
     const fileInfo = context[inputField],
       path = fileInfo.path,
       filename = path.split('/').at(-1),
@@ -205,7 +206,7 @@ function handleFileUpload(inputField: FileInputFields) {
     // upload to cloud
     fileManager.cutFile(path, newPath);
 
-    // delete previous image if available
+    // delete previous file if available
     if (previousValues?.[outputField])
       fileManager.deleteFile(getPathOnServer(previousValues[outputField]));
 
@@ -221,7 +222,7 @@ function handleFailure(inputField: FileInputFields) {
   return (context: DetailsCtx) => {
     const fileInfo = context[inputField];
 
-    if (fileInfo.path) fileManager.deleteFile(fileInfo.path);
+    fileManager.deleteFile(fileInfo.path);
   };
 }
 

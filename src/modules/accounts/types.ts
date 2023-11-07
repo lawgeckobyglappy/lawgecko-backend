@@ -27,15 +27,16 @@ type InvitationDetailsInput = {
   _profilePicture: FileInfo;
 };
 
-type InvitationDetails = {
-  address: User['address'];
-  bio: User['bio'];
-  firstName: User['firstName'];
-  governmentID: User['governmentID'];
-  lastName: User['lastName'];
-  phoneNumber: User['phoneNumber'];
-  profilePicture: User['profilePicture'];
-};
+type InvitationDetails = Pick<
+  User,
+  | 'address'
+  | 'bio'
+  | 'firstName'
+  | 'governmentID'
+  | 'lastName'
+  | 'phoneNumber'
+  | 'profilePicture'
+>;
 
 const emptyDetails: InvitationDetails = {
   address: null,

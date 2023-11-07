@@ -12,7 +12,6 @@ const router = Router();
 
 const multipartParser = fileManager.parseMultipartData()({
   filesConfig: { governmentID: {}, profilePicture: {} },
-  pathOnly: false,
   uploadDir: 'public/tmp',
 });
 
