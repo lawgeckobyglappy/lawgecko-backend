@@ -1,10 +1,14 @@
-import { getSlug } from '@utils';
+import { generateId, getSlug } from '@utils';
 import { userRepository } from '../repositories';
 
 export * from './auth';
 export * from './errors';
 
-export { generateUsername };
+export { generateUserId, generateUsername };
+
+function generateUserId() {
+  return generateId();
+}
 
 async function generateUsername(name: string) {
   const username = getSlug(name);

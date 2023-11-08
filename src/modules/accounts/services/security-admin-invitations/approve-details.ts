@@ -35,7 +35,10 @@ const approveSecurityAdminDetails = async ({
   if (!invitation)
     return handleError({ message: 'Invitation not found', statusCode: 404 });
 
-  const { governmentID, profilePicture, ...info } = invitation.details!;
+  if (!invitation.details)
+    return handleError({ message: 'Incomplete user details' });
+
+  const { _id, governmentID, profilePicture, ...info } = invitation.details;
 
   const { data, error } = await UserModel.create({
     ...info,
@@ -48,6 +51,7 @@ const approveSecurityAdminDetails = async ({
 
   const user = await userRepository.insertOne({
     ...data,
+    _id,
     governmentID,
     profilePicture,
   });

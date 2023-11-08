@@ -1,26 +1,27 @@
 import Schema from 'clean-schema';
 
-import { generateId } from '@utils';
 import { User, UserAccountStatus, UserInput, UserRoles } from '@types';
 
 import {
-  validateAddress,
+  validateUserAddress,
   validateAuthProvider,
-  validateString,
   validateUrl,
   validateUserAccountStatus,
   validateUserEmail,
   validateUserPhone,
   validateUserRole,
   validateUsername,
+  validateUserBio,
+  validateUserFirstName,
+  validateUserLastName,
 } from '../validators';
-import { generateUsername } from '../utils';
+import { generateUserId, generateUsername } from '../utils';
 
 export { UserModel };
 
 const UserModel = new Schema<UserInput, User>(
   {
-    _id: { constant: true, value: () => generateId() },
+    _id: { constant: true, value: generateUserId },
     accountStatus: {
       default: UserAccountStatus.ACTIVE,
       shouldInit: false,
@@ -31,7 +32,7 @@ const UserModel = new Schema<UserInput, User>(
       required({ context: { address, role } }) {
         return role == UserRoles.SECURITY_ADMIN ? !address : false;
       },
-      validator: validateAddress,
+      validator: validateUserAddress,
     },
     authProviders: {
       default: [],
@@ -43,18 +44,9 @@ const UserModel = new Schema<UserInput, User>(
         return authProviders;
       },
     },
-    bio: {
-      default: '',
-      validator: validateString('Invalid Bio', {
-        minLength: 0,
-        maxLength: 255,
-      }),
-    },
+    bio: { default: '', validator: validateUserBio },
     email: { readonly: true, validator: validateUserEmail },
-    firstName: {
-      required: true,
-      validator: validateString('Invalid first name'),
-    },
+    firstName: { required: true, validator: validateUserFirstName },
     governmentID: {
       default: '',
       readonly: true,
@@ -65,10 +57,7 @@ const UserModel = new Schema<UserInput, User>(
       },
       validator: validateUrl('Invalid Government ID', true),
     },
-    lastName: {
-      default: '',
-      validator: validateString('Invalid last name'),
-    },
+    lastName: { default: '', validator: validateUserLastName },
     phoneNumber: {
       default: '',
       required({ operation, context }) {

@@ -5,6 +5,7 @@ import { config } from '@config';
 import { generateId } from '@utils';
 import { UserAccountStatus, UserRoles } from '@types';
 
+import { generateUserId } from '../utils';
 import {
   SecurityAdminInvitation,
   SecurityAdminInvitationInput,
@@ -14,10 +15,13 @@ import {
   InvitationDetailsInputAlias,
 } from '../types';
 import {
-  validateAddress,
+  validateUserAddress,
   validateEmail,
   validateString,
   validateUserPhone,
+  validateUserLastName,
+  validateUserFirstName,
+  validateUserBio,
 } from '../validators';
 import { userRepository } from '../repositories';
 import { triggerSendSecurityAdminInvitationEmail } from '../jobs';
@@ -71,27 +75,16 @@ const UserDetailsModel = new Schema<
   InvitationDetails,
   InvitationDetailsInputAlias
 >({
-  address: { required: true, validator: validateAddress },
-  bio: {
-    default: '',
-    validator: validateString('Invalid Bio', {
-      minLength: 0,
-      maxLength: 255,
-    }),
-  },
-  firstName: {
-    required: true,
-    validator: validateString('Invalid first name'),
-  },
+  _id: { constant: true, value: generateUserId },
+  address: { required: true, validator: validateUserAddress },
+  bio: { default: '', validator: validateUserBio },
+  firstName: { required: true, validator: validateUserFirstName },
   governmentID: {
     default: '',
     dependsOn: '_governmentID',
     resolver: ({ context: { _governmentID } }) => _governmentID.path,
   },
-  lastName: {
-    default: '',
-    validator: validateString('Invalid last name'),
-  },
+  lastName: { required: true, validator: validateUserLastName },
   phoneNumber: { required: true, validator: validateUserPhone },
   profilePicture: {
     default: '',
@@ -195,25 +188,30 @@ const appDomainAddress = `localhost:${config.port}`,
 
 function handleFileUpload(inputField: FileInputFields) {
   return ({ context, previousValues }: DetailsSummary) => {
-    const outputField = fileInputToOutputMap[inputField];
+    const { _id, [inputField]: fileInfo } = context,
+      outputField = fileInputToOutputMap[inputField];
 
     // prepare storage(remote/local) location
-    const fileInfo = context[inputField],
-      path = fileInfo.path,
+    const path = fileInfo.path,
       filename = path.split('/').at(-1),
-      newPath = `${STATIC_PATH}/security-admin-info/${filename}`;
+      newPath = `${getFolderOnServer(_id)}/${filename}`;
 
     // upload to cloud
     fileManager.cutFile(path, newPath);
 
     // delete previous file if available
-    if (previousValues?.[outputField])
-      fileManager.deleteFile(getPathOnServer(previousValues[outputField]));
+    if (previousValues?.[outputField]) {
+      console.log(
+        'prev path:',
+        getPathOnServer(_id, previousValues[outputField]),
+      );
+      fileManager.deleteFile(getPathOnServer(_id, previousValues[outputField]));
+    }
 
     //  return sanitized values
     return {
       ...fileInfo,
-      path: `${appDomainAddress}/security-admin-info/${filename}`,
+      path: `${getFolderOnServer(_id, appDomainAddress)}/${filename}`,
     };
   };
 }
@@ -227,15 +225,18 @@ function handleFailure(inputField: FileInputFields) {
 }
 
 function onDelete({ details }: SecurityAdminInvitation) {
-  if (!details) return;
-
-  if (details.governmentID)
-    fileManager.deleteFile(getPathOnServer(details.governmentID));
-
-  if (details.profilePicture)
-    fileManager.deleteFile(getPathOnServer(details.profilePicture));
+  if (details) fileManager.deleteFolder(getFolderOnServer(details._id));
 }
 
-function getPathOnServer(path: string) {
-  return `${STATIC_PATH}/${path.split(`${appDomainAddress}/`).at(-1)}`;
+function getFolderOnServer(
+  accountId: InvitationDetails['_id'],
+  basePath = STATIC_PATH,
+) {
+  return `${basePath}/files/accounts/${accountId}`;
+}
+
+function getPathOnServer(accountId: InvitationDetails['_id'], path: string) {
+  return `${getFolderOnServer(accountId)}/${path
+    .split(`${getFolderOnServer(accountId, appDomainAddress)}/`)
+    .at(-1)}`;
 }

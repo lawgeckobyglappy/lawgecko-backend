@@ -14,10 +14,13 @@ import { userRepository } from '../repositories';
 import { validateEmail, validateString } from './shared';
 
 export {
-  validateAddress,
   validateAuthProvider,
   validateUserAccountStatus,
+  validateUserAddress,
+  validateUserBio,
   validateUserEmail,
+  validateUserFirstName,
+  validateUserLastName,
   validateUsername,
   validateUserPhone,
   validateUserRole,
@@ -93,7 +96,7 @@ function validateUserAccountStatus(status: any) {
 
 const countryCodes = getSupportedRegionCodes();
 
-function validateAddress(val: any) {
+function validateUserAddress(val: any) {
   if (!val || !isObject(val))
     return { valid: false, reason: 'Invalid address' };
 
@@ -122,6 +125,21 @@ function validateAddress(val: any) {
       street: (isStreetValid as any).validated,
     },
   };
+}
+
+function validateUserBio(val: any) {
+  return validateString('Invalid Bio', {
+    minLength: 0,
+    maxLength: 255,
+  })(val);
+}
+
+function validateUserFirstName(val: any) {
+  return validateString('Invalid first name')(val);
+}
+
+function validateUserLastName(val: any) {
+  return validateString('Invalid last name')(val);
 }
 
 const enums = UserRolesList.filter((r) => r != UserRoles.SUPER_ADMIN);

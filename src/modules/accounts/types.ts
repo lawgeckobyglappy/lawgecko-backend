@@ -29,6 +29,7 @@ type InvitationDetailsInput = {
 
 type InvitationDetails = Pick<
   User,
+  | '_id'
   | 'address'
   | 'bio'
   | 'firstName'
@@ -38,7 +39,7 @@ type InvitationDetails = Pick<
   | 'profilePicture'
 >;
 
-const emptyDetails: InvitationDetails = {
+const emptyDetails = {
   address: null,
   bio: '',
   firstName: '',
