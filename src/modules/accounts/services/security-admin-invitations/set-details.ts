@@ -12,7 +12,6 @@ const setSecurityAdminInvitationDetails = async (
   details: InvitationDetailsInput,
 ) => {
   let invitation = await SecurityAdminInvitationRepo.findByToken(token);
-
   if (!invitation)
     return handleError({ message: 'Invitation not found', statusCode: 404 });
 

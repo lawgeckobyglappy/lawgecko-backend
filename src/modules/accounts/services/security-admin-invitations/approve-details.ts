@@ -57,7 +57,9 @@ const approveSecurityAdminDetails = async ({
   });
 
   // TODO: send admin welcome email
+
   // TODO: delete invitation
+  await SecurityAdminInvitationRepo.deleteById(id);
 
   return { data: user };
 };

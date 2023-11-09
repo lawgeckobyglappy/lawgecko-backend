@@ -22,6 +22,8 @@ import {
   validateUserLastName,
   validateUserFirstName,
   validateUserBio,
+  validateGovernmentID,
+  validateProfilePicture,
 } from '../validators';
 import { userRepository } from '../repositories';
 import { triggerSendSecurityAdminInvitationEmail } from '../jobs';
@@ -99,7 +101,7 @@ const UserDetailsModel = new Schema<
     sanitizer: handleFileUpload('_governmentID'),
     required: ({ context: { _governmentID, governmentID } }) =>
       !governmentID && !_governmentID,
-    validator: () => true,
+    validator: validateGovernmentID,
   },
   _profilePicture: {
     alias: 'profilePicture',
@@ -108,7 +110,7 @@ const UserDetailsModel = new Schema<
     sanitizer: handleFileUpload('_profilePicture'),
     required: ({ context: { _profilePicture, profilePicture } }) =>
       !profilePicture && !_profilePicture,
-    validator: () => true,
+    validator: validateProfilePicture,
   },
 }).getModel();
 
@@ -200,13 +202,8 @@ function handleFileUpload(inputField: FileInputFields) {
     fileManager.cutFile(path, newPath);
 
     // delete previous file if available
-    if (previousValues?.[outputField]) {
-      console.log(
-        'prev path:',
-        getPathOnServer(_id, previousValues[outputField]),
-      );
+    if (previousValues?.[outputField])
       fileManager.deleteFile(getPathOnServer(_id, previousValues[outputField]));
-    }
 
     //  return sanitized values
     return {

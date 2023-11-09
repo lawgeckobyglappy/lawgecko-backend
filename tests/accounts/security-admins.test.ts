@@ -15,6 +15,7 @@ import { cleanupDp } from '../_utils';
 import { addUsers, users } from '../_utils/users';
 import { expectAuthError, generateToken } from '../_utils/auth';
 import { SecurityAdminInvitationRepo } from '../../src/modules/accounts/repositories/security-admin-invitation';
+import { set } from 'mongoose';
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -266,6 +267,216 @@ describe('Security Admins', () => {
 
         expect(error).toBeUndefined();
         expect(data).toBeDefined();
+      });
+    });
+
+    describe('PATCH /accounts/security-admins/invitations/:token', () => {
+      let setUrl = '';
+      let invitationToken = '';
+      beforeEach(async () => {
+        await api
+          .post(urls.invite)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ email: 'test@mail.com', name: 'test user' });
+
+        invitationToken = (await SecurityAdminInvitationRepo.find()).map(
+          (i) => i.token,
+        )[0];
+
+        setUrl = `${BASE_URL}/${invitationToken}`;
+      });
+
+      it('should accept details if correct information is given', async () => {
+        const { body, status } = await api
+          .patch(setUrl)
+          .field(
+            'address',
+            '{"city": "Bikini Bottom", "country": "CA", "street": "1234 SomeStreet"}',
+          )
+          .field('bio', 'I am a test Security Admin')
+          .field('firstName', 'Spongebob')
+          .field('lastName', 'Squarepants')
+          .field('phoneNumber', '+46 70 712 34 26')
+          .attach('governmentID', './tests/assets/spongeGovID.png')
+          .attach('profilePicture', './tests/assets/spongeGovID.png')
+          .set('Content-Type', 'multipart/form-data');
+
+        const { data, error } = body;
+
+        expect(status).toBe(200);
+
+        expect(data.details).toMatchObject({ firstName: 'Spongebob' });
+
+        expect(error).toBeUndefined();
+      });
+
+      it('should reject details if file size is greater than 5MB', async () => {
+        const { body, status } = await api
+          .patch(setUrl)
+          .field(
+            'address',
+            '{"city": "Bikini Bottom", "country": "CA", "street": "1234 SomeStreet"}',
+          )
+          .field('bio', 'I am a test Security Admin')
+          .field('firstName', 'Spongebob')
+          .field('lastName', 'Squarepants')
+          .field('phoneNumber', '+46 70 712 34 26')
+          .attach('governmentID', './tests/assets/spongeGovID.png')
+          .attach('profilePicture', './tests/assets/largePhoto.jpg') // This photo is 10.2MB
+          .set('Content-Type', 'multipart/form-data');
+
+        const { data, error } = body;
+
+        expect(error.statusCode).toBe(400);
+
+        // Not a good match
+        expect(data).toBeUndefined();
+
+        expect(error.payload.profilePicture.reasons[0]).toMatchObject(
+          'Maximum File Size Exceeded',
+        );
+      });
+
+      it('should reject details if extension is invalid', async () => {
+        const { body, status } = await api
+          .patch(setUrl)
+          .field(
+            'address',
+            '{"city": "Bikini Bottom", "country": "CA", "street": "1234 SomeStreet"}',
+          )
+          .field('bio', 'I am a test Security Admin')
+          .field('firstName', 'Spongebob')
+          .field('lastName', 'Squarepants')
+          .field('phoneNumber', '+46 70 712 34 26')
+          .attach('governmentID', './tests/assets/spongeGovID.png')
+          .attach('profilePicture', './tests/assets/dummy.pdf') // This photo is 10.2MB
+          .set('Content-Type', 'multipart/form-data');
+
+        const { data, error } = body;
+
+        expect(error.statusCode).toBe(400);
+
+        // Not a good match
+        expect(data).toBeUndefined();
+
+        expect(error.payload.profilePicture.reasons[0]).toMatchObject(
+          'Wrong Extension',
+        );
+      });
+    });
+
+    describe('PATCH /accounts/security-admins/invitations/:id/request-changes', () => {
+      let url = '';
+      let invitation;
+      beforeEach(async () => {
+        const {
+          body: { data },
+        } = await api
+          .post(urls.invite)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ email: 'test@mail.com', name: 'test user' });
+
+        invitation = data;
+
+        url = `${BASE_URL}/${invitation._id}/request-changes`;
+      });
+
+      it('accept request changes if correct information is provided', async () => {
+        await SecurityAdminInvitationRepo.updateOne({ _id: invitation._id }, {
+          details: { firstName: 'first', lastName: 'last' },
+        } as any);
+
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            bio: 'Inappropriate bio, please change!',
+            something: 'Just change anything, please!!!!',
+          });
+
+        const { data, error } = body;
+
+        expect(status).toBe(200);
+
+        expect(error).toBeUndefined();
+
+        expect(data.changesRequested).toMatchObject({
+          bio: 'Inappropriate bio, please change!',
+        });
+
+        expect(data.changesRequested.something).toBeUndefined();
+      });
+
+      it('reject request changes if the invitation does not have details', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            bio: 'Inappropriate bio, please change!',
+            something: 'Just change anything, please!!!!',
+          });
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.payload.changesRequested.reasons[0]).toBe(
+          'validation failed',
+        );
+      });
+
+      it('reject request changes if changesRequested is an empty object', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send('');
+
+        const { data, error } = body;
+
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.message).toBe('VALIDATION_ERROR');
+      });
+
+      it('reject request changes if the invitation is not found', async () => {
+        const { body, status } = await api
+          .patch(`${BASE_URL}/1/request-changes`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            bio: 'Inappropriate bio, please change!',
+            something: 'Just change anything, please!!!!',
+          });
+
+        const { data, error } = body;
+
+        expect(status).toBe(404);
+
+        expect(data).toBeUndefined();
+
+        expect(error.message).toBe('Invitation not found');
+      });
+
+      it('reject request changes if the user is not a super admin', async () => {
+        const otherToken = generateToken({ user: users.ACTIVE_USER });
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${otherToken}`)
+          .send({
+            bio: 'Inappropriate bio, please change!',
+            something: 'Just change anything, please!!!!',
+          });
+
+        const { data, error } = body;
+
+        expect(status).toBe(403);
+
+        expect(data).toBeUndefined();
+
+        expect(error.message).toBe('Access denied');
       });
     });
   });

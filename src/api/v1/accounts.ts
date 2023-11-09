@@ -13,6 +13,7 @@ const router = Router();
 const multipartParser = fileManager.parseMultipartData()({
   filesConfig: { governmentID: {}, profilePicture: {} },
   uploadDir: 'public/tmp',
+  maxSize: Infinity,
 });
 
 // security admin creation

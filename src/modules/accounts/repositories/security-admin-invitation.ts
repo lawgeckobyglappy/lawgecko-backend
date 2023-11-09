@@ -7,9 +7,9 @@ export { SecurityAdminInvitationRepo };
 const schema = new Schema<SecurityAdminInvitation>(
   {
     _id: { type: String, required: true },
-    details: { type: Object, default: null },
     changesRequested: { type: Object, default: null },
     createdBy: { type: String },
+    details: { type: Object, default: null },
     email: { type: String },
     name: { type: String },
     token: { type: String },
@@ -41,4 +41,6 @@ const SecurityAdminInvitationRepo = {
       .lean() as Promise<SecurityAdminInvitation>;
   },
   deleteById: (_id: string) => dbModel.deleteOne({ _id }).lean(),
+  detailsNullById: (_id: string) =>
+    dbModel.findOneAndUpdate({ _id }, { details: null }).lean(),
 };
