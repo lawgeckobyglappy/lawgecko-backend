@@ -1,6 +1,6 @@
+import { handleError } from '@utils';
 import { UserInput, UserRoles } from '@types';
 
-import { handleError } from '../../utils';
 import { UserModel } from '../../entities';
 import { userRepository } from '../../repositories';
 

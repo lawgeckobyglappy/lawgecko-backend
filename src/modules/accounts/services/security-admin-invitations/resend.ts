@@ -1,9 +1,9 @@
 import { sanitize } from 'apitoolz';
 import { AuthInfo, UserRoles } from '@types';
+import { handleAuthError, handleError } from '@utils';
 
 import { SecurityAdminInvitation } from '../../types';
-import { handleAuthError, handleError } from '../../utils';
-import { SecurityAdminInvitationModel } from '../../entities/security-admin-invitation';
+import { SecurityAdminInvitationModel } from '../../entities/users/security-admin-invitation';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
 
 export { resendSecurityAdminInvitation };
@@ -23,9 +23,12 @@ const resendSecurityAdminInvitation = async (
 
   if (error) return handleError(error);
 
-  await SecurityAdminInvitationRepo.updateOne({ _id: id }, data);
+  const updated = await SecurityAdminInvitationRepo.updateOne(
+    { _id: id },
+    data,
+  );
 
   await handleSuccess();
 
-  return { data: sanitize({ ...invitation, ...data }, { remove: 'token' }) };
+  return { data: sanitize(updated, { remove: 'token' }) };
 };

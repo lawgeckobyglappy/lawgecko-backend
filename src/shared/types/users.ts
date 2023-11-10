@@ -1,3 +1,5 @@
+import { type FileInfo } from 'apitoolz';
+
 export {
   UserAccountStatusList,
   AuthProvidersList,
@@ -13,6 +15,7 @@ export type {
   AuthProvider,
   User,
   UserInput,
+  UserInputAlias,
   IUserAccountStatus,
   UserRole,
   LoginLink,
@@ -63,20 +66,25 @@ const UserRolesList = Object.values(UserRoles) as UserRole[];
 const AuthProvidersList = ['google'] as const;
 type AuthProvider = (typeof AuthProvidersList)[number];
 
+type UserInputAlias = {
+  governmentID: FileInfo;
+  profilePicture: FileInfo;
+};
+
 type UserInput = {
   accountStatus: IUserAccountStatus;
   address: Address;
   bio: string;
   email: string;
   firstName: string;
-  governmentID: string;
   lastName: string;
   phoneNumber: string;
-  profilePicture: string;
   role: UserRole;
   username: string;
 
   _addAuthProvider: AuthProvider;
+  _governmentID: FileInfo;
+  _profilePicture: FileInfo;
 };
 
 type User = {
