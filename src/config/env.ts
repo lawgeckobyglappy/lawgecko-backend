@@ -17,70 +17,75 @@ const currentDeployment = {
   isTest: NODE_ENV == DEPLOYMENT_MODE.TEST,
 };
 
-const constants = loadVariables({
-  DEFAULT_EMAIL_USER: {
-    required: currentDeployment.isProduction,
-    default: '',
-  },
-  DEFAULT_EMAIL_PASSWORD: {
-    required: currentDeployment.isProduction,
-    default: '',
-  },
-  DEFAULT_EMAIL_SERVICE: {
-    required: currentDeployment.isProduction,
-    default: '',
-  },
+const constants = loadVariables(
+  {
+    DEFAULT_EMAIL_USER: {
+      required: currentDeployment.isProduction,
+      default: '',
+    },
+    DEFAULT_EMAIL_PASSWORD: {
+      required: currentDeployment.isProduction,
+      default: '',
+    },
+    DEFAULT_EMAIL_SERVICE: {
+      required: currentDeployment.isProduction,
+      default: '',
+    },
 
-  FRONTEND_URL: {
-    required: currentDeployment.isProduction,
-    default: 'http://localhost:5000',
-  },
+    FRONTEND_URL: {
+      required: currentDeployment.isProduction,
+      default: 'http://localhost:5000',
+    },
 
-  GOOGLE_AUTH_CLIENT_ID: {
-    required: currentDeployment.isProduction,
-    default: '',
-  },
-  GOOGLE_AUTH_CLIENT_SECRET: {
-    required: currentDeployment.isProduction,
-    default: '',
-  },
+    GOOGLE_AUTH_CLIENT_ID: {
+      required: currentDeployment.isProduction,
+      default: '',
+    },
+    GOOGLE_AUTH_CLIENT_SECRET: {
+      required: currentDeployment.isProduction,
+      default: '',
+    },
 
-  JWT_SECRET: {
-    required: currentDeployment.isProduction,
-    default: 'test-secret',
-  },
-  JWT_ACCESS_EXPIRATION_HOURS: {
-    required: currentDeployment.isProduction,
-    default: 168,
-    parser: (v) => parseFloat(v ?? '168'),
-  },
-  ADMIN_JWT_ACCESS_EXPIRATION_HOURS: {
-    required: currentDeployment.isProduction,
-    default: 2,
-    parser: (v) => parseFloat(v ?? '2'),
-  },
+    JWT_SECRET: {
+      required: currentDeployment.isProduction,
+      default: 'test-secret',
+    },
+    JWT_ACCESS_EXPIRATION_HOURS: {
+      required: currentDeployment.isProduction,
+      default: 168,
+      parser: (v: any) => parseFloat(v ?? '168'),
+    },
+    ADMIN_JWT_ACCESS_EXPIRATION_HOURS: {
+      required: currentDeployment.isProduction,
+      default: currentDeployment.isDev ? 168 : 2,
+      parser: (v: any) => parseFloat(v ?? '2'),
+    },
 
-  LOGIN_LINK_EXPIRATION_MINUTES: {
-    required: currentDeployment.isProduction,
-    default: 15,
-    parser: (v) => parseFloat(v ?? '15'),
-  },
+    LOGIN_LINK_EXPIRATION_MINUTES: {
+      required: currentDeployment.isProduction,
+      default: 15,
+      parser: (v: any) => parseFloat(v ?? '15'),
+    },
 
-  SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES: {
-    required: currentDeployment.isProduction,
-    default: 15,
-    parser: (v) => parseFloat(v ?? '15'),
-  },
+    MONGODB_URI: { required: !currentDeployment.isTest, default: '' },
 
-  MONGODB_URI: { required: !currentDeployment.isTest, default: '' },
-
-  PINO_LOG_LEVEL: 'info',
-  PORT: {
-    required: currentDeployment.isProduction,
-    default: () => (currentDeployment.isTest ? 0 : 5000),
-    parser: (v) => (currentDeployment.isTest ? 0 : v),
+    PINO_LOG_LEVEL: 'info',
+    PORT: {
+      required: currentDeployment.isProduction,
+      default: () => (currentDeployment.isTest ? 0 : 5000),
+      parser: (v: any) => (currentDeployment.isTest ? 0 : Number(v)),
+    },
   },
-});
+  {
+    transform(v) {
+      return {
+        ...v,
+        STATIC_PATH: 'public/static',
+        TEMPORARY_FILE_UPLOAD_PATH: 'public/tmp',
+      };
+    },
+  },
+);
 
 export const config = {
   authProviders: {
@@ -100,10 +105,10 @@ export const config = {
   port: constants.PORT,
   db: { dbURI: constants.MONGODB_URI! },
   LOGIN_LINK_EXPIRATION_MINUTES: constants.LOGIN_LINK_EXPIRATION_MINUTES,
-  SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES:
-    constants.SECURITY_ADMIN_INVITATION_EXPIRATION_MINUTES,
+  STATIC_PATH: constants.STATIC_PATH,
+  TEMPORARY_FILE_UPLOAD_PATH: constants.TEMPORARY_FILE_UPLOAD_PATH,
   jwt: {
-    JWT_SECRET: constants.JWT_SECRET ?? 'test-secret',
+    JWT_SECRET: constants.JWT_SECRET,
     JWT_ACCESS_EXPIRATION_HOURS: constants.JWT_ACCESS_EXPIRATION_HOURS,
     ADMIN_JWT_ACCESS_EXPIRATION_HOURS:
       constants.ADMIN_JWT_ACCESS_EXPIRATION_HOURS,

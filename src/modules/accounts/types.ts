@@ -1,9 +1,35 @@
+import { type FileInfo } from 'apitoolz';
+
 import { User } from '@types';
 
-export { SecurityAdminInvitation, SecurityAdminInvitationInput };
+export {
+  FileInfo,
+  InvitationDetails,
+  InvitationDetailsInputAlias,
+  InvitationDetailsInput,
+  SecurityAdminInvitation,
+  SecurityAdminInvitationInput,
+};
 
-type UserDetails = Pick<
+type InvitationDetailsInputAlias = {
+  governmentID: FileInfo;
+  profilePicture: FileInfo;
+};
+
+type InvitationDetailsInput = {
+  address: User['address'];
+  bio: User['bio'];
+  firstName: User['firstName'];
+  lastName: User['lastName'];
+  phoneNumber: User['phoneNumber'];
+
+  _governmentID: FileInfo;
+  _profilePicture: FileInfo;
+};
+
+type InvitationDetails = Pick<
   User,
+  | '_id'
   | 'address'
   | 'bio'
   | 'firstName'
@@ -13,7 +39,7 @@ type UserDetails = Pick<
   | 'profilePicture'
 >;
 
-const emptyDetails: UserDetails = {
+const emptyDetails = {
   address: null,
   bio: '',
   firstName: '',
@@ -25,12 +51,12 @@ const emptyDetails: UserDetails = {
 
 export const SECURITY_ADMIN_INVITATION_DETAILS_KEYS = Object.keys(emptyDetails);
 
-type ChangesRequested = { [K in keyof UserDetails]?: string };
+type ChangesRequested = { [K in keyof InvitationDetails]?: string };
 
 type SecurityAdminInvitationInput = {
   changesRequested: ChangesRequested | null;
   createdBy: User['_id'];
-  details: UserDetails;
+  details: InvitationDetails;
   email: string;
   name: string;
 
@@ -42,9 +68,8 @@ type SecurityAdminInvitation = {
   changesRequested: ChangesRequested | null;
   createdAt: Date;
   createdBy: User['_id'];
-  details: UserDetails | null;
+  details: InvitationDetails | null;
   email: string;
-  expiresAt: Date;
   name: string;
   token: string;
   updatedAt: Date;

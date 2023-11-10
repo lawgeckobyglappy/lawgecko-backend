@@ -1,9 +1,11 @@
 import { sanitize } from 'apitoolz';
+
 import { AuthInfo, UserRoles } from '@types';
+import { handleAuthError, handleError } from '@utils';
 
 import { SecurityAdminInvitation } from '../../types';
-import { handleAuthError, handleError } from '../../utils';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
+import { SecurityAdminInvitationModel } from '../../entities/users/security-admin-invitation';
 
 export { deleteSecurityAdminInvitation };
 
@@ -22,6 +24,8 @@ const deleteSecurityAdminInvitation = async (
 
   if (results.deletedCount == 0)
     return handleError({ message: 'An error occurred' });
+
+  await SecurityAdminInvitationModel.delete(invitation);
 
   return { data: sanitize(invitation, { remove: 'token' }) };
 };

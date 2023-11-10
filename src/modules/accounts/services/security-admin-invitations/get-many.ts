@@ -1,7 +1,8 @@
 import { sanitize } from 'apitoolz';
+
+import { handleAuthError } from '@utils';
 import { AuthInfo, UserRoles } from '@types';
 
-import { handleAuthError } from '../../utils';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
 
 export { getSecurityAdminInvitations };

@@ -9,8 +9,8 @@ dependencies:
     specifier: ^6.3.0
     version: 6.3.0
   apitoolz:
-    specifier: ^0.3.16
-    version: 0.3.16
+    specifier: ^0.3.26
+    version: 0.3.26
   awesome-phonenumber:
     specifier: ^6.1.0
     version: 6.2.0
@@ -20,9 +20,9 @@ dependencies:
   cors:
     specifier: ^2.8.5
     version: 2.8.5
-  dayjs:
-    specifier: ^1.11.9
-    version: 1.11.10
+  date-fns:
+    specifier: ^2.30.0
+    version: 2.30.0
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
@@ -723,6 +723,13 @@ packages:
       tslib: 2.6.2
     dev: false
     optional: true
+
+  /@babel/runtime@7.23.2:
+    resolution: {integrity: sha512-mM8eg4yl5D6i3lu2QKPuPH4FArvJ8KhTofbE7jwMUv9KX5mBvwPAqnV3MlyBNqdp9RyRKP6Yck8TrfYrPvX3bg==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.14.0
+    dev: false
 
   /@bcoe/v8-coverage@0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
@@ -2051,8 +2058,8 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /apitoolz@0.3.16:
-    resolution: {integrity: sha512-fxeNt5MC9FxGz5sYDRXRl75/idiyBAAdJOfDppyY9G5Wv6xxQqdOxG2wBHhw4sR4tFQP52fa/RBxEppqss6WgQ==}
+  /apitoolz@0.3.26:
+    resolution: {integrity: sha512-awfXdpwjkYxrbMjR091ge6aYuqVUFYyBkUDjC0qc5TEVIT5s6YNt1dZiDBfuSc1IoJF8K9o1TIf1b6d6N3GNJQ==}
     dependencies:
       formidable: 2.1.2
     dev: false
@@ -2511,6 +2518,13 @@ packages:
       which: 2.0.2
     dev: true
 
+  /date-fns@2.30.0:
+    resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
+    engines: {node: '>=0.11'}
+    dependencies:
+      '@babel/runtime': 7.23.2
+    dev: false
+
   /date.js@0.3.3:
     resolution: {integrity: sha512-HgigOS3h3k6HnW011nAb43c5xx5rBXk8P2v/WIT9Zv4koIaVXiH2BURguI78VVp+5Qc076T7OR378JViCnZtBw==}
     dependencies:
@@ -2522,10 +2536,6 @@ packages:
   /dateformat@4.6.3:
     resolution: {integrity: sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==}
     dev: true
-
-  /dayjs@1.11.10:
-    resolution: {integrity: sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==}
-    dev: false
 
   /debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -4856,6 +4866,10 @@ packages:
   /real-require@0.2.0:
     resolution: {integrity: sha512-57frrGM/OCTLqLOAh0mhVA9VBMHd+9U7Zb2THMGdBUoZVOtGbJzjxsYGDJ3A9AYYCP4hn6y1TVbaOfzWtm5GFg==}
     engines: {node: '>= 12.13.0'}
+    dev: false
+
+  /regenerator-runtime@0.14.0:
+    resolution: {integrity: sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==}
     dev: false
 
   /regexp.prototype.flags@1.5.1:

@@ -16,11 +16,9 @@ import {
 } from '../../src/modules/accounts/repositories';
 
 import { cleanupDp } from '../_utils';
-import { expectAuthError, generateToken } from '../_utils/auth';
 import { addUsers, users } from '../_utils/users';
-import { UserAccountStatus, UserRoles } from '../../src/shared/types';
-
-const { SECURITY_ADMIN } = UserRoles;
+import { UserAccountStatus } from '../../src/shared/types';
+import { expectAuthError, generateToken } from '../_utils/auth';
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -47,15 +45,16 @@ describe('Auth', () => {
     const url = `${BASE_URL}/register`;
 
     it('should allow users to register if correct infomation is provided', async () => {
-      const { body, status } = await api.post(url).send({
-        email: '1@1.com ',
-        firstName: ' test',
-        lastName: 'user',
-        username: 'test-user',
-        accountStatus: 'blocked',
-        role: 'admin',
-        phoneNumber: '+46 70 712 34 26',
-      });
+      const { body, status } = await api
+        .post(url)
+        .field('email', '1@1.com ')
+        .field('firstName', ' test')
+        .field('lastName', 'user')
+        .field('username', 'test-user')
+        .field('accountStatus', 'blocked')
+        .field('role', 'admin')
+        .field('phoneNumber', '+46 70 712 34 26')
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -74,12 +73,13 @@ describe('Auth', () => {
     });
 
     it('should reject registration if invalid data is provided', async () => {
-      const { body, status } = await api.post(url).send({
-        email: ' ',
-        firstName: '  ',
-        lastName: ' ',
-        username: ' ',
-      });
+      const { body, status } = await api
+        .post(url)
+        .field('email', ' ')
+        .field('firstName', '  ')
+        .field('lastName', ' ')
+        .field('username', ' ')
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -106,12 +106,13 @@ describe('Auth', () => {
     it('should reject registration if email or user name provided are already taken', async () => {
       const existingUser = users.ACTIVE_USER;
 
-      const { body, status } = await api.post(url).send({
-        email: existingUser.email,
-        firstName: ' test',
-        lastName: 'user',
-        username: existingUser.username,
-      });
+      const { body, status } = await api
+        .post(url)
+        .field('email', existingUser.email)
+        .field('firstName', ' test')
+        .field('lastName', 'user')
+        .field('username', existingUser.username)
+        .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
 
@@ -131,7 +132,10 @@ describe('Auth', () => {
 
     describe('Phone number', () => {
       it('should reject registration if phone number is too short', async () => {
-        const { body, status } = await api.post(url).send({ phoneNumber: ' ' });
+        const { body, status } = await api
+          .post(url)
+          .field('phoneNumber', ' ')
+          .set('Content-Type', 'multipart/form-data');
 
         const { data, error } = body;
 
@@ -150,7 +154,8 @@ describe('Auth', () => {
       it('should reject registration if phone number is too long', async () => {
         const { body, status } = await api
           .post(url)
-          .send({ phoneNumber: Array(17).fill('4').join('') });
+          .field('phoneNumber', Array(17).fill('4').join(''))
+          .set('Content-Type', 'multipart/form-data');
 
         const { data, error } = body;
 
@@ -169,7 +174,8 @@ describe('Auth', () => {
       it('should reject registration if phone number is taken', async () => {
         const { body, status } = await api
           .post(url)
-          .send({ phoneNumber: users.ACTIVE_USER.phoneNumber });
+          .field('phoneNumber', users.ACTIVE_USER.phoneNumber)
+          .set('Content-Type', 'multipart/form-data');
 
         const { data, error } = body;
 
@@ -320,103 +326,6 @@ describe('Auth', () => {
       expect(error).toBeUndefined();
 
       expect(data).toMatchObject(user);
-    });
-  });
-
-  describe('POST /accounts/security-admin', () => {
-    let token = '';
-
-    const url = `${BASE_URL}/security-admin`;
-
-    it.todo(
-      'should allow Super Admins to create Security Admins if correct information is provided',
-      async () => {
-        token = generateToken({ user: users.SUPER_ADMIN });
-
-        const input = {
-          email: 'secadmin1@gmail.com',
-          firstName: 'John Doe',
-          lastName: 'John Doe',
-          username: 'john-sys',
-          phoneNumber: '+1 2813450560',
-          governmentID: 'http://cdn.com/somewhere.png',
-          address: {
-            city: 'Boston',
-            country: 'US',
-            street: 'North Main St',
-          },
-        };
-
-        const { body, status } = await api
-          .post(url)
-          .set('Authorization', `Bearer ${token}`)
-          .send(input);
-
-        const { data, error } = body;
-
-        expect(status).toBe(200);
-
-        expect(error).toBeUndefined();
-
-        expect(data).toMatchObject({
-          ...input,
-          phoneNumber: '+1 281-345-0560',
-          profilePicture: '',
-          bio: '',
-          role: SECURITY_ADMIN,
-        });
-      },
-    );
-
-    it.todo(
-      'should not allow Security Admins to create Security Admins',
-      async () => {
-        token = generateToken({ user: users.SECURITY_ADMIN });
-
-        const { body, status } = await api
-          .post(url)
-          .set('Authorization', `Bearer ${token}`)
-          .send({
-            email: 'secadmin1@gmail.com',
-            firstName: 'John Doe',
-            lastName: 'John Doe',
-            username: 'john-sys',
-            phoneNumber: '+1 2813450560',
-            governmentID: 'somewhere.png',
-          });
-
-        const { data, error } = body;
-
-        expect(status).toBe(403);
-
-        expect(error.message).toMatchObject('Access denied');
-
-        expect(data).toBeUndefined();
-      },
-    );
-
-    it.todo('should not allow users to create Security Admins', async () => {
-      token = generateToken({ user: users.ACTIVE_USER });
-
-      const { body, status } = await api
-        .post(url)
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          email: 'sysadmin1@gmail.com',
-          firstName: 'John Doe',
-          lastName: 'John Doe',
-          username: 'john-sys',
-          phoneNumber: '+1 2813450560',
-          governmentID: 'somewhere.png',
-        });
-
-      const { data, error } = body;
-
-      expect(status).toBe(403);
-
-      expect(error.message).toMatchObject('Access denied');
-
-      expect(data).toBeUndefined();
     });
   });
 

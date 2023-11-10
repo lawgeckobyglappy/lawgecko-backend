@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { UserRole } from '@types';
-import { handleAuthError, parseAuth } from '../../modules/accounts/utils';
+import { parseAuth } from '../../modules/accounts/utils';
+import { handleAuthError } from '../utils/errors';
 
 export { requireAuth };
 
