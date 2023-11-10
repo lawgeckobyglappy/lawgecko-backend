@@ -78,7 +78,11 @@ const constants = loadVariables(
   },
   {
     transform(v) {
-      return { ...v, STATIC_PATH: 'public/static' };
+      return {
+        ...v,
+        STATIC_PATH: 'public/static',
+        TEMPORARY_FILE_UPLOAD_PATH: 'public/tmp',
+      };
     },
   },
 );
@@ -102,6 +106,7 @@ export const config = {
   db: { dbURI: constants.MONGODB_URI! },
   LOGIN_LINK_EXPIRATION_MINUTES: constants.LOGIN_LINK_EXPIRATION_MINUTES,
   STATIC_PATH: constants.STATIC_PATH,
+  TEMPORARY_FILE_UPLOAD_PATH: constants.TEMPORARY_FILE_UPLOAD_PATH,
   jwt: {
     JWT_SECRET: constants.JWT_SECRET,
     JWT_ACCESS_EXPIRATION_HOURS: constants.JWT_ACCESS_EXPIRATION_HOURS,

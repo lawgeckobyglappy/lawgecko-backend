@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { fileManager } from 'apitoolz';
 
+import { config } from '@config';
 import { UserRoles } from '@types';
 import { requireAuth } from '@middlewares';
 
@@ -12,7 +13,7 @@ const router = Router();
 
 const multipartParser = fileManager.parseMultipartData()({
   filesConfig: { governmentID: {}, profilePicture: {} },
-  uploadDir: 'public/tmp',
+  uploadDir: config.TEMPORARY_FILE_UPLOAD_PATH,
   maxSize: Infinity,
 });
 

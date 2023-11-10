@@ -1,11 +1,11 @@
 import { sanitize } from 'apitoolz';
 import { VALIDATION_ERRORS } from 'clean-schema';
 
+import { handleAuthError, handleError } from '@utils';
 import { AuthInfo, UserInput, UserRoles } from '@types';
 
 import { UserModel } from '../entities';
 import { userRepository } from '../repositories';
-import { handleAuthError, handleError } from '../utils';
 
 export { updateUser };
 

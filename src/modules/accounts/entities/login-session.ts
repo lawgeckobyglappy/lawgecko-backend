@@ -4,8 +4,7 @@ import { Schema, isBooleanOk } from 'clean-schema';
 import { config } from '@config';
 import { generateId } from '@utils';
 import { LoginSession, LoginSessionInput } from '@types';
-
-import { validateString } from '../validators';
+import { validateString } from 'src/shared/validators';
 
 const { JWT_ACCESS_EXPIRATION_HOURS } = config.jwt;
 

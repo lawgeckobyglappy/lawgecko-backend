@@ -1,11 +1,11 @@
 import { fileManager } from 'apitoolz';
-import { Context, Schema, Summary, isEqual, isObject } from 'clean-schema';
+import { Schema, Summary, isEqual, isObject } from 'clean-schema';
 
-import { config } from '@config';
 import { generateId } from '@utils';
 import { UserAccountStatus, UserRoles } from '@types';
+import { validateEmail, validateString } from 'src/shared/validators';
 
-import { generateUserId } from '../utils';
+import { generateUserId } from '../../utils';
 import {
   SecurityAdminInvitation,
   SecurityAdminInvitationInput,
@@ -13,21 +13,20 @@ import {
   InvitationDetailsInput,
   InvitationDetails,
   InvitationDetailsInputAlias,
-} from '../types';
+} from '../../types';
 import {
   validateUserAddress,
-  validateEmail,
-  validateString,
   validateUserPhone,
   validateUserLastName,
   validateUserFirstName,
   validateUserBio,
   validateGovernmentID,
   validateProfilePicture,
-} from '../validators';
-import { userRepository } from '../repositories';
-import { triggerSendSecurityAdminInvitationEmail } from '../jobs';
-import { SecurityAdminInvitationRepo } from '../repositories/security-admin-invitation';
+} from '../../validators';
+import { userRepository } from '../../repositories';
+import { triggerSendSecurityAdminInvitationEmail } from '../../jobs';
+import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
+import { getFolderOnServer, handleFailure, handleFileUpload } from './utils';
 
 export { SecurityAdminInvitationModel, UserDetailsModel };
 
@@ -65,8 +64,6 @@ const SecurityAdminInvitationModel = new Schema<
   { onDelete },
 ).getModel();
 
-type DetailsCtx = Context<InvitationDetailsInput, InvitationDetails>;
-type DetailsSummary = Summary<InvitationDetailsInput, InvitationDetails>;
 type InvitationSummary = Summary<
   SecurityAdminInvitationInput,
   SecurityAdminInvitation
@@ -178,62 +175,6 @@ async function validateSuperAdminId(val: any) {
   return isValid;
 }
 
-type FileInputFields = '_governmentID' | '_profilePicture';
-
-const fileInputToOutputMap = {
-  _governmentID: 'governmentID',
-  _profilePicture: 'profilePicture',
-} as const;
-
-const appDomainAddress = `localhost:${config.port}`,
-  STATIC_PATH = config.STATIC_PATH;
-
-function handleFileUpload(inputField: FileInputFields) {
-  return ({ context, previousValues }: DetailsSummary) => {
-    const { _id, [inputField]: fileInfo } = context,
-      outputField = fileInputToOutputMap[inputField];
-
-    // prepare storage(remote/local) location
-    const path = fileInfo.path,
-      filename = path.split('/').at(-1),
-      newPath = `${getFolderOnServer(_id)}/${filename}`;
-
-    // upload to cloud
-    fileManager.cutFile(path, newPath);
-
-    // delete previous file if available
-    if (previousValues?.[outputField])
-      fileManager.deleteFile(getPathOnServer(_id, previousValues[outputField]));
-
-    //  return sanitized values
-    return {
-      ...fileInfo,
-      path: `${getFolderOnServer(_id, appDomainAddress)}/${filename}`,
-    };
-  };
-}
-
-function handleFailure(inputField: FileInputFields) {
-  return (context: DetailsCtx) => {
-    const fileInfo = context[inputField];
-
-    fileManager.deleteFile(fileInfo.path);
-  };
-}
-
 function onDelete({ details }: SecurityAdminInvitation) {
   if (details) fileManager.deleteFolder(getFolderOnServer(details._id));
-}
-
-function getFolderOnServer(
-  accountId: InvitationDetails['_id'],
-  basePath = STATIC_PATH,
-) {
-  return `${basePath}/files/accounts/${accountId}`;
-}
-
-function getPathOnServer(accountId: InvitationDetails['_id'], path: string) {
-  return `${getFolderOnServer(accountId)}/${path
-    .split(`${getFolderOnServer(accountId, appDomainAddress)}/`)
-    .at(-1)}`;
 }

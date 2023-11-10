@@ -1,13 +1,13 @@
 import { ERRORS, isObject } from 'clean-schema';
 
 import { AuthInfo, UserRoles } from '@types';
+import { handleAuthError, handleError } from '@utils';
+import { validateEmail, validateString } from 'src/shared/validators';
 
 import { UserModel } from '../../entities';
 import { userRepository } from '../../repositories';
 import { SecurityAdminInvitation } from '../../types';
-import { handleAuthError, handleError } from '../../utils';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
-import { validateEmail, validateString } from '../../validators';
 
 export { approveSecurityAdminDetails };
 
@@ -58,7 +58,6 @@ const approveSecurityAdminDetails = async ({
 
   // TODO: send admin welcome email
 
-  // TODO: delete invitation
   await SecurityAdminInvitationRepo.deleteById(id);
 
   return { data: user };

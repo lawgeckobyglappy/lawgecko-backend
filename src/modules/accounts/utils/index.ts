@@ -2,7 +2,6 @@ import { generateId, getSlug } from '@utils';
 import { userRepository } from '../repositories';
 
 export * from './auth';
-export * from './errors';
 
 export { generateUserId, generateUsername };
 

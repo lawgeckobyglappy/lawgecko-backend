@@ -1,8 +1,9 @@
 import { sanitize } from 'apitoolz';
 
-import { handleError } from '../../utils';
+import { handleError } from '@utils';
+
 import { InvitationDetailsInput, SecurityAdminInvitation } from '../../types';
-import { UserDetailsModel } from '../../entities/security-admin-invitation';
+import { UserDetailsModel } from '../../entities/users/security-admin-invitation';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
 
 export { setSecurityAdminInvitationDetails };

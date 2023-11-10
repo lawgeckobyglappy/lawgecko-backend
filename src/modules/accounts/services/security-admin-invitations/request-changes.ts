@@ -1,10 +1,10 @@
 import { sanitize } from 'apitoolz';
 
 import { AuthInfo, UserRoles } from '@types';
+import { handleAuthError, handleError } from '@utils';
 
 import { SecurityAdminInvitation } from '../../types';
-import { handleAuthError, handleError } from '../../utils';
-import { SecurityAdminInvitationModel } from '../../entities/security-admin-invitation';
+import { SecurityAdminInvitationModel } from '../../entities/users/security-admin-invitation';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
 
 export { requestAdminInvitationDetailsChanges };

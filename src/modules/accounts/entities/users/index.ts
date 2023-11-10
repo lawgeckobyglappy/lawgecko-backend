@@ -1,11 +1,17 @@
 import Schema from 'clean-schema';
+import { fileManager } from 'apitoolz';
 
-import { User, UserAccountStatus, UserInput, UserRoles } from '@types';
+import {
+  User,
+  UserAccountStatus,
+  UserInput,
+  UserInputAlias,
+  UserRoles,
+} from '@types';
 
 import {
   validateUserAddress,
   validateAuthProvider,
-  validateUrl,
   validateUserAccountStatus,
   validateUserEmail,
   validateUserPhone,
@@ -14,12 +20,15 @@ import {
   validateUserBio,
   validateUserFirstName,
   validateUserLastName,
-} from '../validators';
-import { generateUserId, generateUsername } from '../utils';
+  validateGovernmentID,
+  validateProfilePicture,
+} from '../../validators';
+import { generateUserId, generateUsername } from '../../utils';
+import { getFolderOnServer, handleFailure, handleFileUpload } from './utils';
 
 export { UserModel };
 
-const UserModel = new Schema<UserInput, User>(
+const UserModel = new Schema<UserInput, User, UserInputAlias>(
   {
     _id: { constant: true, value: generateUserId },
     accountStatus: {
@@ -49,13 +58,8 @@ const UserModel = new Schema<UserInput, User>(
     firstName: { required: true, validator: validateUserFirstName },
     governmentID: {
       default: '',
-      readonly: true,
-      required({ operation, context: { role, governmentID } }) {
-        return role == UserRoles.SECURITY_ADMIN
-          ? operation == 'update' && !governmentID
-          : false;
-      },
-      validator: validateUrl('Invalid Government ID', true),
+      dependsOn: '_governmentID',
+      resolver: ({ context: { _governmentID } }) => _governmentID.path,
     },
     lastName: { default: '', validator: validateUserLastName },
     phoneNumber: {
@@ -71,7 +75,8 @@ const UserModel = new Schema<UserInput, User>(
     },
     profilePicture: {
       default: '',
-      validator: validateUrl('Invalid profile picture', true),
+      dependsOn: '_profilePicture',
+      resolver: ({ context: { _profilePicture } }) => _profilePicture.path,
     },
     role: { readonly: true, validator: validateUserRole },
     username: {
@@ -84,6 +89,37 @@ const UserModel = new Schema<UserInput, User>(
     },
 
     _addAuthProvider: { virtual: true, validator: validateAuthProvider },
+    _governmentID: {
+      alias: 'governmentID',
+      virtual: true,
+      onFailure: handleFailure('_governmentID'),
+      sanitizer: handleFileUpload('_governmentID'),
+      required({ operation, context: { role, _governmentID, governmentID } }) {
+        if (role == UserRoles.USER) return false;
+
+        return operation == 'update' && !governmentID && !_governmentID;
+      },
+      validator: validateGovernmentID,
+    },
+    _profilePicture: {
+      alias: 'profilePicture',
+      virtual: true,
+      onFailure: handleFailure('_profilePicture'),
+      sanitizer: handleFileUpload('_profilePicture'),
+      required({
+        operation,
+        context: { role, _profilePicture, profilePicture },
+      }) {
+        if (role == UserRoles.USER) return false;
+
+        return operation == 'update' && !profilePicture && !_profilePicture;
+      },
+      validator: validateProfilePicture,
+    },
   },
-  { setMissingDefaultsOnUpdate: true },
+  { onDelete, setMissingDefaultsOnUpdate: true },
 ).getModel();
+
+function onDelete({ _id }: User) {
+  fileManager.deleteFolder(getFolderOnServer(_id));
+}

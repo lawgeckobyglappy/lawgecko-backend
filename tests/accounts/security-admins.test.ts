@@ -11,7 +11,7 @@ import {
 
 import { makeServer } from '../../src/app';
 
-import { cleanupDp } from '../_utils';
+import { cleanupDp, cleanupTemporaryFileUploadDirectory } from '../_utils';
 import { addUsers, users } from '../_utils/users';
 import { expectAuthError, generateToken } from '../_utils/auth';
 import { SecurityAdminInvitationRepo } from '../../src/modules/accounts/repositories/security-admin-invitation';
@@ -44,7 +44,10 @@ describe('Security Admins', () => {
     token = generateToken({ user: superAdmin });
   });
 
-  afterEach(async () => await cleanupDp());
+  afterEach(async () => {
+    cleanupTemporaryFileUploadDirectory();
+    await cleanupDp();
+  });
 
   describe('DELETE /accounts/security-admins/:id', () => {
     let invitationIds: string[] = [];

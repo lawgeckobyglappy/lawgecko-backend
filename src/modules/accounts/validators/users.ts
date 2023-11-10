@@ -9,9 +9,9 @@ import {
   UserRoles,
   UserRolesList,
 } from '@types';
-import { userRepository } from '../repositories';
+import { validateEmail, validateString } from 'src/shared/validators';
 
-import { validateEmail, validateString } from './shared';
+import { userRepository } from '../repositories';
 
 export {
   validateAuthProvider,

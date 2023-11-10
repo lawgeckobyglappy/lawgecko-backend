@@ -4,8 +4,7 @@ import Schema from 'clean-schema';
 import { config } from '@config';
 import { generateId } from '@utils';
 import { LoginLink, LoginLinkInput } from '@types';
-
-import { validateString } from '../validators';
+import { validateString } from 'src/shared/validators';
 
 const { LOGIN_LINK_EXPIRATION_MINUTES } = config;
 
