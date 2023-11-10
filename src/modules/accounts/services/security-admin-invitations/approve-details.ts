@@ -8,6 +8,7 @@ import { UserModel } from '../../entities';
 import { userRepository } from '../../repositories';
 import { SecurityAdminInvitation } from '../../types';
 import { SecurityAdminInvitationRepo } from '../../repositories/security-admin-invitation';
+import { triggerSendSecurityAdminWelcomeEmail } from '../../jobs';
 
 export { approveSecurityAdminDetails };
 
@@ -56,7 +57,10 @@ const approveSecurityAdminDetails = async ({
     profilePicture,
   });
 
-  // TODO: send admin welcome email
+  triggerSendSecurityAdminWelcomeEmail({
+    email: validation.data.email,
+    password: validation.data.password,
+  });
 
   await SecurityAdminInvitationRepo.deleteById(id);
 

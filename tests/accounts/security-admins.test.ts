@@ -16,6 +16,7 @@ import { addUsers, users } from '../_utils/users';
 import { expectAuthError, generateToken } from '../_utils/auth';
 import { SecurityAdminInvitationRepo } from '../../src/modules/accounts/repositories/security-admin-invitation';
 import { set } from 'mongoose';
+import { userRepository } from '../../src/modules/accounts/repositories';
 
 let api: request.SuperTest<request.Test>, server: any;
 
@@ -273,20 +274,19 @@ describe('Security Admins', () => {
       });
     });
 
-    describe('PATCH /accounts/security-admins/invitations/:token', () => {
+    describe('SetDetails /accounts/security-admins/invitations/:token', () => {
       let setUrl = '';
-      let invitationToken = '';
+      let invitation;
       beforeEach(async () => {
-        await api
+        const { body } = await api
           .post(urls.invite)
           .set('Authorization', `Bearer ${token}`)
           .send({ email: 'test@mail.com', name: 'test user' });
+        const { data } = body;
 
-        invitationToken = (await SecurityAdminInvitationRepo.find()).map(
-          (i) => i.token,
-        )[0];
+        invitation = await SecurityAdminInvitationRepo.findById(data._id);
 
-        setUrl = `${BASE_URL}/${invitationToken}`;
+        setUrl = `${BASE_URL}/${invitation.token}`;
       });
 
       it('should accept details if correct information is given', async () => {
@@ -313,7 +313,7 @@ describe('Security Admins', () => {
         expect(error).toBeUndefined();
       });
 
-      it('should reject details if file size is greater than 5MB', async () => {
+      it('should not accept details if file size is greater than 5MB', async () => {
         const { body, status } = await api
           .patch(setUrl)
           .field(
@@ -340,7 +340,7 @@ describe('Security Admins', () => {
         );
       });
 
-      it('should reject details if extension is invalid', async () => {
+      it('should not accept details if extension is invalid', async () => {
         const { body, status } = await api
           .patch(setUrl)
           .field(
@@ -368,7 +368,7 @@ describe('Security Admins', () => {
       });
     });
 
-    describe('PATCH /accounts/security-admins/invitations/:id/request-changes', () => {
+    describe('RequestChanges /accounts/security-admins/invitations/:id/request-changes', () => {
       let url = '';
       let invitation;
       beforeEach(async () => {
@@ -384,7 +384,7 @@ describe('Security Admins', () => {
         url = `${BASE_URL}/${invitation._id}/request-changes`;
       });
 
-      it('accept request changes if correct information is provided', async () => {
+      it('should accept request changes if correct information is provided', async () => {
         await SecurityAdminInvitationRepo.updateOne({ _id: invitation._id }, {
           details: { firstName: 'first', lastName: 'last' },
         } as any);
@@ -410,7 +410,7 @@ describe('Security Admins', () => {
         expect(data.changesRequested.something).toBeUndefined();
       });
 
-      it('reject request changes if the invitation does not have details', async () => {
+      it('should not accept request changes if the invitation does not have details', async () => {
         const { body, status } = await api
           .patch(url)
           .set('Authorization', `Bearer ${token}`)
@@ -430,7 +430,7 @@ describe('Security Admins', () => {
         );
       });
 
-      it('reject request changes if changesRequested is an empty object', async () => {
+      it('should not accept request changes if changesRequested is an empty object', async () => {
         const { body, status } = await api
           .patch(url)
           .set('Authorization', `Bearer ${token}`)
@@ -445,7 +445,7 @@ describe('Security Admins', () => {
         expect(error.message).toBe('VALIDATION_ERROR');
       });
 
-      it('reject request changes if the invitation is not found', async () => {
+      it('should not accept request changes if the invitation is not found', async () => {
         const { body, status } = await api
           .patch(`${BASE_URL}/1/request-changes`)
           .set('Authorization', `Bearer ${token}`)
@@ -463,7 +463,7 @@ describe('Security Admins', () => {
         expect(error.message).toBe('Invitation not found');
       });
 
-      it('reject request changes if the user is not a super admin', async () => {
+      it('should not accept request changes if the user is not a super admin', async () => {
         const otherToken = generateToken({ user: users.ACTIVE_USER });
         const { body, status } = await api
           .patch(url)
@@ -480,6 +480,48 @@ describe('Security Admins', () => {
         expect(data).toBeUndefined();
 
         expect(error.message).toBe('Access denied');
+      });
+    });
+
+    describe('ApproveDetails /accounts/security-admins/invitations/:id/approve', () => {
+      let url = '';
+      let invitation;
+      beforeEach(async () => {
+        const {
+          body: { data },
+        } = await api
+          .post(urls.invite)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ email: 'test@mail.com', name: 'test user' });
+
+        invitation = await SecurityAdminInvitationRepo.findById(data._id);
+        url = `${BASE_URL}/${data._id}/approve`;
+
+        const setUrl = `${BASE_URL}/${invitation.token}`;
+        await api
+          .patch(setUrl)
+          .field(
+            'address',
+            '{"city": "Bikini Bottom", "country": "CA", "street": "1234 SomeStreet"}',
+          )
+          .field('bio', 'I am a test Security Admin')
+          .field('firstName', 'Spongebob')
+          .field('lastName', 'Squarepants')
+          .field('phoneNumber', '+46 70 712 34 26')
+          .attach('governmentID', './tests/assets/spongeGovID.png')
+          .attach('profilePicture', './tests/assets/spongeGovID.png')
+          .set('Content-Type', 'multipart/form-data');
+      });
+
+      it("should contain the Security Admin's email provided in the Database", async () => {
+        await api.patch(url).set('Authorization', `Bearer ${token}`).send({
+          email: 'test@mail.com',
+          password: 'sponge123',
+        });
+
+        const user = await userRepository.findOne({ email: 'test@mail.com' });
+
+        expect(user?.email).toMatch('test@mail.com');
       });
     });
   });
