@@ -217,8 +217,6 @@ describe('Security Admins', () => {
   });
 
   describe('PATCH /accounts/security-admins', () => {
-    const url = urls.resend;
-
     it('should return null if invitation does not exist', async () => {
       const { body, status } = await api
         .patch(urls.resend('1'))
@@ -486,6 +484,7 @@ describe('Security Admins', () => {
     describe('ApproveDetails /accounts/security-admins/invitations/:id/approve', () => {
       let url = '';
       let invitation;
+
       beforeEach(async () => {
         const {
           body: { data },
@@ -495,8 +494,27 @@ describe('Security Admins', () => {
           .send({ email: 'test@mail.com', name: 'test user' });
 
         invitation = await SecurityAdminInvitationRepo.findById(data._id);
-        url = `${BASE_URL}/${data._id}/approve`;
+        url = `${BASE_URL}/${invitation._id}/approve`;
+      });
 
+      it('is a test', async () => {
+        const { body, status } = await api.patch(url);
+        const { data, error } = body;
+        console.log(data, error);
+      });
+
+      it('should reject with if no token is provided', async () => {
+        expectAuthError({
+          description: 'should reject with if no token is provided',
+          errorCode: 401,
+          errorMessage: 'Authentication failed',
+          method: 'patch',
+          role: '',
+          url,
+        });
+      });
+
+      it("should contain the Security Admin's email provided in the Database", async () => {
         const setUrl = `${BASE_URL}/${invitation.token}`;
         await api
           .patch(setUrl)
@@ -511,9 +529,7 @@ describe('Security Admins', () => {
           .attach('governmentID', './tests/assets/spongeGovID.png')
           .attach('profilePicture', './tests/assets/spongeGovID.png')
           .set('Content-Type', 'multipart/form-data');
-      });
 
-      it("should contain the Security Admin's email provided in the Database", async () => {
         await api.patch(url).set('Authorization', `Bearer ${token}`).send({
           email: 'test@mail.com',
           password: 'sponge123',
@@ -522,6 +538,24 @@ describe('Security Admins', () => {
         const user = await userRepository.findOne({ email: 'test@mail.com' });
 
         expect(user?.email).toMatch('test@mail.com');
+      });
+
+      it('should not accept the approval if details are empty', async () => {
+        const { body, status } = await api
+          .patch(url)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            email: 'test@mail.com',
+            password: 'sponge123',
+          });
+
+        const { data, error } = body;
+        console.log(data, error);
+        expect(status).toBe(400);
+
+        expect(data).toBeUndefined();
+
+        expect(error.message).toMatch('Incomplete user details');
       });
     });
   });
