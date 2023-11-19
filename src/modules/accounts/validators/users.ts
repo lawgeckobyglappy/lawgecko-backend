@@ -41,7 +41,7 @@ async function validateUserEmail(val: any) {
 }
 
 async function validateUserPhone(val: any) {
-  const isValid = validateString('', { minLength: 5, maxLength: 16 })(val);
+  const isValid = validateString('', { minLength: 5, maxLength: 25 })(val);
 
   if (!isValid.valid) return isValid;
 
