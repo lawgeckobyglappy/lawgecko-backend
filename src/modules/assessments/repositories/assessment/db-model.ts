@@ -7,8 +7,9 @@ export { dbModel };
 const assessmentSchema = new Schema<Assessment>(
   {
     _id: { type: String, required: true },
-    photo: { type: String },
-    summary: { type: String },
+    description: { type: String },
+    title: { type: String, required: true },
+    image: { type: String },
   },
   { timestamps: true },
 );

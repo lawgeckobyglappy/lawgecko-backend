@@ -1,29 +1,48 @@
 import { type FileInfo } from 'apitoolz';
 
-export { AssessmentInput, Assessment, Question, Mcq };
+export {
+  AssessmentInput,
+  Assessment,
+  AssessmentInputAlias,
+  QuestionInput,
+  Question,
+};
+
+type AssessmentInputAlias = {
+  image?: FileInfo;
+};
 
 type AssessmentInput = {
-  photo?: FileInfo;
-  summary?: string;
+  description?: string;
+  title: string;
+
+  _image?: FileInfo;
 };
 
 type Assessment = {
   _id: string;
-  photo?: string;
-  summary?: string;
+  image?: string;
+  description?: string;
+  title: string;
+  published: boolean;
+};
+
+type QuestionInput = {
+  questionText: string;
+  answerType: string;
+  required: boolean;
+
+  assessment: string; // reference to Assessment._id
 };
 
 type Question = {
-  assessment: Assessment;
   _id: string;
   questionText: string;
   answerType: string;
-  options?: Array<Mcq>;
-};
+  required: boolean;
+  options: Array<string>;
 
-type Mcq = {
-  _id: string;
-  value: string;
+  assessment: string; // reference to Assessment._id
 };
 
 /*

@@ -1,12 +1,17 @@
 import { handleError } from '@utils';
 
-import { AssessmentInput } from '../../types';
+import { Assessment, QuestionInput } from '../../types';
 import { AssessmentModel } from '../../entitites';
 import { assessmentRepository } from '../../repositories/assessment';
-export { createAssessment };
+export { createQuestion };
 
-const createAssessment = async (values: Partial<AssessmentInput>) => {
-  const { data, error } = await AssessmentModel.create({
+type Props = {
+  id: Assessment['_id'];
+  values: Partial<QuestionInput>;
+};
+
+const createQuestion = async ({ id, values }: Props) => {
+  const { data, error } = await QuestionModel.create({
     ...values,
   });
 

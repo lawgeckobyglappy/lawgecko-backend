@@ -53,15 +53,47 @@ describe('Accounts', () => {
       token = generateToken({ user: users.SECURITY_ADMIN });
       const { body, status } = await api
         .post(url)
-        .field('summary', 'This is a random assessment that has no questions.')
-        .attach('photo', './tests/assets/spongeGovID.png')
+        .field(
+          'description',
+          'This is a random assessment that has no questions.',
+        )
+        .field('title', 'Random Assessment')
+        .attach('image', './tests/assets/spongeGovID.png')
         .set('Authorization', `Bearer ${token}`)
         .set('Content-Type', 'multipart/form-data');
 
       const { data, error } = body;
-      console.log(data);
+
       expect(status).toBe(200);
+
       expect(error).toBeUndefined();
+
+      expect(data).toMatchObject({
+        description: 'This is a random assessment that has no questions.',
+        title: 'Random Assessment',
+      });
+    });
+
+    it('should reject creation of an assessment if no title is provided (Too short)', async () => {
+      token = generateToken({ user: users.SECURITY_ADMIN });
+      const { body, status } = await api
+        .post(url)
+        .field(
+          'description',
+          'This is a random assessment that has no questions.',
+        )
+        .field('title', '')
+        .attach('image', './tests/assets/spongeGovID.png')
+        .set('Authorization', `Bearer ${token}`)
+        .set('Content-Type', 'multipart/form-data');
+
+      const { data, error } = body;
+
+      expect(status).toBe(400);
+
+      expect(data).toBeUndefined();
+
+      expect(error.payload.title.reasons).toMatchObject(['Too short']);
     });
   });
 });
