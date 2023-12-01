@@ -5,13 +5,14 @@ import {
   Assessment,
   AssessmentInput,
   AssessmentInputAlias,
+  QuestionInput,
   Question,
 } from '../types';
 import { validateString } from 'src/shared/validators';
 import { handleFileUpload, handleFailure, getFolderOnServer } from './utils';
 import { validateProfilePicture } from 'src/modules/accounts/validators';
 
-export { AssessmentModel };
+export { AssessmentModel, QuestionModel };
 
 const AssessmentModel = new Schema<
   AssessmentInput,
@@ -42,3 +43,20 @@ const AssessmentModel = new Schema<
   },
   { setMissingDefaultsOnUpdate: true },
 ).getModel();
+
+const QuestionModel = new Schema<QuestionInput, Question>({
+  _id: { constant: true, value: generateId() },
+  options: {
+    default: [],
+  },
+  questionText: {
+    default: '',
+    validator: validateString('', { minLength: 1, maxLength: 200 }),
+  },
+  required: {
+    default: true,
+  },
+  assessment: {
+    default: '',
+  },
+}).getModel();

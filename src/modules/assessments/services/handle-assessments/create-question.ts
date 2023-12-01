@@ -1,8 +1,8 @@
 import { handleError } from '@utils';
 
 import { Assessment, QuestionInput } from '../../types';
-import { AssessmentModel } from '../../entitites';
-import { assessmentRepository } from '../../repositories/assessment';
+import { QuestionModel } from '../../entitites';
+import { questionRepository } from '../../repositories/question';
 export { createQuestion };
 
 type Props = {
@@ -17,6 +17,6 @@ const createQuestion = async ({ id, values }: Props) => {
 
   if (error) return handleError(error);
 
-  const assessment = await assessmentRepository.insertOne(data);
+  const assessment = await questionRepository.insertOne(data);
   return { data: assessment };
 };

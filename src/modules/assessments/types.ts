@@ -28,8 +28,9 @@ type Assessment = {
 };
 
 type QuestionInput = {
-  questionText: string;
   answerType: string;
+  options: Array<string>;
+  questionText: string;
   required: boolean;
 
   assessment: string; // reference to Assessment._id
@@ -37,10 +38,10 @@ type QuestionInput = {
 
 type Question = {
   _id: string;
-  questionText: string;
   answerType: string;
-  required: boolean;
   options: Array<string>;
+  questionText: string;
+  required: boolean;
 
   assessment: string; // reference to Assessment._id
 };
