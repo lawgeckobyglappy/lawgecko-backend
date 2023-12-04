@@ -13,6 +13,7 @@ type Props = {
 const createQuestion = async ({ id, values }: Props) => {
   const { data, error } = await QuestionModel.create({
     ...values,
+    assessment: id,
   });
 
   if (error) return handleError(error);

@@ -15,5 +15,7 @@ const multipartParser = fileManager.parseMultipartData()({
 const router = Router();
 
 router.post('/assessment', multipartParser, controllers.createAssessment);
-router.post('/question/:id', controllers.createQuestion);
-router.get('/assessment', controllers.getAssessment);
+router.post('/publish/:id', controllers.publishAssessment);
+router.post('/question/:id', multipartParser, controllers.createQuestion);
+router.patch('/assessment/:id', multipartParser, controllers.editAssessment);
+router.get('/assessment/:id', controllers.getAssessment);

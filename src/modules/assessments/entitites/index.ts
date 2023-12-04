@@ -59,4 +59,13 @@ const QuestionModel = new Schema<QuestionInput, Question>({
   assessment: {
     default: '',
   },
+  startNumber: {
+    default: 0,
+  },
+  endNumber: {
+    default: 0,
+  },
+  step: {
+    default: 0,
+  },
 }).getModel();

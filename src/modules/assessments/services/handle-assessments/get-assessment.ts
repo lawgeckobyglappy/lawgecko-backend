@@ -4,10 +4,21 @@ import { handleError } from '@utils';
 import { handleAuthError } from '@utils';
 
 import { assessmentRepository } from '../../repositories/assessment';
+import { questionRepository } from '../../repositories/question';
 
 export { getAssessment };
 
-const getAssessment = async ({ assessment: { _id } }: any) => {
-  const assessment = 5;
-  return { data: assessment };
+type Props = {
+  id: string;
+};
+
+const getAssessment = async ({ id }: Props) => {
+  const assessment = assessmentRepository.findById(id);
+  const questions = questionRepository.find({ assessment: id });
+  return {
+    data: {
+      assessment,
+      questions,
+    },
+  };
 };
