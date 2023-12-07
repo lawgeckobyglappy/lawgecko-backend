@@ -8,6 +8,7 @@ const assessmentSchema = new Schema<Assessment>(
   {
     _id: { type: String, required: true },
     description: { type: String },
+    published: { type: Boolean },
     title: { type: String, required: true },
     image: { type: String },
   },

@@ -13,5 +13,6 @@ const createAssessment = async (values: Partial<AssessmentInput>) => {
   if (error) return handleError(error);
 
   const assessment = await assessmentRepository.insertOne(data);
+
   return { data: assessment };
 };

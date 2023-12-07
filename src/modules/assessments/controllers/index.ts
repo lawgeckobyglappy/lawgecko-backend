@@ -3,7 +3,9 @@ import {
   createQuestion,
   editAssessment,
   getAssessment,
+  getAllAssessments,
   publishAssessment,
+  getPublishedAssessments,
 } from '../services';
 
 import { makeController } from 'src/shared/utils/api';
@@ -34,6 +36,11 @@ const controllers = {
         id: req.params.id,
         values: req.body,
       }),
+    200,
+  ),
+  getAllAssessments: makeController((req) => getAllAssessments(), 200),
+  getPublishedAssessments: makeController(
+    (req) => getPublishedAssessments(),
     200,
   ),
 };

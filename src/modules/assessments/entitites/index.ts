@@ -24,6 +24,9 @@ const AssessmentModel = new Schema<
     description: {
       default: '',
     },
+    published: {
+      default: false,
+    },
     title: {
       default: '',
       validator: validateString('', { minLength: 1, maxLength: 30 }),
@@ -46,6 +49,12 @@ const AssessmentModel = new Schema<
 
 const QuestionModel = new Schema<QuestionInput, Question>({
   _id: { constant: true, value: generateId() },
+  answerType: {
+    default: 'free',
+  },
+  assessment: {
+    default: '',
+  },
   options: {
     default: [],
   },
@@ -55,9 +64,6 @@ const QuestionModel = new Schema<QuestionInput, Question>({
   },
   required: {
     default: true,
-  },
-  assessment: {
-    default: '',
   },
   startNumber: {
     default: 0,

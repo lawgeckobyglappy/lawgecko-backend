@@ -7,8 +7,8 @@ type Props = {
 };
 
 const publishAssessment = async ({ id }: Props) => {
-  const assessment = assessmentRepository.updateOne(
-    { assessment: id },
+  const assessment = await assessmentRepository.updateOne(
+    { _id: id },
     { published: true },
   );
 

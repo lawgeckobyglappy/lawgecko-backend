@@ -13,8 +13,9 @@ type Props = {
 };
 
 const getAssessment = async ({ id }: Props) => {
-  const assessment = assessmentRepository.findById(id);
-  const questions = questionRepository.find({ assessment: id });
+  const assessment = await assessmentRepository.findById(id);
+
+  const questions = await questionRepository.find({ assessment: id });
   return {
     data: {
       assessment,

@@ -22,8 +22,6 @@ const assessmentRepository = {
   findById: (id: string) => dbModel.findById(id).lean(),
   findOne: (query: FilterQuery<Assessment> = {}) =>
     dbModel.findOne(query).lean(),
-  findByPhoneNumber: (phoneNumber: string) =>
-    dbModel.findOne({ phoneNumber }).lean(),
   updateOne: (
     query: FilterQuery<Assessment> = {},
     updates: Partial<Assessment>,

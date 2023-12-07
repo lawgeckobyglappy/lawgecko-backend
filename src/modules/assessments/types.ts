@@ -15,6 +15,7 @@ type AssessmentInputAlias = {
 type AssessmentInput = {
   description?: string;
   title: string;
+  published: boolean;
 
   _image?: FileInfo;
 };
@@ -31,7 +32,7 @@ type QuestionInput = {
   answerType: string;
   options?: Array<string>;
   questionText: string;
-  required: boolean;
+  required?: boolean;
   startNumber?: number;
   endNumber?: number;
   step?: number;
