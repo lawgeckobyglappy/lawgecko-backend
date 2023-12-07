@@ -9,15 +9,18 @@ import {
   UserRoles,
   UserRolesList,
 } from '@types';
+import { validateEmail, validateString } from 'src/shared/validators';
+
 import { userRepository } from '../repositories';
 
-import { validateEmail, validateString } from './shared';
-
 export {
-  validateAddress,
   validateAuthProvider,
   validateUserAccountStatus,
+  validateUserAddress,
+  validateUserBio,
   validateUserEmail,
+  validateUserFirstName,
+  validateUserLastName,
   validateUsername,
   validateUserPhone,
   validateUserRole,
@@ -32,13 +35,13 @@ async function validateUserEmail(val: any) {
 
   const isTaken = await userRepository.findOne({ email: isValid.validated });
 
-  if (isTaken) return { valid: false, reason: 'Email already taken' };
+  if (isTaken) return { valid: false, reasons: ['Email already taken'] };
 
   return isValid;
 }
 
 async function validateUserPhone(val: any) {
-  const isValid = validateString('', { minLength: 5, maxLength: 16 })(val);
+  const isValid = validateString('', { minLength: 5, maxLength: 25 })(val);
 
   if (!isValid.valid) return isValid;
 
@@ -93,7 +96,7 @@ function validateUserAccountStatus(status: any) {
 
 const countryCodes = getSupportedRegionCodes();
 
-function validateAddress(val: any) {
+function validateUserAddress(val: any) {
   if (!val || !isObject(val))
     return { valid: false, reason: 'Invalid address' };
 
@@ -122,6 +125,21 @@ function validateAddress(val: any) {
       street: (isStreetValid as any).validated,
     },
   };
+}
+
+function validateUserBio(val: any) {
+  return validateString('Invalid Bio', {
+    minLength: 0,
+    maxLength: 255,
+  })(val);
+}
+
+function validateUserFirstName(val: any) {
+  return validateString('Invalid first name')(val);
+}
+
+function validateUserLastName(val: any) {
+  return validateString('Invalid last name')(val);
 }
 
 const enums = UserRolesList.filter((r) => r != UserRoles.SUPER_ADMIN);

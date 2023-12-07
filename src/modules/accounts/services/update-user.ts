@@ -1,11 +1,11 @@
 import { sanitize } from 'apitoolz';
 import { VALIDATION_ERRORS } from 'clean-schema';
 
+import { handleAuthError, handleError } from '@utils';
 import { AuthInfo, UserInput, UserRoles } from '@types';
 
 import { UserModel } from '../entities';
 import { userRepository } from '../repositories';
-import { handleAuthError, handleError } from '../utils';
 
 export { updateUser };
 
@@ -39,6 +39,7 @@ const updateUser = async ({ id, updates, authInfo }: Options) => {
 
   if (isCurrentUser) {
     updates = sanitize(updates, { remove: ['accountStatus', 'role'] });
+
     if (currentUser.role == UserRoles.USER)
       updates = sanitize(updates, {
         remove: ['email', 'firstName', 'lastName', 'address'],

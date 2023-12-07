@@ -4,13 +4,13 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { logger } from '@shared';
 import config from './env';
 
-const { environment } = config;
+const { currentDeployment } = config;
 
 /**
  * Connect To Database
  */
 export const connectdb = async (url: string) => {
-  if (environment == 'test') {
+  if (currentDeployment.isTest) {
     const server = await MongoMemoryServer.create();
     url = server.getUri();
   }
@@ -22,7 +22,7 @@ export const connectdb = async (url: string) => {
     // useUnifiedTopology: true,
   });
 
-  if (environment != 'test') logger.info('Connected to MongoDB');
+  if (!currentDeployment.isTest) logger.info('Connected to MongoDB');
 
   return database;
 };
