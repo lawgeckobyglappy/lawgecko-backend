@@ -1,7 +1,6 @@
-import { handleError } from '@utils';
-
 import { Assessment, AssessmentInput } from '../../types';
 import { assessmentRepository } from '../../repositories/assessment';
+
 export { editAssessment };
 
 type Props = {

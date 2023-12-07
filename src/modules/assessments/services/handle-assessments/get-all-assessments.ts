@@ -1,8 +1,3 @@
-import { AuthInfo } from '@types';
-
-import { handleError } from '@utils';
-import { handleAuthError } from '@utils';
-
 import { assessmentRepository } from '../../repositories/assessment';
 
 export { getAllAssessments };

@@ -1,5 +1,5 @@
 import Schema from 'clean-schema';
-import { generateId, getSlug } from '@utils';
+import { generateId } from '@utils';
 
 import {
   Assessment,
@@ -9,7 +9,7 @@ import {
   Question,
 } from '../types';
 import { validateString } from 'src/shared/validators';
-import { handleFileUpload, handleFailure, getFolderOnServer } from './utils';
+import { handleFileUpload, handleFailure } from './utils';
 import { validateProfilePicture } from 'src/modules/accounts/validators';
 
 export { AssessmentModel, QuestionModel };

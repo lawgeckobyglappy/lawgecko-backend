@@ -1,5 +1,6 @@
-import { Assessment, AssessmentInput } from '../../types';
+import { Assessment } from '../../types';
 import { assessmentRepository } from '../../repositories/assessment';
+
 export { publishAssessment };
 
 type Props = {

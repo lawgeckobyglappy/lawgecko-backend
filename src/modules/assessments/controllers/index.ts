@@ -38,9 +38,6 @@ const controllers = {
       }),
     200,
   ),
-  getAllAssessments: makeController((req) => getAllAssessments(), 200),
-  getPublishedAssessments: makeController(
-    (req) => getPublishedAssessments(),
-    200,
-  ),
+  getAllAssessments: makeController(() => getAllAssessments(), 200),
+  getPublishedAssessments: makeController(() => getPublishedAssessments(), 200),
 };

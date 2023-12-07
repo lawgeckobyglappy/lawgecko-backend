@@ -3,7 +3,9 @@ import { handleError } from '@utils';
 import { Assessment, QuestionInput } from '../../types';
 import { QuestionModel } from '../../entitites';
 import { questionRepository } from '../../repositories/question';
+
 import { assessmentRepository } from '../../repositories/assessment';
+
 export { createQuestion };
 
 type Props = {
@@ -12,7 +14,7 @@ type Props = {
 };
 
 const createQuestion = async ({ id, values }: Props) => {
-  let assessment = await assessmentRepository.findById(id);
+  const assessment = await assessmentRepository.findById(id);
   if (!assessment) {
     return {
       error: {
@@ -75,5 +77,6 @@ const createQuestion = async ({ id, values }: Props) => {
   }
 
   const question = await questionRepository.insertOne(data);
+
   return { data: question };
 };
