@@ -15,6 +15,7 @@ type AuthConfig = {
   errorMessage: 'Access denied' | 'Authentication failed';
   method: 'delete' | 'get' | 'patch' | 'post';
   role?: '' | UserRole;
+  user?: Partial<User>;
   url: string;
 };
 
@@ -28,9 +29,14 @@ function generateToken({
   user?: Partial<User>;
 }) {
   if (user)
-    return createToken({ userId: user._id, userRole: user.role } as any);
+    return createToken({
+      userId: user._id,
+      userRole: user.role,
+      sessionId: '',
+    });
 
-  if (customId) return createToken({ userId: customId, userRole: role } as any);
+  if (customId)
+    return createToken({ userId: customId, userRole: role, sessionId: '' });
 
   return '';
 }
@@ -41,6 +47,7 @@ function expectAuthError({
   errorMessage,
   method,
   role,
+  user,
   url,
 }: AuthConfig) {
   describe('auth failure', () => {
@@ -53,7 +60,7 @@ function expectAuthError({
 
     it(description, async () => {
       const res = await api[method](url)
-        .set('Authorization', `Bearer ${generateToken({ role })}`)
+        .set('Authorization', `Bearer ${generateToken({ user, role })}`)
         .send();
 
       const { body, status } = res;

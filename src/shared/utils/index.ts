@@ -1,5 +1,6 @@
 import slug from 'slug';
 
+export * from './errors';
 export * from './emails';
 export * from './generate';
 

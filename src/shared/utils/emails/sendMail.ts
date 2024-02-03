@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import { config } from '@config';
 import { logger } from '../../logger';
 
-const { emails, environment } = config;
+const { emails, currentDeployment } = config;
 
 export { sendMail };
 
@@ -29,8 +29,8 @@ const sendMail = async ({
   subject = '',
   html = '',
 }: MailProps) => {
-  if (environment !== 'production') {
-    if (environment == 'development') logger.info({ from, to, subject, html });
+  if (!currentDeployment.isProduction) {
+    if (currentDeployment.isDev) logger.info({ from, to, subject, html });
 
     return;
   }

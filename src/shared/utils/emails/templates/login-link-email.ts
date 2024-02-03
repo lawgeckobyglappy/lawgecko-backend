@@ -1,4 +1,3 @@
-import { User } from '@types';
 import { config } from '@config';
 
 import { sendMail } from '../sendMail';
@@ -6,15 +5,14 @@ import { sendMail } from '../sendMail';
 export { sendLoginLinkEmail };
 
 export type LoginLinkProps = {
+  email: string;
+  firstName: string;
   linkId: string;
-  user: User;
 };
 
 const { FRONTEND_URL, LOGIN_LINK_EXPIRATION_MINUTES } = config;
 
-function sendLoginLinkEmail({ user, linkId }: LoginLinkProps) {
-  const { email, firstName } = user;
-
+function sendLoginLinkEmail({ email, firstName, linkId }: LoginLinkProps) {
   const link = `${FRONTEND_URL}/verify-link/?id=${linkId}`;
 
   const html = `

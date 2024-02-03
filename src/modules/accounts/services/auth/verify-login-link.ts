@@ -1,6 +1,6 @@
-import { handleAuthError, handleError } from '../../utils';
-import { loginLinkRepository, userRepository } from '../../repositories';
+import { handleAuthError, handleError } from '@utils';
 
+import { loginLinkRepository, userRepository } from '../../repositories';
 import { createAuthPayload } from './helpers';
 
 export { verifyLoginLink };

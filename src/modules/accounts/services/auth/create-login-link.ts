@@ -1,7 +1,7 @@
 import { User } from '@types';
+import { handleError } from '@utils';
 
 import { LoginLinkModel } from '../../entities';
-import { handleError } from '../../utils/errors';
 import { triggerSendLoginLinkEmail } from '../../jobs';
 import { loginLinkRepository } from '../../repositories';
 
@@ -14,7 +14,11 @@ const createLoginLink = async (user: User) => {
 
   await loginLinkRepository.insertOne(data);
 
-  triggerSendLoginLinkEmail({ user, linkId: data._id });
+  triggerSendLoginLinkEmail({
+    email: user.email,
+    firstName: user.firstName,
+    linkId: data._id,
+  });
 
   return { data: 'Success' };
 };

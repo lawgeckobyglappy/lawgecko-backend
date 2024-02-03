@@ -1,7 +1,8 @@
 import { UserRole } from '@types';
+import { handleError } from '@utils';
 
+import { createToken } from '../../../utils';
 import { LoginSessionModel } from '../../../entities';
-import { createToken, handleError } from '../../../utils';
 import { loginSessionRepository } from '../../../repositories';
 
 export { createAuthPayload };
