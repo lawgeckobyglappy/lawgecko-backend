@@ -34,8 +34,7 @@ const constants = loadVariables(
 
     FRONTEND_URL: {
       required: currentDeployment.isProduction,
-      // default: 'http://localhost:5000',
-      default: 'https://lawgecko.vercel.app/',
+      default: 'http://localhost:5000',
     },
 
     GOOGLE_AUTH_CLIENT_ID: {
