@@ -11,5 +11,14 @@
       "src": "/(.*)",
       "dest": "index.js"
     }
-  ]
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "headers": {
+        "Access-Control-Allow-Origin": "https://lawgecko.vercel.app",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+      }
+    }
+  }
 }
