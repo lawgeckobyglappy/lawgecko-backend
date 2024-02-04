@@ -14,7 +14,12 @@ const app = express();
 
 if (!currentDeployment.isTest) app.use(morgan);
 
-app.use(cors({ origin: 'https://lawgecko.vercel.app' }));
+app.use(
+  cors({
+    origin: 'https://lawgecko.vercel.app',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  }),
+);
 
 app.use(express.json());
 
