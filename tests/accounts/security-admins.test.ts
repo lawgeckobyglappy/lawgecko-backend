@@ -497,12 +497,6 @@ describe('Security Admins', () => {
         url = `${BASE_URL}/${invitation._id}/approve`;
       });
 
-      it('is a test', async () => {
-        const { body, status } = await api.patch(url);
-        const { data, error } = body;
-        console.log(data, error);
-      });
-
       it('should reject with if no token is provided', async () => {
         expectAuthError({
           description: 'should reject with if no token is provided',
@@ -550,11 +544,9 @@ describe('Security Admins', () => {
           });
 
         const { data, error } = body;
-        console.log(data, error);
+
         expect(status).toBe(400);
-
         expect(data).toBeUndefined();
-
         expect(error.message).toMatch('Incomplete user details');
       });
     });

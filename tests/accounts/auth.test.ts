@@ -146,7 +146,7 @@ describe('Auth', () => {
         expect(error.payload).toMatchObject({
           phoneNumber: expect.objectContaining({
             reasons: expect.arrayContaining(['Too short']),
-            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 25 }),
           }),
         });
       });
@@ -154,7 +154,7 @@ describe('Auth', () => {
       it('should reject registration if phone number is too long', async () => {
         const { body, status } = await api
           .post(url)
-          .field('phoneNumber', Array(17).fill('4').join(''))
+          .field('phoneNumber', Array(26).fill('-').join(''))
           .set('Content-Type', 'multipart/form-data');
 
         const { data, error } = body;
@@ -166,7 +166,7 @@ describe('Auth', () => {
         expect(error.payload).toMatchObject({
           phoneNumber: expect.objectContaining({
             reasons: expect.arrayContaining(['Too long']),
-            metadata: expect.objectContaining({ minLength: 5, maxLength: 16 }),
+            metadata: expect.objectContaining({ minLength: 5, maxLength: 25 }),
           }),
         });
       });

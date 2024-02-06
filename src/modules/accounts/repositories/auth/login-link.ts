@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 
 import { LoginLink } from '@types';
 
@@ -13,7 +13,7 @@ const schema = new Schema<LoginLink>(
   { timestamps: { updatedAt: false } },
 );
 
-const dbModel = model('login-links', schema);
+const dbModel = mongoose.models['login-links'] || model('login-links', schema);
 
 const loginLinkRepository = {
   findById: (id: string) => dbModel.findById(id),

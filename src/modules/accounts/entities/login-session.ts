@@ -1,5 +1,5 @@
 import { add } from 'date-fns';
-import { Schema, isBooleanOk } from 'clean-schema';
+import { Schema, isBooleanOk } from 'ivo';
 
 import { config } from '@config';
 import { generateId } from '@utils';

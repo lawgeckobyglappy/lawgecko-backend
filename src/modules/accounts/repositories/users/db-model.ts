@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Model, Schema, model } from 'mongoose';
 
 import { User, UserAccountStatusList, UserRoles, UserRolesList } from '@types';
 
@@ -23,4 +23,5 @@ const userSchema = new Schema<User>(
   { timestamps: true },
 );
 
-const dbModel = model('users', userSchema);
+const dbModel: Model<User> =
+  mongoose.models['users'] || model('users', userSchema);

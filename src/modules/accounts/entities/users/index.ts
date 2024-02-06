@@ -1,4 +1,4 @@
-import Schema from 'clean-schema';
+import Schema from 'ivo';
 import { fileManager } from 'apitoolz';
 
 import {
@@ -45,7 +45,6 @@ const UserModel = new Schema<UserInput, User, UserInputAlias>(
     },
     authProviders: {
       default: [],
-      dependent: true,
       dependsOn: '_addAuthProvider',
       resolver({ context: { _addAuthProvider, authProviders } }) {
         authProviders.push(_addAuthProvider);
@@ -64,12 +63,8 @@ const UserModel = new Schema<UserInput, User, UserInputAlias>(
     lastName: { default: '', validator: validateUserLastName },
     phoneNumber: {
       default: '',
-      required({ operation, context }) {
-        return (
-          operation == 'creation' &&
-          !context._addAuthProvider &&
-          !context.phoneNumber
-        );
+      required({ isUpdate, context }) {
+        return !isUpdate && !context._addAuthProvider && !context.phoneNumber;
       },
       validator: validateUserPhone,
     },
@@ -94,10 +89,10 @@ const UserModel = new Schema<UserInput, User, UserInputAlias>(
       virtual: true,
       onFailure: handleFailure('_governmentID'),
       sanitizer: handleFileUpload('_governmentID'),
-      required({ operation, context: { role, _governmentID, governmentID } }) {
+      required({ isUpdate, context: { role, _governmentID, governmentID } }) {
         if (role == UserRoles.USER) return false;
 
-        return operation == 'update' && !governmentID && !_governmentID;
+        return isUpdate && !governmentID && !_governmentID;
       },
       validator: validateGovernmentID,
     },
@@ -107,12 +102,12 @@ const UserModel = new Schema<UserInput, User, UserInputAlias>(
       onFailure: handleFailure('_profilePicture'),
       sanitizer: handleFileUpload('_profilePicture'),
       required({
-        operation,
+        isUpdate,
         context: { role, _profilePicture, profilePicture },
       }) {
         if (role == UserRoles.USER) return false;
 
-        return operation == 'update' && !profilePicture && !_profilePicture;
+        return isUpdate && !profilePicture && !_profilePicture;
       },
       validator: validateProfilePicture,
     },
