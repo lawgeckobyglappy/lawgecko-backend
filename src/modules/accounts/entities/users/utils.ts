@@ -1,5 +1,5 @@
 import { fileManager } from 'apitoolz';
-import { Context, Summary } from 'clean-schema';
+import { Context, Summary } from 'ivo';
 
 import { config } from '@config';
 

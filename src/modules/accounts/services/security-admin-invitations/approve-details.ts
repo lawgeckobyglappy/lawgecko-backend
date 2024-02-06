@@ -1,4 +1,4 @@
-import { ERRORS, isObject } from 'clean-schema';
+import { ERRORS, isRecordLike } from 'ivo';
 
 import { AuthInfo, UserRoles } from '@types';
 import { handleAuthError, handleError } from '@utils';
@@ -68,8 +68,8 @@ const approveSecurityAdminDetails = async ({
 };
 
 function validateAdminCredentials(credentials: any) {
-  if (!credentials || !isObject(credentials))
-    return { error: { message: ERRORS.INVALID_DATA } };
+  if (!credentials || !isRecordLike(credentials))
+    return { error: { message: 'Invalid data' } };
 
   const emailValidation = validateEmail(credentials.email),
     passwordValidation = validateString('Invalid password', { minLength: 5 })(

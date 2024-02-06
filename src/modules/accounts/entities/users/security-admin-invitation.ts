@@ -1,5 +1,5 @@
 import { fileManager } from 'apitoolz';
-import { Schema, Summary, isEqual, isObject } from 'clean-schema';
+import { Schema, Summary, isEqual, isRecordLike } from 'ivo';
 
 import { generateId } from '@utils';
 import { UserAccountStatus, UserRoles } from '@types';
@@ -119,7 +119,8 @@ function validateChangesRequested(
 
   if (val == null) return true;
 
-  if (!val || !isObject(val)) return { valid: false, reason: 'Invalid data' };
+  if (!val || !isRecordLike(val))
+    return { valid: false, reason: 'Invalid data' };
 
   const validated = {} as any;
 
@@ -151,7 +152,7 @@ async function validateInvitationEmail(val: any) {
   );
 
   return invitation
-    ? { valid: false, reasons: ['Invitation already sent'] }
+    ? { valid: false, reason: 'Invitation already sent' }
     : isValid;
 }
 

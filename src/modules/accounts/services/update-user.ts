@@ -1,5 +1,5 @@
 import { sanitize } from 'apitoolz';
-import { VALIDATION_ERRORS } from 'clean-schema';
+import { VALIDATION_ERRORS } from 'ivo';
 
 import { handleAuthError, handleError } from '@utils';
 import { AuthInfo, UserInput, UserRoles } from '@types';

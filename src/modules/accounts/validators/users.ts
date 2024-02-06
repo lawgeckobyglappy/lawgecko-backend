@@ -1,5 +1,5 @@
 import { parsePhoneNumber, getSupportedRegionCodes } from 'awesome-phonenumber';
-import { Summary, isObject } from 'clean-schema';
+import { Summary, isRecordLike } from 'ivo';
 
 import {
   AuthProvidersList,
@@ -35,7 +35,7 @@ async function validateUserEmail(val: any) {
 
   const isTaken = await userRepository.findOne({ email: isValid.validated });
 
-  if (isTaken) return { valid: false, reasons: ['Email already taken'] };
+  if (isTaken) return { valid: false, reason: ['Email already taken'] };
 
   return isValid;
 }
@@ -74,7 +74,7 @@ async function validateUsername(val: any) {
 
 function validateAuthProvider(provider: any, summary: UserValidationSummary) {
   const isValid = validateString('Unsupported auth provider', {
-    enums: AuthProvidersList,
+    allow: AuthProvidersList,
   })(provider);
 
   if (!isValid) return isValid;
@@ -90,14 +90,14 @@ function validateAuthProvider(provider: any, summary: UserValidationSummary) {
 
 function validateUserAccountStatus(status: any) {
   return validateString('Invalid account status', {
-    enums: UserAccountStatusList,
+    allow: UserAccountStatusList,
   })(status);
 }
 
 const countryCodes = getSupportedRegionCodes();
 
 function validateUserAddress(val: any) {
-  if (!val || !isObject(val))
+  if (!val || !isRecordLike(val))
     return { valid: false, reason: 'Invalid address' };
 
   let reasons: string[] = [];
@@ -112,10 +112,10 @@ function validateUserAddress(val: any) {
       maxLength: 50,
     })(val.street);
 
-  if (!isCityValid.valid) reasons = reasons.concat(isCityValid.reasons);
-  if (!isStreetValid.valid) reasons = reasons.concat(isStreetValid.reasons);
+  if (!isCityValid.valid) reasons = reasons.concat(isCityValid.reason);
+  if (!isStreetValid.valid) reasons = reasons.concat(isStreetValid.reason);
 
-  if (reasons.length) return { valid: false, reasons };
+  if (reasons.length) return { valid: false, reason: reasons };
 
   return {
     valid: true,
@@ -142,7 +142,7 @@ function validateUserLastName(val: any) {
   return validateString('Invalid last name')(val);
 }
 
-const enums = UserRolesList.filter((r) => r != UserRoles.SUPER_ADMIN);
+const allow = UserRolesList.filter((r) => r != UserRoles.SUPER_ADMIN);
 function validateUserRole(status: any) {
-  return validateString('Invalid role', { enums })(status);
+  return validateString('Invalid role', { allow })(status);
 }

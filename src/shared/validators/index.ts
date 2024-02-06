@@ -1,4 +1,4 @@
-import { StringOptions, isEmailOk, isStringOk } from 'clean-schema';
+import { StringOptions, isEmailOk, isStringOk } from 'ivo';
 import isURL from 'validator/lib/isURL';
 
 export { validateEmail, validateString, validateUrl };
@@ -6,7 +6,7 @@ export { validateEmail, validateString, validateUrl };
 function validateEmail(val: any) {
   const validation = isEmailOk(val);
 
-  if (!validation.valid) validation.reasons = ['Invalid email'];
+  if (!validation.valid) validation.reason = ['Invalid email'];
 
   return validation;
 }
@@ -21,7 +21,7 @@ function validateString<T extends string = string>(
       ...options,
     } as any);
 
-    if (!isValid.valid && msg) isValid.reasons.unshift(msg);
+    if (!isValid.valid && msg) isValid.reason.unshift(msg);
 
     return isValid;
   };

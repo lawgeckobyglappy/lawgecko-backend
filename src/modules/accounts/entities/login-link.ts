@@ -1,5 +1,5 @@
 import { add } from 'date-fns';
-import Schema from 'clean-schema';
+import Schema from 'ivo';
 
 import { config } from '@config';
 import { generateId } from '@utils';
