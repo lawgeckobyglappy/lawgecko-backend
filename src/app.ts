@@ -37,9 +37,12 @@ connectdb(String(db.dbURI));
 
 function makeServer() {
   return app.listen(port, async () => {
-    if (currentDeployment.isTest) return;
+    if (currentDeployment.isTest) {
+      return;
+    }
 
     await scheduler.start();
+
     logger.info(`Listening to port ${port}`);
   });
 }
